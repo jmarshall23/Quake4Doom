@@ -125,7 +125,7 @@ public:
 protected:
 	virtual bool				SetDefaultText( void );
 	virtual const char *		DefaultDefinition( void ) const;
-	virtual bool				Parse( const char *text, const int textLength );
+	virtual bool				Parse( const char *text, const int textLength, bool cache );
 	virtual void				FreeData( void );
 	virtual void				List( void ) const;
 	virtual void				Print( void ) const;
@@ -204,8 +204,8 @@ public:
 // jscott: precache any guide (template) files
 	virtual void				ParseGuides(void);
 	virtual	void				ShutdownGuides(void) { }
-	virtual bool				EvaluateGuide(idStr& name, idLexer* src, idStr& definition) { }
-	virtual bool				EvaluateInlineGuide(idStr& name, idStr& definition) { }
+	virtual bool				EvaluateGuide(idStr& name, idLexer* src, idStr& definition) { return false; }
+	virtual bool				EvaluateInlineGuide(idStr& name, idStr& definition) { return false; }
 // RAVEN END
 
 	virtual void				BeginLevelLoad();
@@ -217,7 +217,7 @@ public:
 	virtual int					GetNumDecls( declType_t type );
 	virtual const char *		GetDeclNameFromType( declType_t type ) const;
 	virtual declType_t			GetDeclTypeFromName( const char *typeName ) const;
-	virtual const idDecl *		FindType( declType_t type, const char *name, bool makeDefault = true );
+	virtual const idDecl *		FindType( declType_t type, const char *name, bool makeDefault = true, bool noCaching = false);
 	virtual const idDecl *		DeclByIndex( declType_t type, int index, bool forceParse = true );
 
 	virtual const idDecl*		FindDeclWithoutParsing( declType_t type, const char *name, bool makeDefault = true );
@@ -234,13 +234,29 @@ public:
 	virtual void				MediaPrint( const char *fmt, ... ) id_attribute((format(printf,2,3)));
 	virtual void				WritePrecacheCommands( idFile *f );
 
-	virtual const idMaterial *		FindMaterial( const char *name, bool makeDefault = true );
+									// Convenience functions for specific types.
+	virtual	const idMaterial *		FindMaterial( const char *name, bool makeDefault = true );
+	virtual const idDeclTable *		FindTable( const char *name, bool makeDefault = true );
 	virtual const idDeclSkin *		FindSkin( const char *name, bool makeDefault = true );
 	virtual const idSoundShader *	FindSound( const char *name, bool makeDefault = true );
+// RAVEN BEGIN
+// jscott: for new Raven decls
+	virtual const rvDeclMatType *	FindMaterialType( const char *name, bool makeDefault = true );
+	virtual	const rvDeclLipSync *	FindLipSync( const char *name, bool makeDefault = true );
+	virtual	const rvDeclPlayback *	FindPlayback( const char *name, bool makeDefault = true );
+	virtual	const rvDeclEffect *	FindEffect( const char *name, bool makeDefault = true );
+// RAVEN END
 
 	virtual const idMaterial *		MaterialByIndex( int index, bool forceParse = true );
+	virtual const idDeclTable *		TableByIndex( int index, bool forceParse = true );
 	virtual const idDeclSkin *		SkinByIndex( int index, bool forceParse = true );
 	virtual const idSoundShader *	SoundByIndex( int index, bool forceParse = true );
+// RAVEN BEGIN
+// jscott: for new Raven decls
+	virtual const rvDeclMatType *	MaterialTypeByIndex( int index, bool forceParse = true );
+	virtual const rvDeclLipSync *	LipSyncByIndex( int index, bool forceParse = true );
+	virtual	const rvDeclPlayback *	PlaybackByIndex( int index, bool forceParse = true );
+	virtual const rvDeclEffect *	EffectByIndex( int index, bool forceParse = true );
 
 public:
 	static void					MakeNameCanonical( const char *name, char *result, int maxLength );
@@ -972,14 +988,14 @@ void idDeclManagerLocal::Init( void ) {
 	cmdSystem->AddCommand( "listSoundShaders", idListDecls_f<DECL_SOUND>, CMD_FL_SYSTEM, "lists sound shaders", idCmdSystem::ArgCompletion_String<listDeclStrings> );
 
 	cmdSystem->AddCommand( "listEntityDefs", idListDecls_f<DECL_ENTITYDEF>, CMD_FL_SYSTEM, "lists entity defs", idCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listFX", idListDecls_f<DECL_FX>, CMD_FL_SYSTEM, "lists FX systems", idCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listParticles", idListDecls_f<DECL_PARTICLE>, CMD_FL_SYSTEM, "lists particle systems", idCmdSystem::ArgCompletion_String<listDeclStrings> );
+	//cmdSystem->AddCommand( "listFX", idListDecls_f<DECL_FX>, CMD_FL_SYSTEM, "lists FX systems", idCmdSystem::ArgCompletion_String<listDeclStrings> );
+	//cmdSystem->AddCommand( "listParticles", idListDecls_f<DECL_PARTICLE>, CMD_FL_SYSTEM, "lists particle systems", idCmdSystem::ArgCompletion_String<listDeclStrings> //);
 	cmdSystem->AddCommand( "listAF", idListDecls_f<DECL_AF>, CMD_FL_SYSTEM, "lists articulated figures", idCmdSystem::ArgCompletion_String<listDeclStrings>);
 
-	cmdSystem->AddCommand( "listPDAs", idListDecls_f<DECL_PDA>, CMD_FL_SYSTEM, "lists PDAs", idCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listEmails", idListDecls_f<DECL_EMAIL>, CMD_FL_SYSTEM, "lists Emails", idCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listVideos", idListDecls_f<DECL_VIDEO>, CMD_FL_SYSTEM, "lists Videos", idCmdSystem::ArgCompletion_String<listDeclStrings> );
-	cmdSystem->AddCommand( "listAudios", idListDecls_f<DECL_AUDIO>, CMD_FL_SYSTEM, "lists Audios", idCmdSystem::ArgCompletion_String<listDeclStrings> );
+	//cmdSystem->AddCommand( "listPDAs", idListDecls_f<DECL_PDA>, CMD_FL_SYSTEM, "lists PDAs", idCmdSystem::ArgCompletion_String<listDeclStrings> );
+	//cmdSystem->AddCommand( "listEmails", idListDecls_f<DECL_EMAIL>, CMD_FL_SYSTEM, "lists Emails", idCmdSystem::ArgCompletion_String<listDeclStrings> );
+	//cmdSystem->AddCommand( "listVideos", idListDecls_f<DECL_VIDEO>, CMD_FL_SYSTEM, "lists Videos", idCmdSystem::ArgCompletion_String<listDeclStrings> );
+	//cmdSystem->AddCommand( "listAudios", idListDecls_f<DECL_AUDIO>, CMD_FL_SYSTEM, "lists Audios", idCmdSystem::ArgCompletion_String<listDeclStrings> );
 
 	cmdSystem->AddCommand( "printTable", idPrintDecls_f<DECL_TABLE>, CMD_FL_SYSTEM, "prints a table", idCmdSystem::ArgCompletion_Decl<DECL_TABLE> );
 	cmdSystem->AddCommand( "printMaterial", idPrintDecls_f<DECL_MATERIAL>, CMD_FL_SYSTEM, "prints a material", idCmdSystem::ArgCompletion_Decl<DECL_MATERIAL> );
@@ -987,8 +1003,8 @@ void idDeclManagerLocal::Init( void ) {
 	cmdSystem->AddCommand( "printSoundShader", idPrintDecls_f<DECL_SOUND>, CMD_FL_SYSTEM, "prints a sound shader", idCmdSystem::ArgCompletion_Decl<DECL_SOUND> );
 
 	cmdSystem->AddCommand( "printEntityDef", idPrintDecls_f<DECL_ENTITYDEF>, CMD_FL_SYSTEM, "prints an entity def", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF> );
-	cmdSystem->AddCommand( "printFX", idPrintDecls_f<DECL_FX>, CMD_FL_SYSTEM, "prints an FX system", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
-	cmdSystem->AddCommand( "printParticle", idPrintDecls_f<DECL_PARTICLE>, CMD_FL_SYSTEM, "prints a particle system", idCmdSystem::ArgCompletion_Decl<DECL_PARTICLE> );
+	//cmdSystem->AddCommand( "printFX", idPrintDecls_f<DECL_FX>, CMD_FL_SYSTEM, "prints an FX system", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
+//	cmdSystem->AddCommand( "printParticle", idPrintDecls_f<DECL_PARTICLE>, CMD_FL_SYSTEM, "prints a particle system", idCmdSystem::ArgCompletion_Decl<DECL_PARTICLE> );
 	cmdSystem->AddCommand( "printAF", idPrintDecls_f<DECL_AF>, CMD_FL_SYSTEM, "prints an articulated figure", idCmdSystem::ArgCompletion_Decl<DECL_AF> );
 
 	cmdSystem->AddCommand( "printPDA", idPrintDecls_f<DECL_PDA>, CMD_FL_SYSTEM, "prints an PDA", idCmdSystem::ArgCompletion_Decl<DECL_PDA> );
@@ -1321,7 +1337,7 @@ idDeclManagerLocal::FindType
 External users will always cause the decl to be parsed before returning
 =================
 */
-const idDecl *idDeclManagerLocal::FindType( declType_t type, const char *name, bool makeDefault ) {
+const idDecl *idDeclManagerLocal::FindType( declType_t type, const char *name, bool makeDefault, bool noCaching) {
 	idDeclLocal *decl;
 
 	if ( !name || !name[0] ) {
@@ -1758,6 +1774,40 @@ const idSoundShader *idDeclManagerLocal::FindSound( const char *name, bool makeD
 const idSoundShader *idDeclManagerLocal::SoundByIndex( int index, bool forceParse ) {
 	return static_cast<const idSoundShader *>( DeclByIndex( DECL_SOUND, index, forceParse ) );
 }
+
+// RAVEN BEGIN
+// jscott: for new Raven decls
+const rvDeclMatType* idDeclManagerLocal::FindMaterialType(const char* name, bool makeDefault) {
+	return static_cast<const rvDeclMatType*>(FindType(DECL_MATERIALTYPE, name, makeDefault));
+}
+
+const rvDeclLipSync* idDeclManagerLocal::FindLipSync(const char* name, bool makeDefault) {
+	return static_cast<const rvDeclLipSync*>(FindType(DECL_LIPSYNC, name, makeDefault));
+}
+
+const rvDeclPlayback* idDeclManagerLocal::FindPlayback(const char* name, bool makeDefault) {
+	return static_cast<const rvDeclPlayback*>(FindType(DECL_PLAYBACK, name, makeDefault));
+}
+const rvDeclEffect* idDeclManagerLocal::FindEffect(const char* name, bool makeDefault) {
+	return static_cast<const rvDeclEffect*>(FindType(DECL_EFFECT, name, makeDefault));
+}
+
+const rvDeclMatType* idDeclManagerLocal::MaterialTypeByIndex(int index, bool forceParse) {
+	return static_cast<const rvDeclMatType*>(DeclByIndex(DECL_MATERIALTYPE, index, forceParse));
+}
+
+const rvDeclLipSync* idDeclManagerLocal::LipSyncByIndex(int index, bool forceParse) {
+	return static_cast<const rvDeclLipSync*>(DeclByIndex(DECL_LIPSYNC, index, forceParse));
+}
+
+const rvDeclPlayback* idDeclManagerLocal::PlaybackByIndex(int index, bool forceParse) {
+	return static_cast<const rvDeclPlayback*>(DeclByIndex(DECL_PLAYBACK, index, forceParse));
+}
+
+const rvDeclEffect* idDeclManagerLocal::EffectByIndex(int index, bool forceParse) {
+	return static_cast<const rvDeclEffect*>(DeclByIndex(DECL_EFFECT, index, forceParse));
+}
+// RAVEN END
 
 /*
 ===================
@@ -2308,7 +2358,7 @@ const char *idDeclLocal::DefaultDefinition() const {
 idDeclLocal::Parse
 =================
 */
-bool idDeclLocal::Parse( const char *text, const int textLength ) {
+bool idDeclLocal::Parse( const char *text, const int textLength, bool cache ) {
 	idLexer src;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );

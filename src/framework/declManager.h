@@ -101,7 +101,7 @@ public:
 	virtual void			GetText( char *text ) const = 0;
 	virtual int				GetTextLength( void ) const = 0;
 // RAVEN BEGIN
-	virtual int				GetCompressedLength( void ) const = 0;
+	//virtual int				GetCompressedLength( void ) const = 0;
 // RAVEN END
 	virtual void			SetText( const char *text ) = 0;
 	virtual bool			ReplaceSourceFileText( void ) = 0;
@@ -109,7 +109,7 @@ public:
 	virtual void			MakeDefault( void ) = 0;
 	virtual bool			EverReferenced( void ) const = 0;
 // RAVEN BEGIN
-	virtual void			SetReferencedThisLevel( void ) = 0;
+	//virtual void			SetReferencedThisLevel( void ) = 0;
 // RAVEN END
 	virtual bool			SetDefaultText( void ) = 0;
 	virtual const char *	DefaultDefinition( void ) const = 0;
@@ -122,7 +122,7 @@ public:
 // jscott: to prevent a recursive crash
 	virtual	bool			RebuildTextSource( void ) { return( false ); }
 // scork: Validation call for detailed error-reporting
-	virtual bool			Validate( const char *psText, int iLength, idStr &strReportTo ) const = 0;
+	//virtual bool			Validate( const char *psText, int iLength, idStr &strReportTo ) const = 0;
 // RAVEN END
 };
 
@@ -407,18 +407,20 @@ public:
 	virtual	const rvDeclPlayback *	PlaybackByIndex( int index, bool forceParse = true ) = 0;
 	virtual const rvDeclEffect *	EffectByIndex( int index, bool forceParse = true ) = 0;
 
-	virtual void					StartPlaybackRecord( rvDeclPlayback *playback ) = 0;
-	virtual bool					SetPlaybackData( rvDeclPlayback *playback, int now, int control, class rvDeclPlaybackData *pbd ) = 0;
-	virtual bool					GetPlaybackData( const rvDeclPlayback *playback, int control, int now, int last, class rvDeclPlaybackData *pbd ) = 0;
-	virtual bool					FinishPlayback( rvDeclPlayback *playback ) = 0;
+	virtual void					StartPlaybackRecord(rvDeclPlayback* playback) { }
+	virtual bool					SetPlaybackData(rvDeclPlayback* playback, int now, int control, class rvDeclPlaybackData* pbd) { return false; }
+	virtual bool					GetPlaybackData( const rvDeclPlayback *playback, int control, int now, int last, class rvDeclPlaybackData *pbd ) { return false; }
+	virtual bool					FinishPlayback( rvDeclPlayback *playback ) { return false; }
+// jmarshall - used by the quake 4 tools.
+	//virtual	idStr					GetNewName( declType_t type, const char *base ) = 0;
+	//virtual	const char *			GetDeclTypeName( declType_t type ) = 0;
+	//virtual size_t					ListDeclSummary( const idCmdArgs &args ) = 0; 
+	//virtual void					RemoveDeclFile( const char *file ) = 0;
+// jmarshall end
 
-	virtual	idStr					GetNewName( declType_t type, const char *base ) = 0;
-	virtual	const char *			GetDeclTypeName( declType_t type ) = 0;
-	virtual size_t					ListDeclSummary( const idCmdArgs &args ) = 0; 
-	virtual void					RemoveDeclFile( const char *file ) = 0;
 // scork: Validation call for detailed error-reporting
-	virtual bool					Validate( declType_t type, int iIndex, idStr &strReportTo ) = 0;
-	virtual idDecl *				AllocateDecl( declType_t type ) = 0;
+	//virtual bool					Validate( declType_t type, int iIndex, idStr &strReportTo ) = 0;
+	//virtual idDecl *				AllocateDecl( declType_t type ) = 0;
 
 #if defined(_XENON)
 // mwhitlock: Xenon texture streaming
