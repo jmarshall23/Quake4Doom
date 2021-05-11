@@ -2082,17 +2082,17 @@ int idRestoreGame::GetBuildNumber( void ) {
 
 void Cmd_CheckSave_f( const idCmdArgs &args )
 {
-	idPlayer	*lp = gameLocal.GetLocalPlayer();
-	idFile		*mp = fileSystem->GetNewFileMemory();
-	idSaveGame	sg( mp );
-
-	sg.CallSave_r( lp->GetType(), lp );
-
-
-	mp->Rewind();
-	idPlayer		test;
-	idRestoreGame	rg( mp );
-
-	rg.CallRestore_r( test.GetType(), &test );
+	//idPlayer	*lp = gameLocal.GetLocalPlayer();
+	//idFile		*mp = fileSystem->GetNewFileMemory();
+	//idSaveGame	sg( mp );
+	//
+	//sg.CallSave_r( lp->GetType(), lp );
+	//
+	//
+	//mp->Rewind();
+	//idPlayer		test;
+	//idRestoreGame	rg( mp );
+	//
+	//rg.CallRestore_r( test.GetType(), &test );
 }
 

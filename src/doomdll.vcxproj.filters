@@ -627,6 +627,9 @@
     <ClInclude Include="bse\BSEInterface.h">
       <Filter>BSE</Filter>
     </ClInclude>
+    <ClInclude Include="bse\BSE.h">
+      <Filter>BSE</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cm\CollisionModel_contacts.cpp">
@@ -1828,6 +1831,12 @@
     </ClCompile>
     <ClCompile Include="ui\Winvar.cpp">
       <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Manager.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="idlib\precompiled.cpp">
+      <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

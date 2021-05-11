@@ -1,33 +1,38 @@
+/*
+===========================================================================
+
+Doom 3 GPL Source Code
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company.
+
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).
+
+Doom 3 Source Code is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Doom 3 Source Code is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
+
+In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
+
+If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+
+===========================================================================
+*/
 
 #ifndef __PRECOMPILED_H__
 #define __PRECOMPILED_H__
 
 #ifdef __cplusplus
 
-// RAVEN BEGIN
-// nrausch: conditional cvar archive flag so that the pc build will archive certain cvars
-#ifdef _XENON
-
-#undef _WINDOWS
-#define PC_CVAR_ARCHIVE CVAR_NOCHEAT //so it doesn't clobber
-#else
-#define PC_CVAR_ARCHIVE CVAR_ARCHIVE
-#endif
-// RAVEN END
 class ThreadedAlloc;		// class that is only used to expand the AutoCrit template to tag allocs/frees called from inside the R_AddModelSurfaces call graph
-
-
-//-----------------------------------------------------
-// RAVEN BEGIN
-// jscott: set up conditional compiles
-#ifdef _DEBUG_MEMORY
-#define ID_REDIRECT_NEWDELETE				// Doesn't work with Radiant
-#define ID_DEBUG_MEMORY
-#endif
-
-#if defined( _FINAL ) && !defined( _MPBETA )
-	#define ID_CONSOLE_LOCK
-#endif
+#define PC_CVAR_ARCHIVE CVAR_ARCHIVE
 
 #ifdef _WINDOWS
 
@@ -102,148 +107,66 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 
 #endif // _WINDOWS
 
-#ifdef __linux__
+//-----------------------------------------------------
 
-// for offsetof
-#include <stddef.h>
-// FLT_MAX and such
-#include <limits.h>
-#include <float.h>
+#define ID_TIME_T time_t
 
-	#define __WITH_PB__
-	#undef WIN32
-	#undef _XBOX
-	#undef _CONSOLE
-	#define _OPENGL
-	#define _LITTLE_ENDIAN
-	#define _CASE_SENSITIVE_FILESYSTEM
+#ifdef _WIN32
 
-	#define NEWLINE				"\n"
-
-	#define _GLVAS_SUPPPORT
-
-	class AlignmentChecker
-	{
-	public:
-		static void UpdateCount(void const * const ptr) {}
-		static void ClearCount() {}
-		static void Print() {}
-	};
-
-	#define RESTRICT
-	#define TIME_THIS_SCOPE(x)
-
-	// we release both a non-SMP and an SMP binary for Linux
-	#ifdef ENABLE_INTEL_SMP
-	// Enables the batching of vertex cache request in SMP mode.
-	// Note (TTimo): is tied to ENABLE_INTEL_SMP
-	#define ENABLE_INTEL_VERTEXCACHE_OPT
-	#endif
-
-#endif
-
-#ifdef MACOS_X
-
-// for offsetof
-#include <stddef.h>
-
-#include <ppc_intrinsics.h>		// for square root estimate instruction
-#include <limits.h>
-#include <float.h>				// for FLT_MIN
-
-	// SMP support for running the backend on a 2nd thread
-#ifndef ENABLE_INTEL_SMP
-	#define ENABLE_INTEL_SMP
-#endif
-	// Enables the batching of vertex cache request in SMP mode.
-	// Note (TTimo): is tied to ENABLE_INTEL_SMP
-	#define ENABLE_INTEL_VERTEXCACHE_OPT
-
-	#define __WITH_PB__
-	#undef WIN32
-	#undef _XBOX
-	#undef _CONSOLE
-	#define _OPENGL
-#ifdef __ppc__
-	#undef _LITTLE_ENDIAN
-#else
-	#define _LITTLE_ENDIAN
-#endif
-	#define _CASE_SENSITIVE_FILESYSTEM
-	#define _USE_OPENAL
-	#define ID_INLINE inline
-	#define NEWLINE				"\n"
-
-	#define _GLVAS_SUPPPORT
-
-	class AlignmentChecker
-	{
-	public:
-		static void UpdateCount(void const * const ptr) {}
-		static void ClearCount() {}
-		static void Print() {}
-	};
-
-	#define RESTRICT
-	#define TIME_THIS_SCOPE(x)
-#endif
-
-#ifdef _WINDOWS
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// prevent auto literal to string conversion
 
 #ifndef Q4SDK
+#ifndef GAME_DLL
 
-#if !defined( GAME_DLL ) && !defined( GAME_MONO )
-
-#define _WIN32_WINNT		0x501
 #define WINVER				0x501
+
+#if 0
+// Dedicated server hits unresolved when trying to link this way now. Likely because of the 2010/Win7 transition? - TTimo
 
 #ifdef	ID_DEDICATED
 // dedicated sets windows version here
+#define	_WIN32_WINNT WINVER
 #define	WIN32_LEAN_AND_MEAN
 #else
-#ifdef TOOL_DLL
-// non-dedicated includes MFC and sets windows verion here
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// prevent auto literal to string conversion
+// non-dedicated includes MFC and sets windows version here
+#include "../tools/comafx/StdAfx.h"			// this will go away when MFC goes away
+#endif
+
+#else
+
 #include "../tools/comafx/StdAfx.h"
-#endif // TOOL_DLL
-#endif // ID_DEDICATED
+
+#endif
 
 #include <winsock2.h>
 #include <mmsystem.h>
 #include <mmreg.h>
 
-#define DIRECTINPUT_VERSION  0x0700
+#define DIRECTINPUT_VERSION  0x0800			// was 0x0700 with the old mssdk
 #define DIRECTSOUND_VERSION  0x0800
 
-#include "../mssdk/include/dsound.h"
-#include "../mssdk/include/dinput.h"
-#include "../mssdk/include/dxerr8.h"
+#include <dsound.h>
+#include <dinput.h>
 
-#endif // GAME_DLL
-#endif // !Q4SDK
+#endif /* !GAME_DLL */
+#endif /* !Q4SDK */
+
+#pragma warning(disable : 4100)				// unreferenced formal parameter
+#pragma warning(disable : 4244)				// conversion to smaller type, possible loss of data
+#pragma warning(disable : 4714)				// function marked as __forceinline not inlined
+#pragma warning(disable : 4996)				// unsafe string operations
 
 #include <malloc.h>							// no malloc.h on mac or unix
 #include <windows.h>						// for qgl.h
-
-// RAVEN BEGIN
-// bdube: for dual monitor support in tools
-#ifndef GET_X_LPARAM
-#define GET_X_LPARAM(lParam)	((int)(short)LOWORD(lParam))
-#endif
-#ifndef GET_Y_LPARAM
-#define GET_Y_LPARAM(lParam)	((int)(short)HIWORD(lParam))
-#endif
-// RAVEN END
-
 #undef FindText								// stupid namespace poluting Microsoft monkeys
 
-#endif // _WINDOWS
+#endif /* _WIN32 */
 
 //-----------------------------------------------------
 
 #if !defined( _DEBUG ) && !defined( NDEBUG )
 	// don't generate asserts
-	#define NDEBUG
+#define NDEBUG
 #endif
 
 #include <stdio.h>
@@ -265,22 +188,10 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 // id lib
 #include "../idlib/Lib.h"
 
-#if !defined( Q4SDK ) && defined( __WITH_PB__ )
-	#include "../punkbuster/pbcommon.h"
-#endif
-
-// RAVEN BEGIN
-// jsinger: added to allow support for serialization/deserialization of binary decls
-#ifdef RV_BINARYDECLS
-// jsinger: Serializable class support
-#include "../serialization/Serializable.h"
-#endif
-// RAVEN END
-
 // framework
 #include "../framework/BuildVersion.h"
 #include "../framework/BuildDefines.h"
-#include "../framework/licensee.h"
+#include "../framework/Licensee.h"
 #include "../framework/CmdSystem.h"
 #include "../framework/CVarSystem.h"
 #include "../framework/Common.h"
@@ -289,20 +200,17 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 #include "../framework/UsercmdGen.h"
 
 // decls
-#include "../framework/declManager.h"
-#include "../framework/declTable.h"
-#include "../framework/declSkin.h"
-#include "../framework/declEntityDef.h"
-// RAVEN BEGIN
-// jscott: not using
-//#include "../framework/DeclFX.h"
-//#include "../framework/DeclParticle.h"
-// RAVEN END
-#include "../framework/declAF.h"
+#include "../framework/DeclManager.h"
+#include "../framework/DeclTable.h"
+#include "../framework/DeclSkin.h"
+#include "../framework/DeclEntityDef.h"
+#include "../framework/DeclFX.h"
+#include "../framework/DeclParticle.h"
+#include "../framework/DeclAF.h"
 #include "../framework/DeclPDA.h"
-#include "../framework/DeclPlayerModel.h"
 // RAVEN BEGIN
 // jscott: new decl types
+#include "../framework/DeclPlayerModel.h"
 #include "../framework/declMatType.h"
 #include "../framework/declLipSync.h"
 #include "../framework/declPlayback.h"
@@ -352,15 +260,11 @@ const float MAX_BOUND_SIZE = 65536.0f;
 
 //-----------------------------------------------------
 
-#if defined( Q4SDK ) || defined( GAME_DLL ) || defined( GAME_MONO )
-
-#ifdef GAME_MPAPI
-#include "../mpgame/Game_local.h"
-#else
+#ifdef GAME_DLL
 #include "../game/Game_local.h"
 #endif
 
-#else
+#ifndef Q4SDK
 
 #include "../framework/DemoChecksum.h"
 
@@ -376,11 +280,16 @@ const float MAX_BOUND_SIZE = 65536.0f;
 // asynchronous networking
 #include "../framework/async/AsyncNetwork.h"
 
-// RAVEN BEGIN
-#include "../tools/Tools.h"
-// RAVEN END
+// The editor entry points are always declared, but may just be
+// stubbed out on non-windows platforms.
+#include "../tools/edit_public.h"
 
-#endif /* !GAME_DLL */
+// Compilers for map, model, video etc. processing.
+#include "../tools/compilers/compiler_public.h"
+
+#endif /* !Q4SDK */
+
+//-----------------------------------------------------
 
 // RAVEN BEGIN
 // jsinger: add AutoPtr and text-to-binary compiler support
@@ -392,8 +301,6 @@ const float MAX_BOUND_SIZE = 65536.0f;
 //          Both compile out completely if the #define's above are not present
 #include "threads/AutoCrit.h"
 // RAVEN END
-
-//-----------------------------------------------------
 
 #endif	/* __cplusplus */
 

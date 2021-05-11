@@ -1,5 +1,30 @@
-// Copyright (C) 2004 Id Software, Inc.
-//
+/*
+===========================================================================
+
+Doom 3 GPL Source Code
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+
+Doom 3 Source Code is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Doom 3 Source Code is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
+
+In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
+
+If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+
+===========================================================================
+*/
 
 #ifndef __FILESYSTEM_H__
 #define __FILESYSTEM_H__
@@ -27,10 +52,8 @@
 ===============================================================================
 */
 
-static const unsigned	FILE_NOT_FOUND_TIMESTAMP	= 0xFFFFFFFF;
+static const ID_TIME_T		FILE_NOT_FOUND_TIMESTAMP	= 0xFFFFFFFF;
 static const int		MAX_PURE_PAKS				= 128;
-// master server can keep server updated with a list of allowed paks per OS
-static const int		MAX_GAMEPAK_PER_OS			= 10;
 static const int		MAX_OSPATH					= 256;
 
 // modes for OpenFileByMode. used as bit mask internally
@@ -44,8 +67,7 @@ typedef enum {
 	PURE_OK,		// we are good to connect as-is
 	PURE_RESTART,	// restart required
 	PURE_MISSING,	// pak files missing on the client
-	PURE_NODLL,		// no DLL could be extracted
-	//	PURE_DIFFERENT, // differing checksums
+	PURE_NODLL		// no DLL could be extracted
 } fsPureReply_t;
 
 typedef enum {
@@ -74,8 +96,6 @@ typedef enum {
 
 typedef struct urlDownload_s {
 	idStr				url;
-	idStr				urlAuth;
-	idStr				referer;
 	char				dlerror[ MAX_STRING_CHARS ];
 	int					dltotal;
 	int					dlnow;
@@ -89,97 +109,14 @@ typedef struct fileDownload_s {
 	void *				buffer;
 } fileDownload_t;
 
-typedef struct proxyDownload_s {
-	idStr				proxyUrl;
-	idStr				proxyAuth;
-} proxyDownload_t;
-
-// RAVEN BEGIN
-// mwhitlock: changes for Xenon to enable us to use texture resources from .xpr
-// bundles.
-#if defined(_XENON)	
-#include "Xtl.h"
-#endif
-// RAVEN END
-
-// RAVEN BEGIN
-// mwhitlock: changes for Xenon to enable us to use texture resources from .xpr
-// bundles.
-#if defined(_XENON)
-
-// Define this to enable background streaming via Xenon's native file I/O
-// routines (unbuffered reads).
-#define _XENON_USE_NATIVE_FILEIO
-
-typedef struct backgroundDownload_s
-{
-	static const int MAX_SEGMENTS = 2;
-
-	struct backgroundDownload_s	*next;					// Set by the fileSystem.
-	dlType_t					opcode;
-	idFile *					f;
-	int							numSegments;
-	fileDownload_t				file[MAX_SEGMENTS];
-	urlDownload_t				url;
-	volatile bool				completed;
-	double						ticksToLoad;			// Used for performance profiling.
-
-public:
-	void Clear(void)
-	{
-		numSegments=0;
-		completed=false;
-		f=0;
-	}
-
-	void AddSegment(int	position, int length, void* buffer)
-	{
-		assert(position>0);
-		assert(length>0);
-		assert(buffer!=0);
-		assert(numSegments<MAX_SEGMENTS);
-		if(numSegments<MAX_SEGMENTS)
-		{
-			file[numSegments].position=position;
-			file[numSegments].length=length;
-			file[numSegments].buffer=buffer;
-			numSegments++;
-		}
-#if defined(_DEBUG)
-		// Sanity: segements should not overlap.
-		for(int s=0;s<numSegments-1;s++)
-		{
-			assert(file[s].position+file[s].length-1 < file[s+1].position);
-		}
-#endif
-	}
-
-	int DownloadSize(void) const
-	{
-		int size=0;
-		for(int s=0;s<numSegments;s++)
-		{
-			size+=file[s].length;
-		}
-		return size;
-	}
-} backgroundDownload_t;
-
-#else
-
 typedef struct backgroundDownload_s {
 	struct backgroundDownload_s	*next;	// set by the fileSystem
-	dlType_t				opcode;
-	idFile *				f;
-	fileDownload_t			file;
-	int						numSegments;
-	urlDownload_t			url;
-	proxyDownload_t			proxy;
-	volatile bool			completed;
+	dlType_t			opcode;
+	idFile *			f;
+	fileDownload_t		file;
+	urlDownload_t		url;
+	volatile bool		completed;
 } backgroundDownload_t;
-
-#endif
-// RAVEN END
 
 // file list for directory listings
 class idFileList {
@@ -261,19 +198,18 @@ public:
 							// with the sole exception of .cfg files.
 							// the function tries to configure pure mode from the paks already referenced and this new list
 							// it returns wether the switch was successfull, and sets the missing checksums
-							// use fs_debug 1 to verbose
-	virtual fsPureReply_t	SetPureServerChecksums( const int pureChecksums[ MAX_PURE_PAKS ], int gamePakChecksum[ MAX_GAMEPAK_PER_OS ], int missingChecksums[ MAX_PURE_PAKS ], int *missingGamePakChecksum, int *restartGamePakChecksu ) = 0;
+							// the process is verbosive when fs_debug 1
+	virtual fsPureReply_t	SetPureServerChecksums( const int pureChecksums[ MAX_PURE_PAKS ], int gamePakChecksum, int missingChecksums[ MAX_PURE_PAKS ], int *missingGamePakChecksum ) = 0;
 							// fills a 0-terminated list of pak checksums for a client
 							// if OS is -1, give the current game pak checksum. if >= 0, lookup the game pak table (server only)
-							// indexes > 0 may be provided on servers when the master is giving additional game paks to let in
-	virtual void			GetPureServerChecksums( int checksums[ MAX_PURE_PAKS ], int OS, int gamePakChecksum[ MAX_GAMEPAK_PER_OS ] ) = 0;
+	virtual void			GetPureServerChecksums( int checksums[ MAX_PURE_PAKS ], int OS, int *gamePakChecksum ) = 0;
 							// before doing a restart, force the pure list and the search order
 							// if the given checksum list can't be completely processed and set, will error out
 	virtual void			SetRestartChecksums( const int pureChecksums[ MAX_PURE_PAKS ], int gamePakChecksum ) = 0;
 							// equivalent to calling SetPureServerChecksums with an empty list
 	virtual	void			ClearPureChecksums( void ) = 0;
 							// get a mask of supported OSes. if not pure, returns -1
-	virtual unsigned int	GetOSMask( void ) = 0;
+	virtual int				GetOSMask( void ) = 0;
 							// Reads a complete file.
 							// Returns the length of the file, or -1 on failure.
 							// A null buffer will just return the file length without loading.
@@ -281,44 +217,23 @@ public:
 							// As a quick check for existance. -1 length == not present.
 							// A 0 byte will always be appended at the end, so string ops are safe.
 							// The buffer should be considered read-only, because it may be cached for other uses.
-	virtual int				ReadFile( const char *relativePath, void **buffer, unsigned *timestamp = NULL ) = 0;
+	virtual int				ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp = NULL ) = 0;
 							// Frees the memory allocated by ReadFile.
 	virtual void			FreeFile( void *buffer ) = 0;
 							// Writes a complete file, will create any needed subdirectories.
 							// Returns the length of the file, or -1 on failure.
 	virtual int				WriteFile( const char *relativePath, const void *buffer, int size, const char *basePath = "fs_savepath" ) = 0;
+
+	// mekberg: is file loading allowed?
+// jmarshall - doesn't need implementation
+	virtual void			SetIsFileLoadingAllowed(bool mode) { }
+// jmarshall end
 							// Removes the given file.
-// RAVEN BEGIN
-// rjohnson: can specify the path cvar
-	virtual void			RemoveFile( const char *relativePath, const char *basePath = "fs_savepath" ) = 0;
-// bdube: added method
-							// Removes the given file and returns the filesystem status of the removal
-	virtual int				RemoveExplicitFile ( const char *OSPath ) = 0;
-
-// mekberg: is file loading allowed?
-	virtual void			SetIsFileLoadingAllowed(bool mode) = 0;
-
-// dluetscher: returns file loading status
-	virtual bool			GetIsFileLoadingAllowed() const = 0;
-
-// amccarthy: set the current asset log name.
-	virtual void			SetAssetLogName(const char *logName) = 0;
-// amccarthy: write out a list of all files loaded.
-	virtual void			WriteAssetLog() = 0;
-// jnewquist: clear list of all files loaded.
-	virtual void			ClearAssetLog() = 0;
-// jnewquist: Accessor for asset log name (with filter)
-	virtual const char*		GetAssetLogName() = 0;
-
-// jscott: new functions for tools
-	virtual idFile *		GetNewFileMemory( void ) = 0;
-	virtual idFile *		GetNewFilePermanent( void ) = 0;
-
-// RAVEN END
+	virtual void			RemoveFile( const char *relativePath ) = 0;
 							// Opens a file for reading.
 	virtual idFile *		OpenFileRead( const char *relativePath, bool allowCopyFiles = true, const char* gamedir = NULL ) = 0;
 							// Opens a file for writing, will create any needed subdirectories.
-	virtual idFile *		OpenFileWrite( const char *relativePath, const char *basePath = "fs_savepath", bool ASCII = false ) = 0;
+	virtual idFile *		OpenFileWrite( const char *relativePath, const char *basePath = "fs_savepath" ) = 0;
 							// Opens a file for writing at the end.
 	virtual idFile *		OpenFileAppend( const char *filename, bool sync = false, const char *basePath = "fs_basepath" ) = 0;
 							// Opens a file for reading, writing, or appending depending on the value of mode.
@@ -344,73 +259,34 @@ public:
 							// in some cases you may need to use this directly
 	virtual void			ClearDirCache( void ) = 0;
 
+							// is D3XP installed? even if not running it atm
+	virtual bool			HasD3XP( void ) = 0;
+							// are we using D3XP content ( through a real d3xp run or through a double mod )
+	virtual bool			RunningD3XP( void ) = 0;
+
+							// don't use for large copies - allocates a single memory block for the copy
+	virtual void			CopyFile( const char *fromOSPath, const char *toOSPath ) = 0;
+
 							// lookup a relative path, return the size or 0 if not found
-	virtual int				RelativeDownloadPathForChecksum( int checksum, char path[ MAX_STRING_CHARS ] ) = 0;
-
-							// verify the file can be downloaded, lookup a relative path, return the size or 0 if not found
 	virtual int				ValidateDownloadPakForChecksum( int checksum, char path[ MAX_STRING_CHARS ], bool isGamePak ) = 0;
-
-							// verify the file can be downloaded, lookup an absolute (OS) path, return the size or 0 if not found
-	virtual int				ValidateDownloadPakForRelativePath( const char *relativePath, char path[ MAX_STRING_CHARS ], bool &isGamePakReturn ) = 0;
 
 	virtual idFile *		MakeTemporaryFile( void ) = 0;
 
 							// make downloaded pak files known so pure negociation works next time
 	virtual int				AddZipFile( const char *path ) = 0;
 
-// RAVEN BEGIN
-// nrausch: explicit pak add/removal
-#ifdef _XENON	
-	virtual bool			AddDownloadedPak( const char *path ) = 0;
-	virtual void			RemoveDownloadedPak( const char *path ) = 0;
-
-	virtual bool			AddExplicitPak( const char *path ) = 0;
-	virtual void			RemoveExplicitPak( const char *path ) = 0;
-	virtual bool			IsPakLoaded( const char *path ) = 0;
-#endif
-// RAVEN END
-
 							// look for a file in the loaded paks or the addon paks
 							// if the file is found in addons, FS's internal structures are ready for a reloadEngine
-	virtual findFile_t		FindFile( const char *path ) = 0;
+	virtual findFile_t		FindFile( const char *path, bool scheduleAddons = false ) = 0;
 
 							// get map/addon decls and take into account addon paks that are not on the search list
 							// the decl 'name' is in the "path" entry of the dict
 	virtual int				GetNumMaps() = 0;
-	virtual int				GetMapDeclIndex( const char *mapName ) = 0;
 	virtual const idDict *	GetMapDecl( int i ) = 0;
-	virtual const idDict *	GetMapDecl( const char *mapName ) = 0;
 	virtual void			FindMapScreenshot( const char *path, char *buf, int len ) = 0;
 
-// RAVEN BEGIN
-// rjohnson: added new functions
-							// Converts a full OS path to an import path.
-	virtual bool			OSpathToImportPath( const char *osPath, idStr &iPath, bool stripTemp = false ) = 0;
-							// Opens a file for reading from the fs_importpath directory
-	virtual idFile *		OpenImportFileRead( const char *filename ) = 0;
-							// Copy a file 
-	virtual void			CopyOSFile( const char *fromOSPath, const char *toOSPath ) = 0;
-	virtual void			CopyOSFile( idFile *src, const char *toOSPath ) = 0;
-// RAVEN END
-
-	// demo functions - only for use by the core ( and not DLL boundary / memory safe anyway )
-	// ReadDemoHeader: returns -1 if a reloadEngine is requested before trying again, 0 if we failed with no backup, and 1 if we can continue
-	// if demo_enforceFS is 0, will always ret 1
-	virtual void			WriteDemoHeader( idFile *file ) = 0;
-	virtual int				ReadDemoHeader( idFile *file ) = 0;
-
-	// new in 1.3
-	// indicates if the filesystem is currently running with pak files restrictions or addons
-	virtual bool			IsRunningWithRestrictions( void ) = 0;
-
-	// new in 1.4
-	virtual void			ReadCodePakLists( const idBitMsg &msg ) = 0;
-	virtual bool			HaveCodePakLists( void ) const = 0;
-
-	// pick best language - used by the core to pick a good default language based on present zpaks
-	virtual void			SelectDefaultLanguage( void ) = 0;
-
-	virtual void			ClearAddonList( void ) = 0;
+							// ignore case and seperator char distinctions
+	virtual bool			FilenameCompare( const char *s1, const char *s2 ) const = 0;
 };
 
 extern idFileSystem *		fileSystem;
