@@ -9,7 +9,7 @@
 // body of code (for merge simplification, etc).
 //----------------------------------------------------------------
 
-#include "../../idlib/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #include "Buying.h"

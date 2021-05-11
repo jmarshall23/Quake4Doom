@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #include "Winding2D.h"

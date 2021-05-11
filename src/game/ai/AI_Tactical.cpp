@@ -4,7 +4,7 @@
 // - relaxed posture
 // - turning in place too much, rely more on look angles?
 
-#include "../../idlib/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #include "../Game_local.h"

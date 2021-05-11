@@ -1,4 +1,4 @@
-#include "../precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #include "Simd_generic.h"

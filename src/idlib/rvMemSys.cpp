@@ -4,7 +4,7 @@
 // Created by: Dwight Luetscher
 //
 
-#include "../idlib/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #ifdef _RV_MEM_SYS_SUPPORT

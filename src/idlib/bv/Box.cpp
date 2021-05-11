@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 idBox box_zero( vec3_zero, vec3_zero, mat3_identity );

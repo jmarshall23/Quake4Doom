@@ -458,6 +458,9 @@
     <ClCompile Include="idlib\hashing\MD5.cpp">
       <Filter>idLib\Hashing</Filter>
     </ClCompile>
+    <ClCompile Include="idlib\precompiled.cpp">
+      <Filter>idLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="idlib\precompiled.h">

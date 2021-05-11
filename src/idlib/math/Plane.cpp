@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 idPlane plane_origin( 0.0f, 0.0f, 0.0f, 0.0f );

@@ -1,5 +1,5 @@
 
-#include "../precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 idBounds bounds_zero( vec3_zero, vec3_zero );

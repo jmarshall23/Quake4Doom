@@ -106,6 +106,9 @@
     <Filter Include="Ui">
       <UniqueIdentifier>{b3166d25-0562-49da-bc8d-961006fe1785}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BSE">
+      <UniqueIdentifier>{6582a8ed-b0fb-4901-a878-86b7c470ebfa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cm\CollisionModel.h">
@@ -620,6 +623,9 @@
     </ClInclude>
     <ClInclude Include="ui\Winvar.h">
       <Filter>Ui</Filter>
+    </ClInclude>
+    <ClInclude Include="bse\BSEInterface.h">
+      <Filter>BSE</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

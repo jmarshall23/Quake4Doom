@@ -6,7 +6,7 @@ AI for the Harvester on dispersal
 ================
 */
 
-#include "../../idlib/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #include "../Game_local.h"

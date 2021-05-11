@@ -49,7 +49,7 @@
 //		As a result, it approximates "advancing".
 //		
 ///////////////////////////////////////////////////////////////////////////////////
-#include "../../idlib/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 
