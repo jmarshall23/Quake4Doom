@@ -3663,7 +3663,7 @@ void idPlayer::DrawHUD( idUserInterface *_hud ) {
 
 	// Draw the cinematic hud when in a cinematic
 	if ( gameLocal.GetCamera( ) ) {
-		if ( cinematicHud && !(gameLocal.editors & EDITOR_MODVIEW) ) {
+		if ( cinematicHud ) {
 			cinematicHud->Redraw( gameLocal.time );
 		}
 		return;
@@ -9311,7 +9311,7 @@ void idPlayer::Think( void ) {
 #endif
 
  	// Dont do any thinking if we are in modview
-	if ( gameLocal.editors & EDITOR_MODVIEW || gameEdit->PlayPlayback() ) {
+	if ( gameEdit->PlayPlayback() ) {
 		// calculate the exact bobbed view position, which is used to
 		// position the view weapon, among other things
 		CalculateFirstPersonView();

@@ -3958,13 +3958,15 @@ const char* idMultiplayerGame::HandleGuiCommands( const char *_menuCommand ) {
 
 // RAVEN BEGIN
 // mekberg: set the r_mode.
-			cvarSystem->SetCVarInteger( "r_aspectRatio", 0 );
-			currentGui->SetStateInt( "r_aspectRatio", 0 );
-			currentGui->HandleNamedEvent( "forceAspect0" );
-			currentGui->SetStateInt( "com_machineSpec", cvarSystem->GetCVarInteger( "com_machineSpec" ) );
-			currentGui->StateChanged( gameLocal.realClientTime );
-			cvarSystem->SetCVarInteger( "r_mode", common->GetRModeForMachineSpec ( cvarSystem->GetCVarInteger( "com_machineSpec" ) ) );
-			common->SetDesiredMachineSpec( cvarSystem->GetCVarInteger( "com_machineSpec" ) );
+// jmarshall - removed legacy quality settings code.
+			//cvarSystem->SetCVarInteger( "r_aspectRatio", 0 );
+			//currentGui->SetStateInt( "r_aspectRatio", 0 );
+			//currentGui->HandleNamedEvent( "forceAspect0" );
+			//currentGui->SetStateInt( "com_machineSpec", cvarSystem->GetCVarInteger( "com_machineSpec" ) );
+			//currentGui->StateChanged( gameLocal.realClientTime );
+			//cvarSystem->SetCVarInteger( "r_mode", common->GetRModeForMachineSpec ( cvarSystem->GetCVarInteger( "com_machineSpec" ) ) );
+			//common->SetDesiredMachineSpec( cvarSystem->GetCVarInteger( "com_machineSpec" ) );
+// jmarshall end
 // RAVEN END
 
 			cmdSystem->BufferCommandText( CMD_EXEC_NOW,	"execMachineSpec" );

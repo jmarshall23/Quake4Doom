@@ -52,10 +52,10 @@ private:
 
 ID_INLINE const char *rvDeclLipSync::GetLipSyncData( int langIdx ) const 
 { 
-	if( common->LanguageHasVO( langIdx ) )
-	{
-		return( mLipSyncData.GetString( common->GetLanguage( langIdx ) ) ); 
-	}
+	//if( common->LanguageHasVO( langIdx ) )
+	//{
+	//	return( mLipSyncData.GetString( common->GetLanguage( langIdx ) ) ); 
+	//}
 
 	return( mLipSyncData.GetString( "english" ) ); 
 }

@@ -1983,7 +1983,7 @@ Returns 'AICHECKTACTICAL_NOMOVE' if the given tactical state should be used but 
 */
 aiCTResult_t idAI::CheckTactical ( aiTactical_t tactical ) {
 	// Handle non movement tactical states first
-	if ( BIT(tactical) & AITACTICAL_NONMOVING_BITS ) {
+	if (Q4BIT(tactical) & AITACTICAL_NONMOVING_BITS ) {
 		// If we are moving 
 		if ( move.fl.moving ) {
 			return AICTRESULT_OK;

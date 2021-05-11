@@ -1002,18 +1002,19 @@ bool idInterpreter::Execute( void ) {
 
 // RAVEN BEGIN
 // bdube: if the debugger is running then we need to check to see if any breakpoints have beeng hit
-		if ( gameLocal.editors & EDITOR_DEBUGGER ) {
-			common->DebuggerCheckBreakpoint ( this, &gameLocal.program, instructionPointer );
-		} else if ( g_debugScript.GetBool ( ) ) {
-			static int lastLineNumber = -1;
-			if ( lastLineNumber != gameLocal.program.GetStatement ( instructionPointer ).linenumber ) {				
-				gameLocal.Printf ( "%s (%d)\n", 
-					gameLocal.program.GetFilename ( gameLocal.program.GetStatement ( instructionPointer ).file ),
-					gameLocal.program.GetStatement ( instructionPointer ).linenumber
-					);
-				lastLineNumber = gameLocal.program.GetStatement ( instructionPointer ).linenumber;
-			}
-		}
+// jmarshall - reval
+		//if ( gameLocal.editors & EDITOR_DEBUGGER ) {
+		//	common->DebuggerCheckBreakpoint ( this, &gameLocal.program, instructionPointer );
+		//} else if ( g_debugScript.GetBool ( ) ) {
+		//	static int lastLineNumber = -1;
+		//	if ( lastLineNumber != gameLocal.program.GetStatement ( instructionPointer ).linenumber ) {				
+		//		gameLocal.Printf ( "%s (%d)\n", 
+		//			gameLocal.program.GetFilename ( gameLocal.program.GetStatement ( instructionPointer ).file ),
+		//			gameLocal.program.GetStatement ( instructionPointer ).linenumber
+		//			);
+		//		lastLineNumber = gameLocal.program.GetStatement ( instructionPointer ).linenumber;
+		//	}
+		//}
 // RAVEN END
 
 		switch( st->op ) {

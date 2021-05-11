@@ -107,6 +107,18 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 
 #endif // _WINDOWS
 
+#ifndef BIT
+#define BIT( num )				BITT< num >::VALUE
+#endif
+
+template< unsigned int B >
+class BITT {
+public:
+	typedef enum bitValue_e {
+		VALUE = 1 << B,
+	} bitValue_t;
+};
+
 //-----------------------------------------------------
 
 #define ID_TIME_T time_t

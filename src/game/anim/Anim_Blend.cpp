@@ -873,9 +873,9 @@ void idAnim::CallFrameCommands( idEntity *ent, int from, int to ) const {
 							 command.string?command.string->c_str():"???" );
 			}
 
-			if ( ( gameLocal.editors & EDITOR_MODVIEW ) && !frameCommandInfo[command.type].modview ) {
-				continue;
-			}
+			//if ( ( gameLocal.editors & EDITOR_MODVIEW ) && !frameCommandInfo[command.type].modview ) {
+			//	continue;
+			//}
 // RAVEN END			
 
 			switch( command.type ) {
@@ -3064,13 +3064,16 @@ idDeclModelDef::Validate
 =====================
 */
 bool idDeclModelDef::Validate( const char *psText, int iTextLength, idStr &strReportTo ) const {
-	idDeclModelDef *pSelf = (idDeclModelDef*) declManager->AllocateDecl( DECL_MODELDEF );
-	bool bOk = pSelf->Parse( psText, iTextLength, false );
-	pSelf->FreeData();
-	delete pSelf->base;
-	delete pSelf;
-
-	return bOk;
+// jmarshall
+	//idDeclModelDef *pSelf = (idDeclModelDef*) declManager->AllocateDecl( DECL_MODELDEF );
+	//bool bOk = pSelf->Parse( psText, iTextLength, false );
+	//pSelf->FreeData();
+	//delete pSelf->base;
+	//delete pSelf;
+	//
+	//return bOk;
+	return true;
+// jmarshall end
 }
 
 /*

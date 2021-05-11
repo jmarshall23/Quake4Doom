@@ -484,11 +484,11 @@ void idGameLocal::Init( void ) {
 	// register game specific decl folders
 // RAVEN BEGIN
 #ifndef RV_SINGLE_DECL_FILE
-	declManager->RegisterDeclFolderWrapper( "def",			".def",			DECL_ENTITYDEF );
+	declManager->RegisterDeclFolder( "def",			".def",			DECL_ENTITYDEF );
 // bdube: not used in quake 4
 //	declManager->RegisterDeclFolder( "fx",					".fx",			DECL_FX );
 //	declManager->RegisterDeclFolder( "particles",			".prt",			DECL_PARTICLE );
-	declManager->RegisterDeclFolderWrapper( "af",			".af",			DECL_AF );
+	declManager->RegisterDeclFolder( "af",			".af",			DECL_AF );
 //	declManager->RegisterDeclFolderWrapper( "newpdas",		".pda",			DECL_PDA );
 #else
 	if(!cvarSystem->GetCVarBool("com_SingleDeclFile"))
@@ -1110,10 +1110,10 @@ void idGameLocal::Error( const char *fmt, ... ) const {
 
 // RAVEN BEGIN
 // scork: some model errors arrive here during validation which kills the whole process, so let's just warn about them instead...
-	if ( common->DoingDeclValidation() ) {
-		this->Warning( "%s", text );
-		return;
-	}
+	//if ( common->DoingDeclValidation() ) {
+	//	this->Warning( "%s", text );
+	//	return;
+	//}
 // RAVEN END
 
 	thread = idThread::CurrentThread();
@@ -3521,10 +3521,10 @@ TIME_THIS_SCOPE("idGameLocal::RunFrame - gameDebug.BeginFrame()");
 		}
 
 		// If modview is running then let it think
-		common->ModViewThink( );	
+		//common->ModViewThink( );	
 
 		// rjohnson: added option for guis to always think
-		common->RunAlwaysThinkGUIs( time );
+		//common->RunAlwaysThinkGUIs( time );
 
 		// nmckenzie: Let AI System stuff update itself.
 		if ( !isMultiplayer ) {
@@ -6097,9 +6097,9 @@ void idGameLocal::SetCamera( idCamera *cam ) {
 // RAVEN BEGIN
 // bdube: tool support
 		inCinematic = false;
-		if( !( gameLocal.editors & ( EDITOR_MODVIEW | EDITOR_PLAYBACKS ) ) ) {
-			inCinematic = true;
-		}
+		//if( !( gameLocal.editors & ( EDITOR_MODVIEW | EDITOR_PLAYBACKS ) ) ) {
+		//	inCinematic = true;
+		//}
 // RAVEN END
 
 		if ( skipCinematic && camera->spawnArgs.GetBool( "disconnect" ) ) {

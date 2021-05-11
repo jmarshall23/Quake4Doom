@@ -330,6 +330,8 @@ public:
 	//virtual void			RegisterDeclFolderWrapper( const char *folder, const char *extension, declType_t defaultType, bool unique = false, bool norecurse = false ) = 0;
 // RAVEN END
 
+	virtual void			RegisterDeclFolder(const char* folder, const char* extension, declType_t defaultType) = 0;
+
 							// Returns a checksum for all loaded decl text.
 	virtual int				GetChecksum( void ) const = 0;
 

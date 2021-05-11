@@ -150,8 +150,8 @@ class ID_VEC4_ALIGN idVec4;
 #define NULL					((void *)0)
 #endif
 
-#ifndef BIT
-#define BIT( num )				( 1 << ( num ) )
+#ifndef Q4BIT
+#define Q4BIT( num )				( 1 << ( num ) )
 #endif
 
 #define	MAX_STRING_CHARS		1024		// max length of a string

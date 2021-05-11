@@ -170,7 +170,7 @@ void idModelExport::LoadMayaDll( void ) {
 	}
 // RAVEN BEGIN
 // jscott: maya needs the source control in the tools dll
-	common->LoadToolsDLL();
+	//common->LoadToolsDLL();
 // RAVEN END
 }
 

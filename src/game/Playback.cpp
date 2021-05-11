@@ -38,17 +38,18 @@ rvGamePlayback::rvGamePlayback( void )
 	mStartTime = gameLocal.time;
 	mOldFlags = 0;
 	mClipModel = new idClipModel( traceModel );
-
-	if( !g_currentPlayback.GetInteger() )
-	{
-		newName = declManager->GetNewName( DECL_PLAYBACK, "playbacks/untitled" );
-		mPlayback = ( rvDeclPlayback * )declManager->CreateNewDecl( DECL_PLAYBACK, newName, newName + ".playback" );
-		mPlayback->ReplaceSourceFileText();
-		mPlayback->Invalidate();
-
-		g_currentPlayback.SetInteger( mPlayback->Index() );
-	}
-	else
+// jmarshall - not used in retail workflow
+	//if( !g_currentPlayback.GetInteger() )
+	//{
+	//	newName = declManager->GetNewName( DECL_PLAYBACK, "playbacks/untitled" );
+	//	mPlayback = ( rvDeclPlayback * )declManager->CreateNewDecl( DECL_PLAYBACK, newName, newName + ".playback" );
+	//	mPlayback->ReplaceSourceFileText();
+	//	mPlayback->Invalidate();
+	//
+	//	g_currentPlayback.SetInteger( mPlayback->Index() );
+	//}
+	//else
+// jmarshall end
 	{
 		mPlayback = ( rvDeclPlayback * )declManager->PlaybackByIndex( g_currentPlayback.GetInteger() );
 	}

@@ -1499,13 +1499,14 @@ idDeclCameraDef::Validate
 =====================
 */
 bool idDeclCameraDef::Validate( const char *psText, int iTextLength, idStr &strReportTo ) const {
-	idDeclCameraDef *pSelf = (idDeclCameraDef*) declManager->AllocateDecl( DECL_MODELDEF );
-	bool bOk = pSelf->Parse( psText, iTextLength, false );
-	pSelf->FreeData();
-	delete pSelf->base;
-	delete pSelf;
-
-	return bOk;
+	//idDeclCameraDef *pSelf = (idDeclCameraDef*) declManager->AllocateDecl( DECL_MODELDEF );
+	//bool bOk = pSelf->Parse( psText, iTextLength, false );
+	//pSelf->FreeData();
+	//delete pSelf->base;
+	//delete pSelf;
+	//
+	//return bOk;
+	return true;
 }
 
 /*
