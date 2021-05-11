@@ -70,7 +70,7 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 	#endif	// !Q4SDK
 	#define _GLVAS_SUPPPORT
 	//#define RV_BINARYDECLS
-	#define RV_SINGLE_DECL_FILE
+	//#define RV_SINGLE_DECL_FILE
 	// this can't be used with _RV_MEM_SYS_SUPPORT and actually shouldn't be used at all on the Xenon at present
 	#if !defined(_RV_MEM_SYS_SUPPORT) && !defined(ID_REDIRECT_NEWDELETE)
 		#define RV_UNIFIED_ALLOCATOR
@@ -204,10 +204,7 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 #include "../framework/DeclTable.h"
 #include "../framework/DeclSkin.h"
 #include "../framework/DeclEntityDef.h"
-#include "../framework/DeclFX.h"
-#include "../framework/DeclParticle.h"
 #include "../framework/DeclAF.h"
-#include "../framework/DeclPDA.h"
 // RAVEN BEGIN
 // jscott: new decl types
 #include "../framework/DeclPlayerModel.h"

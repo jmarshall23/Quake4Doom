@@ -26,8 +26,14 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../idlib/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
+
+// jmarshall - Raven Decl Support
+#include "../bse/BSE_Envelope.h"
+#include "../bse/BSE_Particle.h"
+#include "../bse/BSE.h"
+// jmarshall end
 
 /*
 
@@ -131,7 +137,7 @@ protected:
 
 private:
 	idDecl *					self;
-
+	bool						insideLevelLoad;
 	idStr						name;					// name of the decl
 	char *						textSource;				// decl text definition
 	int							textLength;				// length of textSource
@@ -807,20 +813,39 @@ void idDeclManagerLocal::Init( void ) {
 	RegisterDeclType( "material",			DECL_MATERIAL,		idDeclAllocator<idMaterial> );
 	RegisterDeclType( "skin",				DECL_SKIN,			idDeclAllocator<idDeclSkin> );
 	RegisterDeclType( "sound",				DECL_SOUND,			idDeclAllocator<idSoundShader> );
-
 	RegisterDeclType( "entityDef",			DECL_ENTITYDEF,		idDeclAllocator<idDeclEntityDef> );
 	RegisterDeclType( "mapDef",				DECL_MAPDEF,		idDeclAllocator<idDeclEntityDef> );
-	RegisterDeclType( "fx",					DECL_FX,			idDeclAllocator<idDeclFX> );
-	RegisterDeclType( "particle",			DECL_PARTICLE,		idDeclAllocator<idDeclParticle> );
+
+// jmarshall: Raven Decl Support
+	RegisterDeclType(  "materialType",		DECL_MATERIALTYPE,  idDeclAllocator<rvDeclMatType>);
+	RegisterDeclType(  "lipSync",			DECL_LIPSYNC,		idDeclAllocator<rvDeclLipSync>);
+	RegisterDeclType(  "playback",			DECL_PLAYBACK,		idDeclAllocator<rvDeclPlayback>);
+	RegisterDeclType(	"effect",			DECL_EFFECT,		idDeclAllocator<rvDeclEffect>);
+// jmarshall end
+
+// jmarshall: Raven Decl Support
+	//RegisterDeclType( "fx",					DECL_FX,			idDeclAllocator<idDeclFX> );
+	//RegisterDeclType( "particle",			DECL_PARTICLE,		idDeclAllocator<idDeclParticle> );
+// jmarshall end
 	RegisterDeclType( "articulatedFigure",	DECL_AF,			idDeclAllocator<idDeclAF> );
-	RegisterDeclType( "pda",				DECL_PDA,			idDeclAllocator<idDeclPDA> );
-	RegisterDeclType( "email",				DECL_EMAIL,			idDeclAllocator<idDeclEmail> );
-	RegisterDeclType( "video",				DECL_VIDEO,			idDeclAllocator<idDeclVideo> );
-	RegisterDeclType( "audio",				DECL_AUDIO,			idDeclAllocator<idDeclAudio> );
+
+// jmarshall: Raven Decl Support
+	//RegisterDeclType( "pda",				DECL_PDA,			idDeclAllocator<idDeclPDA> );
+	//RegisterDeclType( "email",				DECL_EMAIL,			idDeclAllocator<idDeclEmail> );
+	//RegisterDeclType( "video",				DECL_VIDEO,			idDeclAllocator<idDeclVideo> );
+	//RegisterDeclType( "audio",				DECL_AUDIO,			idDeclAllocator<idDeclAudio> );
+// jmarshall end
 
 	RegisterDeclFolder( "materials",		".mtr",				DECL_MATERIAL );
 	RegisterDeclFolder( "skins",			".skin",			DECL_SKIN );
 	RegisterDeclFolder( "sound",			".sndshd",			DECL_SOUND );
+
+// jmarshall: Raven Decl Support
+	RegisterDeclFolder("materials/types",	".mtt",				DECL_MATERIALTYPE);
+	RegisterDeclFolder("lipsync",			".lipsync",			DECL_LIPSYNC);
+	RegisterDeclFolder("playbacks",			".playback",		DECL_PLAYBACK);
+	RegisterDeclFolder("effects",			".fx",				DECL_EFFECT);
+// jmarshall end
 
 	// add console commands
 	cmdSystem->AddCommand( "listDecls", ListDecls_f, CMD_FL_SYSTEM, "lists all decls" );

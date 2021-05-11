@@ -244,6 +244,9 @@
   <ItemGroup>
     <ClInclude Include="bse\BSE.h" />
     <ClInclude Include="bse\BSEInterface.h" />
+    <ClInclude Include="bse\BSE_Envelope.h" />
+    <ClInclude Include="bse\BSE_Particle.h" />
+    <ClInclude Include="bse\BSE_SpawnDomains.h" />
     <ClInclude Include="cm\CollisionModel.h" />
     <ClInclude Include="cm\CollisionModel_local.h" />
     <ClInclude Include="framework\BuildDefines.h" />
@@ -255,10 +258,11 @@
     <ClInclude Include="framework\CVarSystem.h" />
     <ClInclude Include="framework\DeclAF.h" />
     <ClInclude Include="framework\DeclEntityDef.h" />
-    <ClInclude Include="framework\DeclFX.h" />
+    <ClInclude Include="framework\declLipSync.h" />
     <ClInclude Include="framework\DeclManager.h" />
-    <ClInclude Include="framework\DeclParticle.h" />
-    <ClInclude Include="framework\DeclPDA.h" />
+    <ClInclude Include="framework\declMatType.h" />
+    <ClInclude Include="framework\declPlayback.h" />
+    <ClInclude Include="framework\DeclPlayerModel.h" />
     <ClInclude Include="framework\DeclSkin.h" />
     <ClInclude Include="framework\DeclTable.h" />
     <ClInclude Include="framework\DemoChecksum.h" />
@@ -279,6 +283,7 @@
     <ClInclude Include="framework\async\MsgChannel.h" />
     <ClInclude Include="framework\async\NetworkSystem.h" />
     <ClInclude Include="framework\async\ServerScan.h" />
+    <ClInclude Include="idlib\precompiled.h" />
     <ClInclude Include="renderer\Cinematic.h" />
     <ClInclude Include="renderer\glext.h" />
     <ClInclude Include="renderer\GuiModel.h" />
@@ -1253,6 +1258,7 @@
     <ClInclude Include="ui\Winvar.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bse\BSE_EffectTemplate.cpp" />
     <ClCompile Include="bse\BSE_Manager.cpp" />
     <ClCompile Include="cm\CollisionModel.cpp" />
     <ClCompile Include="cm\CollisionModel_contacts.cpp" />
@@ -1270,10 +1276,11 @@
     <ClCompile Include="framework\CVarSystem.cpp" />
     <ClCompile Include="framework\DeclAF.cpp" />
     <ClCompile Include="framework\DeclEntityDef.cpp" />
-    <ClCompile Include="framework\DeclFX.cpp" />
+    <ClCompile Include="framework\DeclLipSync.cpp" />
     <ClCompile Include="framework\DeclManager.cpp" />
-    <ClCompile Include="framework\DeclParticle.cpp" />
-    <ClCompile Include="framework\DeclPDA.cpp" />
+    <ClCompile Include="framework\DeclMatType.cpp" />
+    <ClCompile Include="framework\DeclPlayback.cpp" />
+    <ClCompile Include="framework\DeclPlayerModel.cpp" />
     <ClCompile Include="framework\DeclSkin.cpp" />
     <ClCompile Include="framework\DeclTable.cpp" />
     <ClCompile Include="framework\DemoFile.cpp" />

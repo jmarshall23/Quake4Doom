@@ -154,126 +154,114 @@ public:
 };
 // RAVEN END
 
+
 class idDecl {
 public:
-							// The constructor should initialize variables such that
-							// an immediate call to FreeData() does no harm.
-							idDecl( void ) { base = NULL; }
-	virtual 				~idDecl( void ) {};
+	// The constructor should initialize variables such that
+	// an immediate call to FreeData() does no harm.
+	idDecl(void) { base = NULL; }
+	virtual 				~idDecl(void) {};
 
-							// Returns the name of the decl.
-	const char *			GetName( void ) const { return base->GetName(); }
+	// Returns the name of the decl.
+	const char* GetName(void) const { return base->GetName(); }
 
-							// Returns the decl type.
-	declType_t				GetType( void ) const { return base->GetType(); }
+	// Returns the decl type.
+	declType_t				GetType(void) const { return base->GetType(); }
 
-							// Returns the decl state which is usefull for finding out if a decl defaulted.
-	declState_t				GetState( void ) const { return base->GetState(); }
+	// Returns the decl state which is usefull for finding out if a decl defaulted.
+	declState_t				GetState(void) const { return base->GetState(); }
 
-							// Returns true if the decl was defaulted or the text was created with a call to SetDefaultText.
-	bool					IsImplicit( void ) const { return base->IsImplicit(); }
+	// Returns true if the decl was defaulted or the text was created with a call to SetDefaultText.
+	bool					IsImplicit(void) const { return base->IsImplicit(); }
 
-							// The only way non-manager code can have an invalid decl is if the *ByIndex()
-							// call was used with forceParse = false to walk the lists to look at names
-							// without touching the media.
-	bool					IsValid( void ) const { return base->IsValid(); }
+	// The only way non-manager code can have an invalid decl is if the *ByIndex()
+	// call was used with forceParse = false to walk the lists to look at names
+	// without touching the media.
+	bool					IsValid(void) const { return base->IsValid(); }
 
-							// Sets state back to unparsed.
-							// Used by decl editors to undo any changes to the decl.
-	void					Invalidate( void ) { base->Invalidate(); }
+	// Sets state back to unparsed.
+	// Used by decl editors to undo any changes to the decl.
+	void					Invalidate(void) { base->Invalidate(); }
 
-							// if a pointer might possible be stale from a previous level,
-							// call this to have it re-parsed
-	void					EnsureNotPurged( void ) { base->EnsureNotPurged(); }
+	// if a pointer might possible be stale from a previous level,
+	// call this to have it re-parsed
+	void					EnsureNotPurged(void) { base->EnsureNotPurged(); }
 
-							// Returns the index in the per-type list.
-	int						Index( void ) const { return base->Index(); }
+	// Returns the index in the per-type list.
+	int						Index(void) const { return base->Index(); }
 
-							// Returns the line number the decl starts.
-	int						GetLineNum( void ) const { return base->GetLineNum(); }
+	// Returns the line number the decl starts.
+	int						GetLineNum(void) const { return base->GetLineNum(); }
 
-							// Returns the name of the file in which the decl is defined.
-	const char *			GetFileName( void ) const { return base->GetFileName(); }
+	// Returns the name of the file in which the decl is defined.
+	const char* GetFileName(void) const { return base->GetFileName(); }
 
-							// Returns the decl text.
-	void					GetText( char *text ) const { base->GetText( text ); }
+	// Returns the decl text.
+	void					GetText(char* text) const { base->GetText(text); }
 
-							// Returns the length of the decl text.
-	int						GetTextLength( void ) const { return base->GetTextLength(); }
+	// Returns the length of the decl text.
+	int						GetTextLength(void) const { return base->GetTextLength(); }
 
-							// Returns the compressed length of the decl text.
-	int						GetCompressedLength( void ) const { return( base->GetCompressedLength() ); }
+	// Sets new decl text.
+	void					SetText(const char* text) { base->SetText(text); }
 
-							// Sets new decl text.
-	void					SetText( const char *text ) { base->SetText( text ); }
+	// Saves out new text for the decl.
+	// Used by decl editors to replace the decl text in the source file.
+	bool					ReplaceSourceFileText(void) { return base->ReplaceSourceFileText(); }
 
-							// Saves out new text for the decl.
-							// Used by decl editors to replace the decl text in the source file.
-	bool					ReplaceSourceFileText( void ) { return base->ReplaceSourceFileText(); }
+	// Returns true if the source file changed since it was loaded and parsed.
+	bool					SourceFileChanged(void) const { return base->SourceFileChanged(); }
 
-							// Returns true if the source file changed since it was loaded and parsed.
-	bool					SourceFileChanged( void ) const { return base->SourceFileChanged(); }
+	// Frees data and makes the decl a default.
+	void					MakeDefault(void) { base->MakeDefault(); }
 
-							// Frees data and makes the decl a default.
-	void					MakeDefault( void ) { base->MakeDefault(); }
-
-							// Returns true if the decl was ever referenced.
-	bool					EverReferenced( void ) const { return base->EverReferenced(); }
+	// Returns true if the decl was ever referenced.
+	bool					EverReferenced(void) const { return base->EverReferenced(); }
 
 public:
-							// Sets textSource to a default text if necessary.
-							// This may be overridden to provide a default definition based on the
-							// decl name. For instance materials may default to an implicit definition
-							// using a texture with the same name as the decl.
-	virtual bool			SetDefaultText( void ) { return base->SetDefaultText(); }
+	// Sets textSource to a default text if necessary.
+	// This may be overridden to provide a default definition based on the
+	// decl name. For instance materials may default to an implicit definition
+	// using a texture with the same name as the decl.
+	virtual bool			SetDefaultText(void) { return base->SetDefaultText(); }
 
-							// Each declaration type must have a default string that it is guaranteed
-							// to parse acceptably. When a decl is not explicitly found, is purged, or
-							// has an error while parsing, MakeDefault() will do a FreeData(), then a
-							// Parse() with DefaultDefinition(). The defaultDefintion should start with
-							// an open brace and end with a close brace.
-	virtual const char *	DefaultDefinition( void ) const { return base->DefaultDefinition(); }
+	// Each declaration type must have a default string that it is guaranteed
+	// to parse acceptably. When a decl is not explicitly found, is purged, or
+	// has an error while parsing, MakeDefault() will do a FreeData(), then a
+	// Parse() with DefaultDefinition(). The defaultDefintion should start with
+	// an open brace and end with a close brace.
+	virtual const char* DefaultDefinition(void) const { return base->DefaultDefinition(); }
 
-							// The manager will have already parsed past the type, name and opening brace.
-							// All necessary media will be touched before return.
-							// The manager will have called FreeData() before issuing a Parse().
-							// The subclass can call MakeDefault() internally at any point if
-							// there are parse errors.
-	virtual bool			Parse( const char *text, const int textLength, bool noCaching ) { return base->Parse( text, textLength, noCaching ); }
+	// The manager will have already parsed past the type, name and opening brace.
+	// All necessary media will be touched before return.
+	// The manager will have called FreeData() before issuing a Parse().
+	// The subclass can call MakeDefault() internally at any point if
+	// there are parse errors.
+	virtual bool			Parse(const char* text, const int textLength) { return base->Parse(text, textLength, false); }
 
-							// Frees any pointers held by the subclass. This may be called before
-							// any Parse(), so the constructor must have set sane values. The decl will be
-							// invalid after issuing this call, but it will always be immediately followed
-							// by a Parse()
-	virtual void			FreeData( void ) { base->FreeData(); }
+	// Frees any pointers held by the subclass. This may be called before
+	// any Parse(), so the constructor must have set sane values. The decl will be
+	// invalid after issuing this call, but it will always be immediately followed
+	// by a Parse()
+	virtual void			FreeData(void) { base->FreeData(); }
 
-							// Returns the size of the decl in memory.
-	virtual size_t			Size( void ) const { return base->Size(); }
+	// Returns the size of the decl in memory.
+	virtual size_t			Size(void) const { return base->Size(); }
 
-							// If this isn't overridden, it will just print the decl name.
-							// The manager will have printed 7 characters on the line already,
-							// containing the reference state and index number.
-	virtual void			List( void ) const { base->List(); }
+	// If this isn't overridden, it will just print the decl name.
+	// The manager will have printed 7 characters on the line already,
+	// containing the reference state and index number.
+	virtual void			List(void) const { base->List(); }
 
-							// The print function will already have dumped the text source
-							// and common data, subclasses can override this to dump more
-							// explicit data.
-	virtual void			Print( void ) const { base->Print(); }
-
-// RAVEN BEGIN
-							// Rebuilds the text source of the decl for saving
-	virtual	bool			RebuildTextSource( void ) { return( base->RebuildTextSource() ); }
-
-							// Marks this decl as referenced this level
-	virtual void			SetReferencedThisLevel( void ) { base->SetReferencedThisLevel(); }
-
-// scork: for detailed error reporting
-	virtual bool			Validate( const char *psText, int iLength, idStr &strReportTo ) const { return base->Validate( psText, iLength, strReportTo ); }
-// RAVEN END
+	// The print function will already have dumped the text source
+	// and common data, subclasses can override this to dump more
+	// explicit data.
+	virtual void			Print(void) const { base->Print(); }
 
 public:
-	idDeclBase *			base;
+	idDeclBase* base;
 };
+
 
 
 template< class type >
@@ -311,8 +299,6 @@ class idDeclManager {
 public:
 	virtual					~idDeclManager( void ) {}
 
-	virtual void			SetInsideLoad( bool var ) = 0;
-	virtual bool			GetInsideLoad( void ) = 0;
 	virtual void			Init( void ) = 0;
 	virtual void			Shutdown( void ) = 0;
 	virtual void			Reload( bool force ) = 0;
@@ -341,7 +327,7 @@ public:
 // RAVEN BEGIN
 // jscott: for timing
 							// Registers a new folder with decl files.
-	virtual void			RegisterDeclFolderWrapper( const char *folder, const char *extension, declType_t defaultType, bool unique = false, bool norecurse = false ) = 0;
+	//virtual void			RegisterDeclFolderWrapper( const char *folder, const char *extension, declType_t defaultType, bool unique = false, bool norecurse = false ) = 0;
 // RAVEN END
 
 							// Returns a checksum for all loaded decl text.

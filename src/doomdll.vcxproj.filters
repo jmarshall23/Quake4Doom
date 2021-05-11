@@ -144,16 +144,7 @@
     <ClInclude Include="framework\DeclEntityDef.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="framework\DeclFX.h">
-      <Filter>Framework</Filter>
-    </ClInclude>
     <ClInclude Include="framework\DeclManager.h">
-      <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\DeclParticle.h">
-      <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="framework\DeclPDA.h">
       <Filter>Framework</Filter>
     </ClInclude>
     <ClInclude Include="framework\DeclSkin.h">
@@ -630,6 +621,30 @@
     <ClInclude Include="bse\BSE.h">
       <Filter>BSE</Filter>
     </ClInclude>
+    <ClInclude Include="framework\DeclPlayerModel.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\declLipSync.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\declPlayback.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="bse\BSE_Envelope.h">
+      <Filter>BSE</Filter>
+    </ClInclude>
+    <ClInclude Include="bse\BSE_Particle.h">
+      <Filter>BSE</Filter>
+    </ClInclude>
+    <ClInclude Include="bse\BSE_SpawnDomains.h">
+      <Filter>BSE</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\declMatType.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="idlib\precompiled.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cm\CollisionModel_contacts.cpp">
@@ -677,16 +692,7 @@
     <ClCompile Include="framework\DeclEntityDef.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="framework\DeclFX.cpp">
-      <Filter>Framework</Filter>
-    </ClCompile>
     <ClCompile Include="framework\DeclManager.cpp">
-      <Filter>Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\DeclParticle.cpp">
-      <Filter>Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="framework\DeclPDA.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="framework\DeclSkin.cpp">
@@ -1840,6 +1846,21 @@
     </ClCompile>
     <ClCompile Include="cm\CollisionModel.cpp">
       <Filter>CM</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\DeclPlayerModel.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\DeclLipSync.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\DeclPlayback.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_EffectTemplate.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\DeclMatType.cpp">
+      <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

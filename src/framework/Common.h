@@ -21,6 +21,18 @@ typedef enum {
 } saveType_t;
 // RAVEN END
 
+#ifndef BIT
+#define BIT( num )				BITT< num >::VALUE
+#endif
+
+template< unsigned int B >
+class BITT {
+public:
+	typedef enum bitValue_e {
+		VALUE = 1 << B,
+	} bitValue_t;
+};
+
 typedef enum {
 	EDITOR_NONE					= 0,
 	EDITOR_RADIANT				= BIT(1),

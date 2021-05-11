@@ -2,7 +2,10 @@
 //
 
 #include "precompiled.h"
+#include "BSE_Envelope.h"
+#include "BSE_Particle.h"
 #include "BSE.h"
+#include "BSE_SpawnDomains.h"
 
 rvBSEManagerLocal bseLocal;
 rvBSEManager* bse = &bseLocal;

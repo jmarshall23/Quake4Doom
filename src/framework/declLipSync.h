@@ -35,13 +35,13 @@ public:
 	const char			*GetLipSyncData( int langIdx = -1 ) const;
 
 	virtual const char	*DefaultDefinition( void ) const;
-	virtual bool		Parse( const char *text, const int textLength, bool noCaching );
+	virtual bool		Parse( const char *text, const int textLength );
 	virtual void		FreeData( void );
-	virtual	bool		RebuildTextSource( void );
+	//virtual	bool		RebuildTextSource( void );
 	virtual size_t		Size( void ) const;
 
 	// scork: for detailed error-reporting
-	virtual bool		Validate( const char *psText, int iTextLength, idStr &strReportTo ) const;
+	//virtual bool		Validate( const char *psText, int iTextLength, idStr &strReportTo ) const;
 
 private:
 	idStr				mDescription;
