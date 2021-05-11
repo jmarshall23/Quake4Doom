@@ -370,7 +370,9 @@ idClipModel::LoadModel
 */
 bool idClipModel::LoadModel( const char *name ) {
 	FreeModel();
-	collisionModel = collisionModelManager->LoadModel( gameLocal.GetMapName(), name );
+// jmarshall: added precache flag
+	collisionModel = collisionModelManager->LoadModel( gameLocal.GetMapName(), name, false );
+// jmarshall end
 	if ( collisionModel != NULL ) {
 		collisionModel->GetBounds( bounds );
 		collisionModel->GetContents( contents );
@@ -496,7 +498,9 @@ idClipModel::idClipModel( const idClipModel *model ) {
 	contents = model->contents;
 	collisionModel = NULL;
 	if ( model->collisionModel != NULL ) {
-		collisionModel = collisionModelManager->LoadModel( gameLocal.GetMapName(), model->collisionModel->GetName() );
+// jmarshall - added precache flag
+		collisionModel = collisionModelManager->LoadModel( gameLocal.GetMapName(), model->collisionModel->GetName(), false );
+// jmarshall end
 	}
 	traceModelIndex = -1;
 	if ( model->traceModelIndex != -1 ) {
@@ -570,7 +574,9 @@ void idClipModel::Restore( idRestoreGame *savefile ) {
 	savefile->ReadInt( contents );
 	savefile->ReadString( collisionModelName );
 	if ( collisionModelName.Length() ) {
-		collisionModel = collisionModelManager->LoadModel( gameLocal.GetMapName(), collisionModelName );
+// jmarshall - added precache flag
+		collisionModel = collisionModelManager->LoadModel( gameLocal.GetMapName(), collisionModelName, false );
+// jmarshall end
 	} else {
 		collisionModel = NULL;
 	}
@@ -858,7 +864,9 @@ void idClip::Init( void ) {
 	idVec3 size, maxSector = vec3_origin;
 
 	// get world map bounds
-	world = collisionModelManager->LoadModel( gameLocal.GetMapName(), WORLD_MODEL_NAME );
+// jmarshall - added precache flag
+	world = collisionModelManager->LoadModel( gameLocal.GetMapName(), WORLD_MODEL_NAME, false );
+// jmarshall end
 	world->GetBounds( worldBounds );
 
 	// create world sectors

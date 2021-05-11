@@ -188,7 +188,7 @@ void idCollisionModelManagerLocal::WriteBrushes( idFile *fp, cm_node_t *node ) {
 idCollisionModelManagerLocal::WriteCollisionModel
 ================
 */
-void idCollisionModelManagerLocal::WriteCollisionModel( idFile *fp, cm_model_t *model ) {
+void idCollisionModelManagerLocal::WriteCollisionModel( idFile *fp, idCollisionModelLocal *model ) {
 	int i, polygonMemory, brushMemory;
 
 	fp->WriteFloatString( "collisionModel \"%s\" {\n", model->name.c_str() );
@@ -268,7 +268,7 @@ idCollisionModelManagerLocal::WriteCollisionModelForMapEntity
 bool idCollisionModelManagerLocal::WriteCollisionModelForMapEntity( const idMapEntity *mapEnt, const char *filename, const bool testTraceModel ) {
 	idFile *fp;
 	idStr name;
-	cm_model_t *model;
+	idCollisionModelLocal *model;
 
 	SetupHash();
 	model = CollisionModelForMapEntity( mapEnt );
@@ -319,7 +319,7 @@ Loading of collision model file
 idCollisionModelManagerLocal::ParseVertices
 ================
 */
-void idCollisionModelManagerLocal::ParseVertices( idLexer *src, cm_model_t *model ) {
+void idCollisionModelManagerLocal::ParseVertices( idLexer *src, idCollisionModelLocal *model ) {
 	int i;
 
 	src->ExpectTokenString( "{" );
@@ -340,7 +340,7 @@ void idCollisionModelManagerLocal::ParseVertices( idLexer *src, cm_model_t *mode
 idCollisionModelManagerLocal::ParseEdges
 ================
 */
-void idCollisionModelManagerLocal::ParseEdges( idLexer *src, cm_model_t *model ) {
+void idCollisionModelManagerLocal::ParseEdges( idLexer *src, idCollisionModelLocal *model ) {
 	int i;
 
 	src->ExpectTokenString( "{" );
@@ -368,7 +368,7 @@ void idCollisionModelManagerLocal::ParseEdges( idLexer *src, cm_model_t *model )
 idCollisionModelManagerLocal::ParseNodes
 ================
 */
-cm_node_t *idCollisionModelManagerLocal::ParseNodes( idLexer *src, cm_model_t *model, cm_node_t *parent ) {
+cm_node_t *idCollisionModelManagerLocal::ParseNodes( idLexer *src, idCollisionModelLocal *model, cm_node_t *parent ) {
 	cm_node_t *node;
 
 	model->numNodes++;
@@ -392,7 +392,7 @@ cm_node_t *idCollisionModelManagerLocal::ParseNodes( idLexer *src, cm_model_t *m
 idCollisionModelManagerLocal::ParsePolygons
 ================
 */
-void idCollisionModelManagerLocal::ParsePolygons( idLexer *src, cm_model_t *model ) {
+void idCollisionModelManagerLocal::ParsePolygons( idLexer *src, idCollisionModelLocal *model ) {
 	cm_polygon_t *p;
 	int i, numEdges;
 	idVec3 normal;
@@ -435,7 +435,7 @@ void idCollisionModelManagerLocal::ParsePolygons( idLexer *src, cm_model_t *mode
 idCollisionModelManagerLocal::ParseBrushes
 ================
 */
-void idCollisionModelManagerLocal::ParseBrushes( idLexer *src, cm_model_t *model ) {
+void idCollisionModelManagerLocal::ParseBrushes( idLexer *src, idCollisionModelLocal *model ) {
 	cm_brush_t *b;
 	int i, numPlanes;
 	idVec3 normal;
@@ -481,7 +481,7 @@ idCollisionModelManagerLocal::ParseCollisionModel
 ================
 */
 bool idCollisionModelManagerLocal::ParseCollisionModel( idLexer *src ) {
-	cm_model_t *model;
+	idCollisionModelLocal *model;
 	idToken token;
 
 	if ( numModels >= MAX_SUBMODELS ) {
@@ -494,6 +494,11 @@ bool idCollisionModelManagerLocal::ParseCollisionModel( idLexer *src ) {
 	// parse the file
 	src->ExpectTokenType( TT_STRING, 0, &token );
 	model->name = token;
+	
+	if (token.Cmpn(PROC_CLIPMODEL_STRING_PRFX, strlen(PROC_CLIPMODEL_STRING_PRFX)) == 0) {
+		numInlinedProcClipModels++;
+	}
+
 	src->ExpectTokenString( "{" );
 	while ( !src->CheckTokenString( "}" ) ) {
 

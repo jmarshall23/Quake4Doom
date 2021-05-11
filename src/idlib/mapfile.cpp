@@ -1153,7 +1153,7 @@ idMapFile::NeedsReload
 */
 bool idMapFile::NeedsReload() {
 	if ( name.Length() ) {
-		unsigned int time = (unsigned int)-1;
+		ID_TIME_T time = (ID_TIME_T)-1;
 		if ( idLib::fileSystem->ReadFile( name, NULL, &time ) > 0 ) {
 			return ( time > fileTime );
 		}

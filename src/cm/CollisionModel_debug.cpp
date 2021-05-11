@@ -80,8 +80,8 @@ int cm_contentsFlagByIndex[] = {
 	CONTENTS_BODY,					// 9
 	CONTENTS_CORPSE,				// 10
 	CONTENTS_TRIGGER,				// 11
-	CONTENTS_AAS_SOLID,				// 12
-	CONTENTS_AAS_OBSTACLE,			// 13
+	//CONTENTS_LAVA,					// 12
+	//CONTENTS_SLIME,					// 13
 	CONTENTS_FLASHLIGHT_TRIGGER,	// 14
 	0
 };
@@ -94,7 +94,7 @@ idCVar cm_drawNormals(		"cm_drawNormals",		"0",		CVAR_GAME | CVAR_BOOL,	"draw po
 idCVar cm_backFaceCull(		"cm_backFaceCull",		"0",		CVAR_GAME | CVAR_BOOL,	"cull back facing polygons" );
 idCVar cm_debugCollision(	"cm_debugCollision",	"0",		CVAR_GAME | CVAR_BOOL,	"debug the collision detection" );
 
-static idVec4 cm_color;
+idVec4 cm_color;
 
 /*
 ================
@@ -149,7 +149,7 @@ const char *idCollisionModelManagerLocal::StringFromContents( const int contents
 idCollisionModelManagerLocal::DrawEdge
 ================
 */
-void idCollisionModelManagerLocal::DrawEdge( cm_model_t *model, int edgeNum, const idVec3 &origin, const idMat3 &axis ) {
+void idCollisionModelManagerLocal::DrawEdge( idCollisionModelLocal *model, int edgeNum, const idVec3 &origin, const idMat3 &axis ) {
 	int side;
 	cm_edge_t *edge;
 	idVec3 start, end, mid;
@@ -197,7 +197,7 @@ void idCollisionModelManagerLocal::DrawEdge( cm_model_t *model, int edgeNum, con
 idCollisionModelManagerLocal::DrawPolygon
 ================
 */
-void idCollisionModelManagerLocal::DrawPolygon( cm_model_t *model, cm_polygon_t *p, const idVec3 &origin, const idMat3 &axis, const idVec3 &viewOrigin ) {
+void idCollisionModelManagerLocal::DrawPolygon( idCollisionModelLocal *model, cm_polygon_t *p, const idVec3 &origin, const idMat3 &axis, const idVec3 &viewOrigin ) {
 	int i, edgeNum;
 	cm_edge_t *edge;
 	idVec3 center, end, dir;
@@ -255,7 +255,7 @@ void idCollisionModelManagerLocal::DrawPolygon( cm_model_t *model, cm_polygon_t 
 idCollisionModelManagerLocal::DrawNodePolygons
 ================
 */
-void idCollisionModelManagerLocal::DrawNodePolygons( cm_model_t *model, cm_node_t *node,
+void idCollisionModelManagerLocal::DrawNodePolygons( idCollisionModelLocal *model, cm_node_t *node,
 										   const idVec3 &origin, const idMat3 &axis,
 										   const idVec3 &viewOrigin, const float radius ) {
 	int i;
@@ -301,32 +301,6 @@ void idCollisionModelManagerLocal::DrawNodePolygons( cm_model_t *model, cm_node_
 			node = node->children[0];
 		}
 	}
-}
-
-/*
-================
-idCollisionModelManagerLocal::DrawModel
-================
-*/
-void idCollisionModelManagerLocal::DrawModel( cmHandle_t handle, const idVec3 &modelOrigin, const idMat3 &modelAxis,
-					const idVec3 &viewOrigin, const float radius ) {
-
-	cm_model_t *model;
-	idVec3 viewPos;
-
-	if ( handle < 0 && handle >= numModels ) {
-		return;
-	}
-
-	if ( cm_drawColor.IsModified() ) {
-		sscanf( cm_drawColor.GetString(), "%f %f %f %f", &cm_color.x, &cm_color.y, &cm_color.z, &cm_color.w );
-		cm_drawColor.ClearModified();
-	}
-
-	model = models[ handle ];
-	viewPos = (viewOrigin - modelOrigin) * modelAxis.Transpose();
-	checkCount++;
-	DrawNodePolygons( model, model->node, modelOrigin, modelAxis, viewPos, radius );
 }
 
 /*
@@ -377,6 +351,10 @@ void idCollisionModelManagerLocal::DebugOutput( const idVec3 &origin ) {
 		return;
 	}
 
+	idCollisionModel* cm = collisionModelManager->GetCollisionModel(cm_testModel.GetInteger());
+	if (cm == NULL)
+		return;
+
 	testend = (idVec3 *) Mem_Alloc( cm_testTimes.GetInteger() * sizeof(idVec3) );
 
 	if ( cm_testReset.GetBool() || ( cm_testWalk.GetBool() && !start.Compare( start ) ) ) {
@@ -425,7 +403,7 @@ void idCollisionModelManagerLocal::DebugOutput( const idVec3 &origin ) {
 	timer.Clear();
 	timer.Start();
 	for ( i = 0; i < cm_testTimes.GetInteger(); i++ ) {
-		Translation( &trace, start, testend[i], &itm, boxAxis, CONTENTS_SOLID|CONTENTS_PLAYERCLIP, cm_testModel.GetInteger(), vec3_origin, modelAxis );
+		Translation( &trace, start, testend[i], &itm, boxAxis, CONTENTS_SOLID|CONTENTS_PLAYERCLIP, cm, vec3_origin, modelAxis );
 	}
 	timer.Stop();
 	t = timer.Milliseconds();
@@ -467,7 +445,7 @@ void idCollisionModelManagerLocal::DebugOutput( const idVec3 &origin ) {
 		timer.Start();
 		for ( i = 0; i < cm_testTimes.GetInteger(); i++ ) {
 			rotation.SetOrigin( testend[i] );
-			Rotation( &trace, start, rotation, &itm, boxAxis, CONTENTS_SOLID|CONTENTS_PLAYERCLIP, cm_testModel.GetInteger(), vec3_origin, modelAxis );
+			Rotation( &trace, start, rotation, &itm, boxAxis, CONTENTS_SOLID|CONTENTS_PLAYERCLIP, cm, vec3_origin, modelAxis );
 		}
 		timer.Stop();
 		t = timer.Milliseconds();

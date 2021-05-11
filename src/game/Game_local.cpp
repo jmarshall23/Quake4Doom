@@ -2717,7 +2717,10 @@ void idGameLocal::CacheDictionaryMedia( const idDict *dict ) {
 				// precache the render model
 				renderModelManager->FindModel( kv->GetValue() );
 				// precache .cm files only
-				collisionModelManager->PreCacheModel( GetMapName(), kv->GetValue() );
+// jmarshall: caching code is different in Doom 3
+				//collisionModelManager->PreCacheModel( GetMapName(), kv->GetValue() );
+				collisionModelManager->LoadModel(GetMapName(), kv->GetValue(), true);
+// jmarshall end
 			}
 		} else if ( MATCH( "s_shader" ) ) {
 			
@@ -4414,7 +4417,9 @@ void idGameLocal::RunDebugInfo( void ) {
 	}
 
 	// collision map debug output
-	collisionModelManager->DebugOutput( player->GetEyePosition(), mat3_identity );
+// jmarshall - debug output
+	collisionModelManager->DebugOutput( player->GetEyePosition() );
+// jmarshall end
 
 // RAVEN BEGIN
 // jscott: for debugging playbacks

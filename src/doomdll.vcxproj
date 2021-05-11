@@ -1254,6 +1254,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bse\BSE_Manager.cpp" />
+    <ClCompile Include="cm\CollisionModel.cpp" />
     <ClCompile Include="cm\CollisionModel_contacts.cpp" />
     <ClCompile Include="cm\CollisionModel_contents.cpp" />
     <ClCompile Include="cm\CollisionModel_debug.cpp" />
