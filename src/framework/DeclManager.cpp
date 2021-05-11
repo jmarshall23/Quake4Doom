@@ -84,6 +84,15 @@ public:
 	declType_t					defaultType;
 };
 
+// jmarshall: Quake 4 Guide(template) support
+struct rvGuideTemplate {
+	idStr name;
+	idList<idStr> parms;
+	idStr body;
+	bool inlineGuide;
+};
+// jmarshall end
+
 class idDeclFile;
 
 class idDeclLocal : public idDeclBase {
@@ -177,6 +186,10 @@ public:
 	int							numLines;
 
 	idDeclLocal *				decls;
+// jmarshall: guide support
+private:
+	idStr						PreprocessGuides(const char* buffer, int length);
+// jmarshall end
 };
 
 class idDeclManagerLocal : public idDeclManager {
@@ -186,6 +199,15 @@ public:
 	virtual void				Init( void );
 	virtual void				Shutdown( void );
 	virtual void				Reload( bool force );
+
+// RAVEN BEGIN
+// jscott: precache any guide (template) files
+	virtual void				ParseGuides(void);
+	virtual	void				ShutdownGuides(void) { }
+	virtual bool				EvaluateGuide(idStr& name, idLexer* src, idStr& definition) { }
+	virtual bool				EvaluateInlineGuide(idStr& name, idStr& definition) { }
+// RAVEN END
+
 	virtual void				BeginLevelLoad();
 	virtual void				EndLevelLoad();
 	virtual void				RegisterDeclType( const char *typeName, declType_t type, idDecl *(*allocator)( void ) );
@@ -227,7 +249,11 @@ public:
 	idDeclType *				GetDeclType( int type ) const { return declTypes[type]; }
 	const idDeclFile *			GetImplicitDeclFile( void ) const { return &implicitDecls; }
 
+// jmarshall - Quake 4 guide(template) support
+	idList<rvGuideTemplate>		guides;
+// jmarshall end
 private:
+
 	idList<idDeclType *>		declTypes;
 	idList<idDeclFolder *>		declFolders;
 
@@ -595,6 +621,72 @@ void idDeclFile::Reload( bool force ) {
 	// parse the text
 	LoadAndParse();
 }
+/*
+================
+idDeclFile::PreprocessGuides
+================
+*/
+idStr idDeclFile::PreprocessGuides(const char* text, int textLength) {
+	idLexer src;
+	idToken	token, token2;
+
+	idStr finalBuffer = "";
+
+	src.LoadMemory(text, textLength, "", 0);
+	src.SetFlags(DECL_LEXER_FLAGS);
+	src.SkipUntilString("{");
+
+	while (1) {
+		if (!src.ReadToken(&token)) {
+			break;
+		}
+
+		if (!token.Icmp("}")) {
+			break;
+		}
+		else if (token == "guide") {
+			idToken name;
+			idStr newDecl;
+			rvGuideTemplate*guide = NULL;
+
+			src.ReadToken(&name);
+			src.ReadToken(&token);
+
+			for (int i = 0; i < declManagerLocal.guides.Num(); i++)
+			{
+				if (declManagerLocal.guides[i].name == token)
+				{
+					guide = &declManagerLocal.guides[i];
+					break;
+				}
+			}
+
+			if (guide == NULL)
+			{
+				common->FatalError("Failed to find guide %s\n", token.c_str());
+			}
+
+			newDecl = name;
+			newDecl += "\n";
+			newDecl += guide->body;
+			
+			src.ExpectTokenString("(");
+			for (int i = 0; i < guide->parms.Num(); i++ )
+			{
+				src.ReadToken(&token);
+				newDecl.Replace(guide->parms[i].c_str(), token);
+			}
+			src.ExpectTokenString(")");
+
+			finalBuffer += newDecl;
+		}
+	}
+
+	finalBuffer += text;
+
+	finalBuffer.Replace("guide", "// guide");
+	return finalBuffer;
+}
 
 /*
 ================
@@ -617,6 +709,10 @@ int idDeclFile::LoadAndParse() {
 	idDeclLocal *newDecl;
 	bool		reparse;
 
+// jmarshall: quake 4 guide support
+	bool		canUseGuides = strstr(fileName, ".mtr");
+// jmarshall end
+
 	// load the text
 	common->DPrintf( "...loading '%s'\n", fileName.c_str() );
 	length = fileSystem->ReadFile( fileName, (void **)&buffer, &timestamp );
@@ -625,7 +721,20 @@ int idDeclFile::LoadAndParse() {
 		return 0;
 	}
 
-	if ( !src.LoadMemory( buffer, length, fileName ) ) {
+// jmarshall: quake 4 guide support
+	idStr finalPreprocessedBuffer;
+
+	if (!canUseGuides)
+	{
+		finalPreprocessedBuffer = buffer;
+	}
+	else
+	{
+		finalPreprocessedBuffer = PreprocessGuides(buffer, length);
+	}
+// jmarshall end
+
+	if ( !src.LoadMemory(finalPreprocessedBuffer.c_str(), finalPreprocessedBuffer.Length(), fileName ) ) {
 		common->Error( "Couldn't parse %s", fileName.c_str() );
 		Mem_Free( buffer );
 		return 0;
@@ -808,6 +917,10 @@ void idDeclManagerLocal::Init( void ) {
 	ClearHuffmanFrequencies();
 #endif
 
+// jmarshall - template(guide) Support
+	ParseGuides();
+// jmarshall end
+
 	// decls used throughout the engine
 	RegisterDeclType( "table",				DECL_TABLE,			idDeclAllocator<idDeclTable> );
 	RegisterDeclType( "material",			DECL_MATERIAL,		idDeclAllocator<idMaterial> );
@@ -926,6 +1039,78 @@ void idDeclManagerLocal::Shutdown( void ) {
 	ShutdownHuffman();
 #endif
 }
+
+// jmarshall: Quake 4 Guide Support
+/*
+=========================
+idDeclManagerLocal::ParseGuides
+=========================
+*/
+void idDeclManagerLocal::ParseGuides(void) {
+	idFileList* fileList = fileSystem->ListFiles("guides", ".guide");
+
+	common->Printf("Parsing Guides...\n");
+
+	for (int i = 0; i < fileList->GetNumFiles(); i++)
+	{
+		idLexer src;
+		idToken	token;
+		idStr fileName = fileList->GetList()[i];
+
+		src.LoadFile(va("guides/%s", fileName.c_str()));
+		src.SetFlags(DECL_LEXER_FLAGS);
+		
+		while (!src.EndOfFile())
+		{
+			src.ReadToken(&token);
+
+			if (token == "guide" || token == "inlineGuide")
+			{
+				rvGuideTemplate guide;
+
+				if (token == "inlineGuide")
+				{
+					guide.inlineGuide = true;
+				}
+				else
+				{
+					guide.inlineGuide = false;
+				}
+
+				src.ReadToken(&token);
+				guide.name = token;
+
+				src.ExpectTokenString("(");
+
+				while (!src.EndOfFile())
+				{
+					src.ReadToken(&token);
+
+					if (token == ")")
+					{
+						break;
+					}
+
+					guide.parms.Append(token);
+				}
+
+				src.ParseBracedSection(guide.body);
+
+				guides.Append(guide);
+			}
+			else
+			{
+				src.Error("Unexpected token in guide %s\n", token.c_str());
+			}
+		}
+	}
+
+	common->Printf("Found %d guides...\n", guides.Num());
+
+	fileSystem->FreeFileList(fileList);
+}
+
+// jmarshall end
 
 /*
 ===================
