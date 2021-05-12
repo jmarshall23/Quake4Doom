@@ -71,6 +71,8 @@ public:
 
 	virtual void			OpenURL( const char *url, bool quit );
 	virtual void			StartProcess( const char *exeName, bool quit );
+
+	virtual int				Milliseconds(void) { return Sys_Milliseconds(); }
 };
 
 #endif /* !__SYS_LOCAL__ */

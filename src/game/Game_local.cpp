@@ -40,8 +40,8 @@ idCVar *					idCVar::staticVars = NULL;
 
 // RAVEN BEGIN
 // rjohnson: new help system for cvar ui
-idCVarHelp *				idCVarHelp::staticCVarHelps = NULL;
-idCVarHelp *				idCVarHelp::staticCVarHelpsTail = NULL;
+//idCVarHelp *				idCVarHelp::staticCVarHelps = NULL;
+//idCVarHelp *				idCVarHelp::staticCVarHelpsTail = NULL;
 // RAVEN END
 
 idCVar com_forceGenericSIMD( "com_forceGenericSIMD", "0", CVAR_BOOL|CVAR_SYSTEM, "force generic platform independent SIMD" );
@@ -457,7 +457,7 @@ void idGameLocal::Init( void ) {
 
 // RAVEN BEGIN
 // rjohnson: new help system for cvar ui
-	idCVarHelp::RegisterStatics();
+	//idCVarHelp::RegisterStatics();
 
 // jsinger: added to support serialization/deserialization of binary decls
 #ifdef RV_BINARYDECLS
