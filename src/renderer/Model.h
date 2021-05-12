@@ -402,7 +402,7 @@ public:
 // RAVEN BEGIN
 // AReis: Added this function for the height map model.
 	// Like InitEmpty but allows a set of arguments to be passed in through a dict.
-	virtual void				InitEmptyFromArgs( const char *name, idDict &Args ) = 0;
+	//virtual void				InitEmptyFromArgs( const char *name, idDict &Args ) = 0;
 // RAVEN END
 
 	// dynamic model instantiations will be created with this
@@ -455,7 +455,7 @@ public:
 	virtual int					Memory() const = 0;
 
 	// for reloadModels
-	virtual unsigned int		Timestamp() const = 0;
+	virtual ID_TIME_T			Timestamp() const = 0;
 
 	// returns the number of surfaces
 	virtual int					NumSurfaces() const = 0;
@@ -503,7 +503,7 @@ public:
 
 // RAVEN BEGIN
 // dluetscher: added call to determine if a collision surface exists within this model
-	virtual bool				HasCollisionSurface( const struct renderEntity_s *ent ) const = 0;
+	//virtual bool				HasCollisionSurface( const struct renderEntity_s *ent ) const = 0;
 // RAVEN END
 
 	// returns a static model based on the definition and view
@@ -515,7 +515,7 @@ public:
 	// wasn't precached correctly.
 // RAVEN BEGIN
 // dluetscher: added surface mask parameter
-	virtual idRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, idRenderModel *cachedModel, dword surfMask = ~SURF_COLLISION  ) = 0;
+	virtual idRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const struct viewDef_s *view, idRenderModel *cachedModel  ) = 0;
 // RAVEN END
 
 	// Returns the number of joints or 0 if the model is not an MD5
@@ -537,18 +537,18 @@ public:
 	virtual int					NearestJoint( int surfaceNum, int a, int c, int b ) const = 0;
 
 	// Writing to and reading from a demo file.
-	virtual void				ReadFromDemo( class idDemoFile *f ) = 0;
-	virtual void				WriteToDemo( class idDemoFile *f ) = 0;
+//	virtual void				ReadFromDemo( class idDemoFile *f ) = 0;
+//	virtual void				WriteToDemo( class idDemoFile *f ) = 0;
 
 // RAVEN BEGIN
 // bdube: surface flag manipulation
-	virtual int					GetSurfaceMask ( const char* surface ) const = 0;;
-
-// jscott: for portal skies
-	virtual void				SetHasSky( bool on ) = 0;
-	virtual bool				GetHasSky( void ) const = 0;
-// ddynerman: Wolf LOD code
-	virtual void				SetViewEntity( const struct viewEntity_s *ve ) = 0;
+//	virtual int					GetSurfaceMask ( const char* surface ) const = 0;;
+//
+//// jscott: for portal skies
+//	virtual void				SetHasSky( bool on ) = 0;
+//	virtual bool				GetHasSky( void ) const = 0;
+//// ddynerman: Wolf LOD code
+//	virtual void				SetViewEntity( const struct viewEntity_s *ve ) = 0;
 // RAVEN END
 
 // RAVEN BEGIN 

@@ -297,7 +297,7 @@ public:
 	virtual int					Memory() const;
 
 private:
-	const idDeclParticle *		particleSystem;
+	//const idDeclParticle *		particleSystem;
 };
 
 /*

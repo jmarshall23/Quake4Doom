@@ -5899,7 +5899,7 @@ idRenderModel *idGameEdit::ANIM_CreateMeshForAnim( idRenderModel *model, const c
 
 	ANIM_CreateAnimFrame( model, md5anim, ent.numJoints, ent.joints, FRAME2MS( frame ), offset, remove_origin_offset );
 
-	newmodel = model->InstantiateDynamicModel( &ent, NULL, NULL, ~SURF_COLLISION );
+	newmodel = model->InstantiateDynamicModel( &ent, NULL, NULL );
 
 	Mem_Free16( ent.joints );
 	ent.joints = NULL;

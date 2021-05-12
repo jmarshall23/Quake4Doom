@@ -12,6 +12,8 @@
 ===============================================================================
 */
 
+class idDemoFile;
+
 // RAVEN BEGIN
 // jscott: new proc format
 //#define	PROC_FILE_ID					"mapProcFile003"
