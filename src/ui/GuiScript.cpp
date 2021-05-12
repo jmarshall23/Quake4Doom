@@ -237,6 +237,95 @@ void Script_Transition(idWindow *window, idList<idGSWinVar> *src) {
 	}
 }
 
+/*
+=========================
+Script_EvalRegs
+=========================
+*/
+// jmarshall - Quake 4 gui implementation
+void Script_NamedEvent(idWindow* window, idList<idGSWinVar>* src) {
+	idWinStr* parm = dynamic_cast<idWinStr*>((*src)[0].var);
+	idStr parmStr = parm->c_str();
+
+	int p = idStr::FindText(parm->c_str(), "::");
+	if (p <= 0)
+	{
+		window->RunNamedEvent(parm->c_str());
+	}
+	else
+	{
+		idStr windowName = parmStr.Mid(0, p);
+		idStr varName = parmStr.Mid(p + 2, parmStr.Length() - (p + 2));
+
+		drawWin_t* childWindow = window->FindChildByName(windowName);
+		if (childWindow)
+		{
+			childWindow->win->RunNamedEvent(varName);
+		}
+		else
+		{
+			common->Warning("GUI: %s: unknown window %s for named event %s\n", window->GetName(), windowName.c_str(), varName.c_str());
+		}
+	}
+}
+
+/*
+=========================
+Script_StopTransitions
+=========================
+*/
+void Script_StopTransitions(idWindow* window, idList<idGSWinVar>* src) {
+	idWinStr* parm = dynamic_cast<idWinStr*>((*src)[0].var);
+	idStr parmStr = parm->c_str();
+
+	drawWin_t* childWindow = window->FindChildByName(parmStr);
+	if (childWindow)
+	{
+		childWindow->win->ClearTransitions();
+	}
+}
+
+/*
+=========================
+Script_ConsoleCmd
+=========================
+*/
+void Script_ConsoleCmd(idWindow* window, idList<idGSWinVar>* src) {
+	idWinStr* parm = dynamic_cast<idWinStr*>((*src)[0].var);
+	idStr parmStr = parm->c_str();
+
+	cmdSystem->BufferCommandText(CMD_EXEC_NOW, parmStr.c_str());
+}
+
+/*
+===================
+Script_ResetVideo
+===================
+*/
+void Script_ResetVideo(idWindow* window, idList<idGSWinVar>* src) {
+	idWinStr* parm = dynamic_cast<idWinStr*>((*src)[0].var);
+	idStr parmStr = parm->c_str();
+	drawWin_t* childWindow = window->FindChildByName(parmStr);
+	if (childWindow)
+	{
+		if (childWindow->win)
+		{
+			childWindow->win->ResetCinematics();
+			childWindow->win->EvalRegs(-1, true);
+		}
+		else
+		{
+			childWindow->simp->ResetCinematics();
+		}
+	}
+	else
+	{
+		window->ResetCinematics();
+		window->EvalRegs(-1, true);
+	}
+}
+// jmarshall end
+
 typedef struct {
 	const char *name;
 	void (*handler) (idWindow *window, idList<idGSWinVar> *src);
@@ -254,7 +343,13 @@ guiCommandDef_t commandList[] = {
 	{ "transition", Script_Transition, 4, 6 },
 	{ "localSound", Script_LocalSound, 1, 1 },
 	{ "runScript", Script_RunScript, 1, 1 },
-	{ "evalRegs", Script_EvalRegs, 0, 0 }
+	{ "evalRegs", Script_EvalRegs, 0, 0 },
+// jmarshall - Quake 4 gui implementation
+	{ "namedevent", Script_NamedEvent, 1, 1},
+	{ "stoptransitions", Script_StopTransitions, 1, 1},
+	{ "consolecmd", Script_ConsoleCmd, 1, 1},
+	{ "resetVideo", Script_ResetVideo, 1, 1}
+// jmarshall end
 };
 
 int	scriptCommandCount = sizeof(commandList) / sizeof(guiCommandDef_t);

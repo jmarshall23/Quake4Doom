@@ -246,6 +246,10 @@ public:
 	bool Contains(const idRectangle &sr, float x, float y);
 	const char *GetName() { return name; };
 
+// jmarshall - quake 4 gui
+	void ClearTransitions(void) { transitions.Clear(); }
+// jmarshall end
+
 	virtual bool Parse(idParser *src, bool rebuild = true);
 	virtual const char *HandleEvent(const sysEvent_t *event, bool *updateVisuals);
 	void	CalcRects(float x, float y);

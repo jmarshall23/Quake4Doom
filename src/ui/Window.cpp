@@ -2532,8 +2532,10 @@ bool idWindow::Parse( idParser *src, bool rebuild) {
 #endif
 		} 
 		if ( !src->ReadToken( &token ) ) {
-			src->Error( "Unexpected end of file" );
-			ret = false;
+// jmarshall - quake 4 hack
+			//src->Error( "Unexpected end of file" );
+			//ret = false;
+// jmarshall end
 			break;
 		}
 	}

@@ -56,7 +56,9 @@ public:
 
 	virtual void	WriteToSaveGame( idFile *savefile );
 	virtual void	ReadFromSaveGame( idFile *savefile );
-
+// jmarshall - quake 4 gui
+	void			ResetCinematics(void);
+// jmarshall end
 protected:
 	void 			CalcClientRect(float xofs, float yofs);
 	void 			SetupTransforms(float x, float y);

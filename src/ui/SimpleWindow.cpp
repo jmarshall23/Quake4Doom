@@ -437,3 +437,11 @@ size_t idSimpleWindow::Size() {
 	sz += backGroundName.Size();
 	return sz;
 }
+
+// jmarshall - quake 4 gui
+void idSimpleWindow::ResetCinematics(void) {
+	if (background) {
+		background->ResetCinematicTime(gui->GetTime());
+	}
+}
+// jmarshall end
