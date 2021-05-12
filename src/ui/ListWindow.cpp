@@ -388,7 +388,9 @@ void idListWindow::PostParse() {
 		r.x = tabStops[i];
 		r.w = (i < c - 1) ? tabStops[i+1] - r.x - tabBorder : -1;
 		r.align = (doAligns) ? tabAligns[i] : 0;
-		if(tabVAligns.Num() > 0) {
+// jmarshall crash fix
+		if(tabVAligns.Num() > 0 && i < tabVAligns.Num()) {
+// jmarshall end
 			r.valign = tabVAligns[i];
 		} else {
 			r.valign = 0;

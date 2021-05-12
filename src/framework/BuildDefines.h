@@ -44,7 +44,7 @@
 
 #ifndef ID_ENFORCE_KEY
 #	if !defined( ID_DEDICATED ) && !defined( ID_DEMO_BUILD )
-#		define ID_ENFORCE_KEY 1
+#		define ID_ENFORCE_KEY 0
 #	else
 // twhitaker: just leave it undefined
 // TTimo: that breaks the ability to control it from command line settings with !win32 builds, but I can live with it

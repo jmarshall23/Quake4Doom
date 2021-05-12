@@ -51,6 +51,7 @@ idList<fontInfoEx_t> idDeviceContext::fonts;
 
 int idDeviceContext::FindFont( const char *name ) {
 	int c = fonts.Num();
+
 	for (int i = 0; i < c; i++) {
 		if (idStr::Icmp(name, fonts[i].name) == 0) {
 			return i;
@@ -59,7 +60,9 @@ int idDeviceContext::FindFont( const char *name ) {
 
 	// If the font was not found, try to register it
 	idStr fileName = name;
-	fileName.Replace("fonts", va("fonts/%s", fontLang.c_str()) );
+// jmarshall
+	//fileName.Replace("fonts", va("fonts/%s", fontLang.c_str()) );
+// jmarshall end
 
 	fontInfoEx_t fontInfo;
 		int index = fonts.Append( fontInfo );
