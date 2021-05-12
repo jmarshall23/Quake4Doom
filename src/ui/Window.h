@@ -291,7 +291,9 @@ public:
 	void FixupParms();
 	void GetScriptString(const char *name, idStr &out);
 	void SetScriptParams();
-	bool HasOps() {	return (ops.Num() > 0); };
+// jmarshall - gui crash.
+	bool HasOps() {	return (numOps > 0); };
+// jmarshall end
 	float EvalRegs(int test = -1, bool force = false);
 	void StartTransition();
 	void AddTransition(idWinVar *dest, idVec4 from, idVec4 to, int time, float accelTime, float decelTime);
@@ -440,8 +442,10 @@ protected:
 	idList<idTransitionData> transitions;
 
 	static bool registerIsTemporary[MAX_EXPRESSION_REGISTERS]; // statics to assist during parsing
-
-	idList<wexpOp_t> ops;			   	// evaluate to make expressionRegisters
+// jmarshall - gui crash
+	wexpOp_t ops[MAX_EXPRESSION_OPS];			   	// evaluate to make expressionRegisters
+	int numOps;
+// jmarshall end
 	idList<float> expressionRegisters;
 	idList<wexpOp_t> *saveOps;			   	// evaluate to make expressionRegisters
 	idList<rvNamedEvent*>		namedEvents;		//  added named events

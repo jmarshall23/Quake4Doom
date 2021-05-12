@@ -2120,7 +2120,8 @@ void idEntity::StopSound( const s_channelType channel, bool broadcast ) {
 	}
 
 // RAVEN BEGIN
-	idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+	idSoundEmitter* emitter = NULL;
+	emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 	if ( emitter ) {
 		emitter->StopSound( channel );
 	}

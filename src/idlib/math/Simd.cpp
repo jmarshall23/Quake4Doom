@@ -60,6 +60,9 @@ void idSIMD::InitProcessor( const char *module, bool forceGeneric ) {
 	idSIMDProcessor *newProcessor;
 
 	cpuid = idLib::sys->GetProcessorId();
+// jmarshall - temp disable SIMD
+	forceGeneric = true;
+// jmarshall end
 
 	if ( forceGeneric ) {
 

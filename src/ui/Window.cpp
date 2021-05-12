@@ -154,6 +154,10 @@ void idWindow::CommonInit() {
 	}
 
 	hideCursor = false;
+
+// jmarshall - gui crash
+	numOps = 0;
+// jmarshall end
 }
 
 /*
@@ -255,6 +259,9 @@ void idWindow::CleanUp() {
 	children.DeleteContents(true);
 	definedVars.DeleteContents(true);
 	timeLineEvents.DeleteContents(true);
+// jmarshall
+	updateVars.Clear();
+// jmarshall end
 	for (i = 0; i < SCRIPT_COUNT; i++) {
 		delete scripts[i];
 	}
@@ -518,8 +525,9 @@ idWindow::StateChanged
 void idWindow::StateChanged( bool redraw ) {
 
 	UpdateWinVars();
-
-	if (expressionRegisters.Num() && ops.Num()) {
+// jmarshall - gui crash.
+	if (expressionRegisters.Num() && numOps) {
+// jmarshall end
 		EvalRegs();
 	}
 
@@ -603,8 +611,9 @@ bool idWindow::RunTimeEvents(int time) {
 	lastTimeRun = time;
 
 	UpdateWinVars();
-
-	if (expressionRegisters.Num() && ops.Num()) {
+// jmarshall - gui crash.
+	if (expressionRegisters.Num() && numOps) {
+// jmarshall end
 		EvalRegs();
 	}
 
@@ -645,7 +654,9 @@ void idWindow::RunNamedEvent ( const char* eventName )
 		UpdateWinVars();
 
 		// Make sure we got all the current values for stuff
-		if (expressionRegisters.Num() && ops.Num()) {
+// jmarshall - gui crash
+		if (expressionRegisters.Num() && numOps) {
+// jmarshall end
 			EvalRegs(-1, true);
 		}
 		
@@ -715,7 +726,7 @@ const char *idWindow::HandleEvent(const sysEvent_t *event, bool *updateVisuals) 
 	if ( flags & WIN_DESKTOP ) {
 		actionDownRun = false;
 		actionUpRun = false;
-		if (expressionRegisters.Num() && ops.Num()) {
+		if (expressionRegisters.Num() && numOps) {
 			EvalRegs();
 		}
 		RunTimeEvents(gui->GetTime());
@@ -2759,14 +2770,15 @@ idWindow::ExpressionOp
 ================
 */
 wexpOp_t *idWindow::ExpressionOp() {
-	if ( ops.Num() == MAX_EXPRESSION_OPS ) {
+// jmarshall - gui crash
+	if (numOps == MAX_EXPRESSION_OPS ) {
 		common->Warning( "expressionOp: gui %s hit MAX_EXPRESSION_OPS", gui->GetSourceFile());
 		return &ops[0];
 	}
 	wexpOp_t wop;
-	memset(&wop, 0, sizeof(wexpOp_t));
-	int i = ops.Append(wop);
-	return &ops[i];
+	memset(&wop, 0, sizeof(wexpOp_t));	
+	return &ops[numOps++];
+// jmarshall end
 }
 
 /*
@@ -3042,7 +3054,7 @@ void idWindow::EvaluateRegisters(float *registers) {
 	idVec4 v;
 
 	int erc = expressionRegisters.Num();
-	int oc = ops.Num();
+	int oc = numOps;
 	// copy the constants
 	for ( i = WEXP_REG_NUM_PREDEFINED ; i < erc ; i++ ) {
 		registers[i] = expressionRegisters[i];
@@ -3869,7 +3881,7 @@ void idWindow::FixupParms() {
 		namedEvents[i]->mEvent->FixupParms(this);
 	}
 
-	c = ops.Num();
+	c = numOps;
 	for (i = 0; i < c; i++) {
 		if (ops[i].b == -2) {
 			// need to fix this up
@@ -3900,7 +3912,7 @@ bool idWindow::IsSimple() {
 		return false;
 	}
 
-	if (ops.Num()) {
+	if (numOps) {
 		return false;
 	}
 	if (flags & (WIN_HCENTER | WIN_VCENTER)) {
@@ -4212,7 +4224,8 @@ bool idWindow::UpdateFromDictionary ( idDict& dict ) {
 	// Clear all registers since they will get recreated
 	regList.Reset ( );
 	expressionRegisters.Clear ( );
-	ops.Clear ( );
+	//ops.Clear ( );
+	numOps = 0;
 	
 	for ( i = 0; i < dict.GetNumKeyVals(); i ++ ) {
 		kv = dict.GetKeyVal ( i );
