@@ -1602,9 +1602,11 @@ void idEntity::Present( void ) {
 	// if there is no handle yet, go ahead and add it, ignoring the last predict frame early out
 	// if not, that causes next render frame to have a bunch of spurious primitive draws ( r_showPrimitives )
 	// ( we suspect this is because TH_UPDATEVISUALS doesn't get cleared? )
-	if ( !gameLocal.isLastPredictFrame && modelDefHandle != -1 ) {
-		return;
-	}
+// jmarshall
+	//if ( !gameLocal.isLastPredictFrame && modelDefHandle != -1 ) {
+	//	return;
+	//}
+// jmarshall end
 
 // RAVEN BEGIN
 // ddynerman: don't render objects not in our instance (only on server)
