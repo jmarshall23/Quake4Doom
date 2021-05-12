@@ -1636,26 +1636,7 @@ void idMaterial::ParseDeform( idLexer &src ) {
 		deform = DFRM_EYEBALL;
 		return;
 	}
-	if ( !token.Icmp( "particle" ) ) {
-		deform = DFRM_PARTICLE;
-		if ( !src.ExpectAnyToken( &token ) ) {
-			src.Warning( "deform particle missing particle name" );
-			SetMaterialFlag( MF_DEFAULTED );
-			return;
-		}
-		deformDecl = declManager->FindType( DECL_PARTICLE, token.c_str(), true );
-		return;
-	}
-	if ( !token.Icmp( "particle2" ) ) {
-		deform = DFRM_PARTICLE2;
-		if ( !src.ExpectAnyToken( &token ) ) {
-			src.Warning( "deform particle missing particle name" );
-			SetMaterialFlag( MF_DEFAULTED );
-			return;
-		}
-		deformDecl = declManager->FindType( DECL_PARTICLE, token.c_str(), true );
-		return;
-	}
+	
 	src.Warning( "Bad deform type '%s'", token.c_str() );
 	SetMaterialFlag( MF_DEFAULTED );
 }
