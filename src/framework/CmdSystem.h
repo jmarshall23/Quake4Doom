@@ -70,7 +70,7 @@ public:
 						// Base for path/file auto-completion.
 	virtual void		ArgCompletion_FolderExtension( const idCmdArgs &args, void(*callback)( const char *s ), const char *folder, bool stripFolder, ... ) = 0;
 	
-	virtual void		ArgCompletion_Models( const idCmdArgs &args, void(*callback)( const char *s ), bool strogg, bool marine ) = 0;
+	//virtual void		ArgCompletion_Models( const idCmdArgs &args, void(*callback)( const char *s ), bool strogg, bool marine ) = 0;
 	
 						// Base for decl name auto-completion.
 	virtual void		ArgCompletion_DeclName( const idCmdArgs &args, void(*callback)( const char *s ), int type ) = 0;
@@ -79,13 +79,13 @@ public:
 	virtual void		BufferCommandArgs( cmdExecution_t exec, const idCmdArgs &args ) = 0;
 
 						// Restore these cvars when the next reloadEngine is done
-	virtual void		SetupCVarsForReloadEngine( const idDict &dict ) = 0;
+//	virtual void		SetupCVarsForReloadEngine( const idDict &dict ) = 0;
 						// Setup a reloadEngine to happen on next command run, and give a command to execute after reload
 	virtual void		SetupReloadEngine( const idCmdArgs &args ) = 0;
 	virtual bool		PostReloadEngine( void ) = 0;
 
 						// There is a cache of the last completion operation that may need to be cleared sometimes
-	virtual void		ClearCompletion( void ) = 0;
+	//virtual void		ClearCompletion( void ) = 0;
 
 						// Default argument completion functions.
 	static void			ArgCompletion_Boolean( const idCmdArgs &args, void(*callback)( const char *s ) );
@@ -177,15 +177,15 @@ ID_INLINE void idCmdSystem::ArgCompletion_VideoName( const idCmdArgs &args, void
 }
 
 ID_INLINE void idCmdSystem::ArgCompletion_ForceModel( const idCmdArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_Models( args, callback, true, true );
+	//cmdSystem->ArgCompletion_Models( args, callback, true, true );
 }
 
 ID_INLINE void idCmdSystem::ArgCompletion_ForceModelStrogg( const idCmdArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_Models( args, callback, true, false );
+	//cmdSystem->ArgCompletion_Models( args, callback, true, false );
 }
 
 ID_INLINE void idCmdSystem::ArgCompletion_ForceModelMarine( const idCmdArgs &args, void(*callback)( const char *s ) ) {
-	cmdSystem->ArgCompletion_Models( args, callback, false, true );
+	//cmdSystem->ArgCompletion_Models( args, callback, false, true );
 }
 
 // RAVEN BEGIN
