@@ -950,6 +950,7 @@ void idDeclManagerLocal::Init( void ) {
 	RegisterDeclType(  "lipSync",			DECL_LIPSYNC,		idDeclAllocator<rvDeclLipSync>);
 	RegisterDeclType(  "playback",			DECL_PLAYBACK,		idDeclAllocator<rvDeclPlayback>);
 	RegisterDeclType(	"effect",			DECL_EFFECT,		idDeclAllocator<rvDeclEffect>);
+	RegisterDeclType(	"playerModel",		DECL_PLAYER_MODEL, idDeclAllocator<rvDeclPlayerModel>);
 // jmarshall end
 
 // jmarshall: Raven Decl Support

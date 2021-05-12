@@ -3,6 +3,10 @@
 
 #include "precompiled.h"
 
+rvDeclPlayerModel::rvDeclPlayerModel() {
+
+}
+
 /*
 ===================
 rvDeclPlayerModel::Size
@@ -27,7 +31,71 @@ rvDeclPlayerModel::FreeData
 ===================
 */
 bool rvDeclPlayerModel::Parse(const char* text, const int textLength) {
-	// jmarshall: can't see were this is used. 
+	idLexer src;
+	idToken	token, token2;
+
+	src.LoadMemory(text, textLength, GetFileName(), GetLineNum());
+	src.SetFlags(DECL_LEXER_FLAGS);
+	src.SkipUntilString("{");
+
+	while (1) {
+		if (!src.ReadToken(&token)) {
+			break;
+		}
+
+		if (!token.Icmp("}")) {
+			break;
+		}
+		else if (token == "head_offset")
+		{
+			src.Parse1DMatrix(3, headOffset.ToFloatPtr());
+			continue;
+		}
+		else if (token == "description")
+		{
+			src.ReadToken(&token);
+			description = token;
+			continue;
+		}
+		else if (token == "team")
+		{
+			src.ReadToken(&token);
+			team = token;
+			continue;
+		}
+		else if (token == "def_head_ui")
+		{
+			src.ReadToken(&token);
+			head = token;
+			continue;
+		}
+		else if (token == "def_head")
+		{
+			src.ReadToken(&token);
+			uiHead = token;
+			continue;
+		}
+		else if (token == "model")
+		{
+			src.ReadToken(&token);
+			model = token;
+			continue;
+		}
+		else
+		{
+			src.Error("Invalid or unexpected token %s\n", token.c_str());
+			return false;
+		}
+	}
+
+	if (model.Length() <= 0)
+	{
+		src.Error("playerModel decl '%s' without model declaration", token.c_str());
+		return false;
+	}
+
+
+
 	return true;
 }
 
