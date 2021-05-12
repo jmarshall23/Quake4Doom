@@ -601,7 +601,7 @@ int idFile::WriteVec4( const idVec4 &vec ) {
  =================
  */
 int idFile::WriteVec5(const idVec5& vec) {
-	idVec4 v = vec;
+	idVec5 v = vec;
 	LittleRevBytes(&v, sizeof(float), sizeof(v) / sizeof(float));
 	return Write(&v, sizeof(v));
 }

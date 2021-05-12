@@ -3175,13 +3175,7 @@ idFile *idFileSystemLocal::OpenFileReadFlags( const char *relativePath, int sear
 	if ( relativePath[0] == '\0' ) {
 		return NULL;
 	}
-
-	// make sure the doomkey file is only readable by game at initialization
-	// any other time the key should only be accessed in memory using the provided functions
-	if( common->IsInitialized() && ( idStr::Icmp( relativePath, CDKEY_FILE ) == 0 || idStr::Icmp( relativePath, XPKEY_FILE ) == 0 ) ) {
-		return NULL;
-	}
-
+	
 	//
 	// search through the path, one element at a time
 	//
@@ -3594,11 +3588,7 @@ size_t idFileSystemLocal::CurlWriteFunction( void *ptr, size_t size, size_t nmem
 	if ( !bgl->f ) {
 		return size * nmemb;
 	}
-	#ifdef _WIN32
-		return _write( static_cast<idFile_Permanent*>(bgl->f)->GetFilePtr()->_file, ptr, size * nmemb );
-	#else
-		return fwrite( ptr, size, nmemb, static_cast<idFile_Permanent*>(bgl->f)->GetFilePtr() );
-	#endif
+	return fwrite(ptr, size, nmemb, static_cast<idFile_Permanent*>(bgl->f)->GetFilePtr());
 }
 
 /*
@@ -3640,11 +3630,7 @@ dword BackgroundDownloadThread( void *parms ) {
 
 		if ( bgl->opcode == DLTYPE_FILE ) {
 			// use the low level read function, because fread may allocate memory
-			#if defined(WIN32)
-				_read( static_cast<idFile_Permanent*>(bgl->f)->GetFilePtr()->_file, bgl->file.buffer, bgl->file.length );
-			#else
-				fread(  bgl->file.buffer, bgl->file.length, 1, static_cast<idFile_Permanent*>(bgl->f)->GetFilePtr() );
-			#endif
+			fread(bgl->file.buffer, bgl->file.length, 1, static_cast<idFile_Permanent*>(bgl->f)->GetFilePtr());
 			bgl->completed = true;
 		} else {
 #if ID_ENABLE_CURL

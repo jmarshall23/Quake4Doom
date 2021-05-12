@@ -22,13 +22,7 @@
 	#define ID_ALLOW_CHEATS 0
 #endif
 
-#ifndef ID_ENABLE_CURL
-	#if !defined( _XENON )
-		#define ID_ENABLE_CURL 1
-	#else
-		#define ID_ENABLE_CURL 0
-	#endif
-#endif
+#define ID_ENABLE_CURL 0
 
 // fake a pure client. useful to connect an all-debug client to a server
 #ifndef ID_FAKE_PURE
