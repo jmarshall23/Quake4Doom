@@ -2362,6 +2362,16 @@ bool idWindow::Parse( idParser *src, bool rebuild) {
 				src->Error( "Unexpected end of file" );
 				return false;
 			}
+// jmarshall - quake 4 guis
+			if (token == "+")
+			{
+				if (!src->ReadToken(&token)) {
+					src->Error("Unexpected end of file");
+					return false;
+				}
+			}
+// jmarshall end
+
 			ev->time = atoi(token.c_str());
 			
 			// reset the mark since we dont want it to include the time
