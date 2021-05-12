@@ -77,7 +77,7 @@ public:
 	const char *				GetSourceFile( void ) const { return source; }
 	ID_TIME_T						GetTimeStamp( void ) const { return timeStamp; }
 
-	idWindow *					GetDesktop() const { return desktop; }
+	virtual idWindow *			GetDesktop() const { return desktop; }
 	void						SetBindHandler( idWindow *win ) { bindHandler = win; }
 	bool						Active() const { return active; }
 	int							GetTime() const { return time; }

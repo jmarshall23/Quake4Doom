@@ -187,7 +187,7 @@ public:
 		if (guiDict && name && *name) {
 			data = guiDict->GetString(GetName());
 		}
-		return data.LengthWithoutColors();
+		return data.Length();
 	}
 	int Length() {
 		if (guiDict && name && *name) {
@@ -199,7 +199,7 @@ public:
 		if (guiDict && name && *name) {
 			data = guiDict->GetString(GetName());
 		}
-		data.RemoveColors();
+		//data.RemoveColors();
 	}
 	virtual const char *c_str() const {
 		return data.c_str();

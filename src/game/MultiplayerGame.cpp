@@ -4656,6 +4656,8 @@ const char* idMultiplayerGame::HandleGuiCommands( const char *_menuCommand ) {
 			for ( i = 0; i < num; i++ ) {
 				dict = fileSystem->GetMapDecl( i );
 				if ( dict ) {
+// jmarshall - mp game list
+/*
 					// any MP gametype supported
 					bool isMP = false;
 					int igt = GAME_SP + 1;
@@ -4677,6 +4679,8 @@ const char* idMultiplayerGame::HandleGuiCommands( const char *_menuCommand ) {
 							mapList->SetSelection( mapList->Num() - 1 );
 						}
 					}
+*/
+// jmarshall end
 				}
 			}
 			// set the current level shot
@@ -5325,6 +5329,8 @@ void idMultiplayerGame::AddChatLine( const char *fmt, ... ) {
 	idStr temp;
 	va_list argptr;
 
+// jmarshall - chat lines
+	/*
 // mekberg: chat changes.
 	wrapInfo_t wrapInfo;
 	idStr wrap1;
@@ -5414,7 +5420,8 @@ void idMultiplayerGame::AddChatLine( const char *fmt, ... ) {
 
 		gameLocal.GetLocalPlayer()->StartSound( chatSound, SND_CHANNEL_ANY, 0, false, NULL );
 	}
-	
+	*/
+// jmarshall end
 }
 
 void idMultiplayerGame::DrawStatSummary( void ) {	

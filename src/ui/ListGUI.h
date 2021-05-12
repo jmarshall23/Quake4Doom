@@ -20,9 +20,9 @@ public:
 	virtual void		Config( idUserInterface *pGUI, const char *name ) = 0;
 // RAVEN BEGIN
 // shouchard:  added greyed support
-	virtual void		Add( int id, const idStr& s, bool greyed = false ) = 0;
+//	virtual void		Add( int id, const idStr& s, bool greyed = false ) = 0;
 						// use the element count as index for the ids
-	virtual void		Push( const idStr& s, bool greyed = false ) = 0;
+	//virtual void		Push( const idStr& s, bool greyed = false ) = 0;
 // RAVEN END
 	virtual bool		Del( int id ) = 0;
 	virtual void		Clear( void ) = 0;
