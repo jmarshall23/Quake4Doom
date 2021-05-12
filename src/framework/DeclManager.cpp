@@ -1080,6 +1080,9 @@ void idDeclManagerLocal::ParseGuides(void) {
 		{
 			src.ReadToken(&token);
 
+			if (token.Length() <= 0)
+				break;
+
 			if (token == "guide" || token == "inlineGuide")
 			{
 				rvGuideTemplate guide;
