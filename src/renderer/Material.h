@@ -24,6 +24,13 @@ class rvGLSLShaderStage;
 
 // moved from image.h for default parm
 typedef enum {
+	TF_LINEAR,
+	TF_NEAREST,
+	TF_DEFAULT				// use the user-specified r_textureFilter
+} textureFilter_t;
+
+// moved from image.h for default parm
+typedef enum {
 	TR_REPEAT,
 	TR_CLAMP,
 	TR_CLAMP_TO_BORDER,		// this should replace TR_CLAMP_TO_ZERO and TR_CLAMP_TO_ZERO_ALPHA,
