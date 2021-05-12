@@ -475,24 +475,9 @@ void *idHeap::Allocate( const dword bytes, byte tag ) {
 
 //RAVEN BEGIN
 //amccarthy:  Added allocation tags for malloc
-#ifdef _DEBUG
-	byte *p = (byte *)local_malloc( bytes + MALLOC_HEADER_SIZE );
-	OutstandingXMallocSize += bytes;
-	assert( tag > 0 && tag < MA_MAX);
-	OutstandingXMallocTagSize[tag] += bytes;
-	if (OutstandingXMallocTagSize[tag] > PeakXMallocTagSize[tag])
-	{
-		PeakXMallocTagSize[tag] = OutstandingXMallocTagSize[tag];
-	}
-	CurrNumAllocations[tag]++;
-	dword *d = (dword *)p;
-	d[0] = bytes;
-	byte *ret = p+MALLOC_HEADER_SIZE;
-	ret[-1] = tag;
-	return ret;
-#else
-	return local_malloc( bytes);
-#endif
+
+return local_malloc( bytes);
+
 
 //RAVEN END
 
@@ -524,20 +509,9 @@ void idHeap::Free( void *p ) {
 	c_heapAllocRunningCount--;
 
 #if USE_LIBC_MALLOC
-//RAVEN BEGIN
-//amccarthy:  allocation tracking
-#ifdef _DEBUG
-	byte *ptr = ((byte *)p) - MALLOC_HEADER_SIZE;
-	dword size = ((dword*)(ptr))[0];
-	byte tag = ((byte *)(p))[-1];
-	OutstandingXMallocSize -= size;
-	assert( tag > 0 && tag < MA_MAX);
-	OutstandingXMallocTagSize[tag] -= size;
-	CurrNumAllocations[tag]--;
-	local_free( ptr );
-#else
+
 	local_free( p );
-#endif
+
 //RAVEN END
 #else
 	switch( ((byte *)(p))[-1] ) {
@@ -1666,8 +1640,8 @@ void Mem_Init( void ) {
 // jnewquist: Tag scope and callees to track allocations using "new".
 	MEM_SCOPED_TAG(tag,MA_DEFAULT);
 // RAVEN END
-	mem_heap = new idHeap;
-	Mem_ClearFrameStats();
+	//mem_heap = new idHeap;
+	//Mem_ClearFrameStats();
 }
 
 /*
