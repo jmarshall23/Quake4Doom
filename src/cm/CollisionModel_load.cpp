@@ -584,6 +584,18 @@ void idCollisionModelManagerLocal::FreeModel( idCollisionModel *_model ) {
 	Mem_Free( model->edges );
 	// free vertices
 	Mem_Free( model->vertices );
+// jmarshall - crash bug
+	for (int i = 0; i < maxModels; i++) {
+		if (!models[i]) {
+			continue;
+		}
+
+		if (models[i] == model) {
+			models[i] = NULL;
+		}
+	}
+// jmarshall end
+
 	// free the model
 	delete model;
 }
@@ -3367,6 +3379,10 @@ idCollisionModel* idCollisionModelManagerLocal::FindModel( const char *name ) {
 
 	// check if this model is already loaded
 	for ( i = 0; i < numModels; i++ ) {
+// jmarshall - crash bug
+		if (models[i] == NULL)
+			continue;
+// jmarshall end
 		if ( !models[i]->name.Icmp( name ) ) {
 			return models[i];
 		}
