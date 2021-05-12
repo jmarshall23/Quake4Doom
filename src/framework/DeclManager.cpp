@@ -650,17 +650,13 @@ idStr idDeclFile::PreprocessGuides(const char* text, int textLength) {
 
 	src.LoadMemory(text, textLength, "", 0);
 	src.SetFlags(DECL_LEXER_FLAGS);
-	src.SkipUntilString("{");
 
 	while (1) {
 		if (!src.ReadToken(&token)) {
 			break;
 		}
 
-		if (!token.Icmp("}")) {
-			break;
-		}
-		else if (token == "guide") {
+		if (token == "guide") {
 			idToken name;
 			idStr newDecl;
 			rvGuideTemplate*guide = NULL;
@@ -693,6 +689,8 @@ idStr idDeclFile::PreprocessGuides(const char* text, int textLength) {
 				newDecl.Replace(guide->parms[i].c_str(), token);
 			}
 			src.ExpectTokenString(")");
+
+			newDecl += "\n";
 
 			finalBuffer += newDecl;
 		}
@@ -748,11 +746,14 @@ int idDeclFile::LoadAndParse() {
 	{
 		finalPreprocessedBuffer = PreprocessGuides(buffer, length);
 	}
+
+	fileSystem->WriteFile(va("generated/%s", fileName.c_str()), finalPreprocessedBuffer.c_str(), finalPreprocessedBuffer.Length());
+
+	Mem_Free(buffer);
 // jmarshall end
 
 	if ( !src.LoadMemory(finalPreprocessedBuffer.c_str(), finalPreprocessedBuffer.Length(), fileName ) ) {
 		common->Error( "Couldn't parse %s", fileName.c_str() );
-		Mem_Free( buffer );
 		return 0;
 	}
 
@@ -762,9 +763,9 @@ int idDeclFile::LoadAndParse() {
 	}
 
 	src.SetFlags( DECL_LEXER_FLAGS );
-
-	checksum = MD5_BlockChecksum( buffer, length );
-
+// jmarshall
+	checksum = MD5_BlockChecksum(finalPreprocessedBuffer.c_str(), finalPreprocessedBuffer.Length());
+// jmarshall end
 	fileSize = length;
 
 	// scan through, identifying each individual declaration
@@ -874,7 +875,7 @@ int idDeclFile::LoadAndParse() {
 			newDecl->textSource = NULL;
 		}
 
-		newDecl->SetTextLocal( buffer + startMarker, size );
+		newDecl->SetTextLocal(finalPreprocessedBuffer.c_str() + startMarker, size );
 		newDecl->sourceFile = this;
 		newDecl->sourceTextOffset = startMarker;
 		newDecl->sourceTextLength = size;
@@ -888,8 +889,6 @@ int idDeclFile::LoadAndParse() {
 	}
 
 	numLines = src.GetLineNum();
-
-	Mem_Free( buffer );
 
 	// any defs that weren't redefinedInReload should now be defaulted
 	for ( idDeclLocal *decl = decls ; decl ; decl = decl->nextInFile ) {
