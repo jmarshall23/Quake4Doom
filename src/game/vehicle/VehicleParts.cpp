@@ -527,17 +527,19 @@ rvVehicleLight::Impulse
 =====================
 */
 void rvVehicleLight::Impulse ( int impulse ) {
-	switch ( impulse ) {
-		case IMPULSE_50:
-			if ( lightOn ) {
-				lightOn = false;
-				TurnOff ( );
-			} else {
-				lightOn = true;
-				TurnOn ( );
-			}
-			break;
-	}
+// jmarshall - todo
+	//switch ( impulse ) {
+	//	case IMPULSE_50:
+	//		if ( lightOn ) {
+	//			lightOn = false;
+	//			TurnOff ( );
+	//		} else {
+	//			lightOn = true;
+	//			TurnOn ( );
+	//		}
+	//		break;
+	//}
+// jmarshall end
 }
 
 /*

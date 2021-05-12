@@ -31,6 +31,9 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "Session_local.h"
 
+#define RENDERDEMO_VERSION 1 
+#define USERCMD_MSEC common->GetUserCmdMSec()
+
 idCVar	idSessionLocal::com_showAngles( "com_showAngles", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
 idCVar	idSessionLocal::com_minTics( "com_minTics", "1", CVAR_SYSTEM, "" );
 idCVar	idSessionLocal::com_showTics( "com_showTics", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
@@ -1444,7 +1447,7 @@ void idSessionLocal::LoadLoadingGui( const char *mapName ) {
 	char guiMap[ MAX_STRING_CHARS ];
 	strncpy( guiMap, va( "guis/map/%s.gui", stripped.c_str() ), MAX_STRING_CHARS );
 	// give the gamecode a chance to override
-	game->GetMapLoadingGUI( guiMap );
+	//game->GetMapLoadingGUI( guiMap );
 
 	if ( uiManager->CheckGui( guiMap ) ) {
 		guiLoading = uiManager->FindGui( guiMap, true, false, true );
@@ -1624,24 +1627,24 @@ void idSessionLocal::ExecuteMapChange( bool noFadeWipe ) {
 
 	// set the user info
 	for ( i = 0; i < numClients; i++ ) {
-		game->SetUserInfo( i, mapSpawnData.userInfo[i], idAsyncNetwork::client.IsActive(), false );
+		game->SetUserInfo( i, mapSpawnData.userInfo[i], false );
 		game->SetPersistentPlayerInfo( i, mapSpawnData.persistentPlayerInfo[i] );
 	}
 
 	// load and spawn all other entities ( from a savegame possibly )
 	if ( loadingSaveGame && savegameFile ) {
-		if ( game->InitFromSaveGame( fullMapName + ".map", rw, sw, savegameFile ) == false ) {
+		if ( game->InitFromSaveGame( fullMapName + ".map", rw, savegameFile ) == false ) {
 			// If the loadgame failed, restart the map with the player persistent data
 			loadingSaveGame = false;
 			fileSystem->CloseFile( savegameFile );
 			savegameFile = NULL;
 
 			game->SetServerInfo( mapSpawnData.serverInfo );
-			game->InitFromNewMap( fullMapName + ".map", rw, sw, idAsyncNetwork::server.IsActive(), idAsyncNetwork::client.IsActive(), Sys_Milliseconds() );
+			game->InitFromNewMap( fullMapName + ".map", rw, idAsyncNetwork::server.IsActive(), idAsyncNetwork::client.IsActive(), Sys_Milliseconds() );
 		}
 	} else {
 		game->SetServerInfo( mapSpawnData.serverInfo );
-		game->InitFromNewMap( fullMapName + ".map", rw, sw, idAsyncNetwork::server.IsActive(), idAsyncNetwork::client.IsActive(), Sys_Milliseconds() );
+		game->InitFromNewMap( fullMapName + ".map", rw, idAsyncNetwork::server.IsActive(), idAsyncNetwork::client.IsActive(), Sys_Milliseconds() );
 	}
 
 	if ( !idAsyncNetwork::IsActive() && !loadingSaveGame ) {
@@ -1663,7 +1666,7 @@ void idSessionLocal::ExecuteMapChange( bool noFadeWipe ) {
 	if ( !idAsyncNetwork::IsActive() && !loadingSaveGame ) {
 		// run a few frames to allow everything to settle
 		for ( i = 0; i < 10; i++ ) {
-			game->RunFrame( mapSpawnData.mapSpawnUsercmd );
+			game->RunFrame( mapSpawnData.mapSpawnUsercmd, 0, 0, 0 ); // serverGameFrame isn't used
 		}
 	}
 
@@ -1865,7 +1868,7 @@ void idSessionLocal::ScrubSaveGameFileName( idStr &saveFileName ) const {
 	idStr inFileName;
 
 	inFileName = saveFileName;
-	inFileName.RemoveColors();
+	//inFileName.RemoveColors();
 	inFileName.StripFileExtension();
 
 	saveFileName.Clear();
@@ -2271,7 +2274,7 @@ void idSessionLocal::AdvanceRenderDemo( bool singleFrameOnly ) {
 			break;
 		}
 		if ( ds == DS_RENDER ) {
-			if ( rw->ProcessDemoCommand( readDemo, &currentDemoRenderView, &demoTimeOffset ) ) {
+			if ( rw->ProcessDemoCommand( readDemo, &currentDemoRenderView, NULL, &demoTimeOffset ) ) {
 				// a view is ready to render
 				skipFrames--;
 				numDemoFrames++;
@@ -2665,7 +2668,7 @@ void idSessionLocal::Frame() {
 	// check for user info changes
 	if ( cvarSystem->GetModifiedFlags() & CVAR_USERINFO ) {
 		mapSpawnData.userInfo[0] = *cvarSystem->MoveCVarsToDict( CVAR_USERINFO );
-		game->SetUserInfo( 0, mapSpawnData.userInfo[0], false, false );
+		game->SetUserInfo( 0, mapSpawnData.userInfo[0], false );
 		cvarSystem->ClearModifiedFlags( CVAR_USERINFO );
 	}
 
@@ -2774,7 +2777,7 @@ void idSessionLocal::RunGameTic() {
 
 	// run the game logic every player move
 	int	start = Sys_Milliseconds();
-	gameReturn_t	ret = game->RunFrame( &cmd );
+	gameReturn_t	ret = game->RunFrame( &cmd, 0, 0, 0 ); // jmarshall: serverGameFrame isn't used
 
 	int end = Sys_Milliseconds();
 	time_gameFrame += end - start;	// note time used for com_speeds
@@ -2983,37 +2986,7 @@ idSessionLocal::ReadCDKey
 =================
 */
 void idSessionLocal::ReadCDKey( void ) {
-	idStr filename;
-	idFile *f;
-	char buffer[32];
-
-	cdkey_state = CDKEY_UNKNOWN;
-
-	filename = "../" BASE_GAMEDIR "/" CDKEY_FILE;
-	f = fileSystem->OpenExplicitFileRead( fileSystem->RelativePathToOSPath( filename, "fs_savepath" ) );
-	if ( !f ) {
-		common->Printf( "Couldn't read %s.\n", filename.c_str() );
-		cdkey[ 0 ] = '\0';
-	} else {
-		memset( buffer, 0, sizeof(buffer) );
-		f->Read( buffer, CDKEY_BUF_LEN - 1 );
-		fileSystem->CloseFile( f );
-		idStr::Copynz( cdkey, buffer, CDKEY_BUF_LEN );
-	}
-
-	xpkey_state = CDKEY_UNKNOWN;
-
-	filename = "../" BASE_GAMEDIR "/" XPKEY_FILE;
-	f = fileSystem->OpenExplicitFileRead( fileSystem->RelativePathToOSPath( filename, "fs_savepath" ) );
-	if ( !f ) {
-		common->Printf( "Couldn't read %s.\n", filename.c_str() );
-		xpkey[ 0 ] = '\0';
-	} else {
-		memset( buffer, 0, sizeof(buffer) );
-		f->Read( buffer, CDKEY_BUF_LEN - 1 );
-		fileSystem->CloseFile( f );
-		idStr::Copynz( xpkey, buffer, CDKEY_BUF_LEN );
-	}
+	
 }
 
 /*
@@ -3022,31 +2995,7 @@ idSessionLocal::WriteCDKey
 ================
 */
 void idSessionLocal::WriteCDKey( void ) {
-	idStr filename;
-	idFile *f;
-	const char *OSPath;
-
-	filename = "../" BASE_GAMEDIR "/" CDKEY_FILE;
-	// OpenFileWrite advertises creating directories to the path if needed, but that won't work with a '..' in the path
-	// occasionally on windows, but mostly on Linux and OSX, the fs_savepath/base may not exist in full
-	OSPath = fileSystem->BuildOSPath( cvarSystem->GetCVarString( "fs_savepath" ), BASE_GAMEDIR, CDKEY_FILE );
-	fileSystem->CreateOSPath( OSPath );
-	f = fileSystem->OpenFileWrite( filename );
-	if ( !f ) {
-		common->Printf( "Couldn't write %s.\n", filename.c_str() );
-		return;
-	}
-	f->Printf( "%s%s", cdkey, CDKEY_TEXT );
-	fileSystem->CloseFile( f );
-
-	filename = "../" BASE_GAMEDIR "/" XPKEY_FILE;
-	f = fileSystem->OpenFileWrite( filename );
-	if ( !f ) {
-		common->Printf( "Couldn't write %s.\n", filename.c_str() );
-		return;
-	}
-	f->Printf( "%s%s", xpkey, CDKEY_TEXT );
-	fileSystem->CloseFile( f );
+	
 }
 
 /*

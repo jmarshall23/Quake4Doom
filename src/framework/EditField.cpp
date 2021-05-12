@@ -554,12 +554,12 @@ void idEditField::Draw( int x, int y, int width, bool showCursor, const idMateri
 		prestep = scroll;
 
 		// Skip color code
-		if ( idStr::IsColor( buffer + prestep ) ) { 
-			prestep += 2;
-		}
-		if ( prestep > 0 && idStr::IsColor( buffer + prestep - 1 ) ) {
-			prestep++;
-		}
+		//if ( idStr::IsColor( buffer + prestep ) ) { 
+		//	prestep += 2;
+		//}
+		//if ( prestep > 0 && idStr::IsColor( buffer + prestep - 1 ) ) {
+		//	prestep++;
+		//}
 	}
 
 	if ( prestep + drawLen > len ) {
@@ -593,12 +593,12 @@ void idEditField::Draw( int x, int y, int width, bool showCursor, const idMateri
 	}
 
 	// Move the cursor back to account for color codes
-	for ( int i = 0; i<cursor; i++ ) {
-		if ( idStr::IsColor( &str[i] ) ) {
-			i++;
-			prestep += 2;
-		}
-	}
+	//for ( int i = 0; i<cursor; i++ ) {
+	//	if ( idStr::IsColor( &str[i] ) ) {
+	//		i++;
+	//		prestep += 2;
+	//	}
+	//}
 
 	renderSystem->DrawSmallChar( x + ( cursor - prestep ) * size, y, cursorChar, shader );
 }

@@ -8154,6 +8154,8 @@ GetItemBuyImpulse
 */
 int GetItemBuyImpulse( const char* itemName )
 {
+// jmarshall - multiplayer
+/*
 	struct ItemBuyImpulse
 	{
 		const char*	itemName;
@@ -8200,7 +8202,8 @@ int GetItemBuyImpulse( const char* itemName )
 			return itemBuyImpulseTable[ i ].itemBuyImpulse;
 		}
 	}
-
+*/
+// jmarshall end
 	return 0;
 }
 
@@ -8564,48 +8567,49 @@ void idPlayer::PerformImpulse( int impulse ) {
 			idFuncRadioChatter::RepeatLast();
 			break;
 		}
-
-// RITUAL BEGIN
-// squirrel: Mode-agnostic buymenus
-		case IMPULSE_100:	AttemptToBuyItem( "weapon_shotgun" );				break;
-		case IMPULSE_101:	AttemptToBuyItem( "weapon_machinegun" );			break;
-		case IMPULSE_102:	AttemptToBuyItem( "weapon_hyperblaster" );			break;
-		case IMPULSE_103:	AttemptToBuyItem( "weapon_grenadelauncher" );		break;
-		case IMPULSE_104:	AttemptToBuyItem( "weapon_nailgun" );				break;
-		case IMPULSE_105:	AttemptToBuyItem( "weapon_rocketlauncher" );		break;
-		case IMPULSE_106:	AttemptToBuyItem( "weapon_railgun" );				break;
-		case IMPULSE_107:	AttemptToBuyItem( "weapon_lightninggun" );			break;
-		case IMPULSE_108:	break; // Unused
-		case IMPULSE_109:	AttemptToBuyItem( "weapon_napalmgun" );				break;
-		case IMPULSE_110:	/* AttemptToBuyItem( "weapon_dmg" );*/				break;
-		case IMPULSE_111:	break; // Unused
-		case IMPULSE_112:	break; // Unused
-		case IMPULSE_113:	break; // Unused
-		case IMPULSE_114:	break; // Unused
-		case IMPULSE_115:	break; // Unused
-		case IMPULSE_116:	break; // Unused
-		case IMPULSE_117:	break; // Unused
-		case IMPULSE_118:	AttemptToBuyItem( "item_armor_small" );				break;
-		case IMPULSE_119:	AttemptToBuyItem( "item_armor_large" );				break;
-		case IMPULSE_120:	AttemptToBuyItem( "ammorefill" );					break;
-		case IMPULSE_121:	break; // Unused
-		case IMPULSE_122:	break; // Unused
-		case IMPULSE_123:	AttemptToBuyItem( "ammo_regen" );					break;
-		case IMPULSE_124:	AttemptToBuyItem( "health_regen" );					break;
-		case IMPULSE_125:	AttemptToBuyItem( "damage_boost" );					break;
-		case IMPULSE_126:	break; // Unused
-		case IMPULSE_127:	break; // Unused
-// RITUAL END
-
-		case IMPULSE_50: {
-			ToggleFlashlight ( );
-			break;
-		}
-
- 		case IMPULSE_51: {
- 			LastWeapon();
- 			break;
- 		}
+// jmarshall - buy menu impulse items? Multiplayer only I assume
+//// RITUAL BEGIN
+//// squirrel: Mode-agnostic buymenus
+//		case IMPULSE_100:	AttemptToBuyItem( "weapon_shotgun" );				break;
+//		case IMPULSE_101:	AttemptToBuyItem( "weapon_machinegun" );			break;
+//		case IMPULSE_102:	AttemptToBuyItem( "weapon_hyperblaster" );			break;
+//		case IMPULSE_103:	AttemptToBuyItem( "weapon_grenadelauncher" );		break;
+//		case IMPULSE_104:	AttemptToBuyItem( "weapon_nailgun" );				break;
+//		case IMPULSE_105:	AttemptToBuyItem( "weapon_rocketlauncher" );		break;
+//		case IMPULSE_106:	AttemptToBuyItem( "weapon_railgun" );				break;
+//		case IMPULSE_107:	AttemptToBuyItem( "weapon_lightninggun" );			break;
+//		case IMPULSE_108:	break; // Unused
+//		case IMPULSE_109:	AttemptToBuyItem( "weapon_napalmgun" );				break;
+//		case IMPULSE_110:	/* AttemptToBuyItem( "weapon_dmg" );*/				break;
+//		case IMPULSE_111:	break; // Unused
+//		case IMPULSE_112:	break; // Unused
+//		case IMPULSE_113:	break; // Unused
+//		case IMPULSE_114:	break; // Unused
+//		case IMPULSE_115:	break; // Unused
+//		case IMPULSE_116:	break; // Unused
+//		case IMPULSE_117:	break; // Unused
+//		case IMPULSE_118:	AttemptToBuyItem( "item_armor_small" );				break;
+//		case IMPULSE_119:	AttemptToBuyItem( "item_armor_large" );				break;
+//		case IMPULSE_120:	AttemptToBuyItem( "ammorefill" );					break;
+//		case IMPULSE_121:	break; // Unused
+//		case IMPULSE_122:	break; // Unused
+//		case IMPULSE_123:	AttemptToBuyItem( "ammo_regen" );					break;
+//		case IMPULSE_124:	AttemptToBuyItem( "health_regen" );					break;
+//		case IMPULSE_125:	AttemptToBuyItem( "damage_boost" );					break;
+//		case IMPULSE_126:	break; // Unused
+//		case IMPULSE_127:	break; // Unused
+//// RITUAL END
+//
+//		case IMPULSE_50: {
+//			ToggleFlashlight ( );
+//			break;
+//		}
+//
+// 		case IMPULSE_51: {
+// 			LastWeapon();
+// 			break;
+// 		}
+// jmarshall end
 	} 
 
 //RAVEN BEGIN
@@ -10955,6 +10959,8 @@ spectate follow?
 ==================
 */
 void idPlayer::SmoothenRenderView( bool firstPerson ) {
+// jmarshall - new demo support?
+/*
 	int d1, d2;
 	idAngles angles, anglesDelta, newAngles;
 
@@ -10989,6 +10995,7 @@ void idPlayer::SmoothenRenderView( bool firstPerson ) {
 			firstPersonViewAxis = renderView->viewaxis;
 		}
 	}
+*/
 }
 
 /*

@@ -1,5 +1,30 @@
-// Copyright (C) 2004 Id Software, Inc.
-//
+/*
+===========================================================================
+
+Doom 3 GPL Source Code
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+
+Doom 3 Source Code is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Doom 3 Source Code is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
+
+In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
+
+If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+
+===========================================================================
+*/
 
 #ifndef __USERCMDGEN_H__
 #define __USERCMDGEN_H__
@@ -12,32 +37,26 @@
 ===============================================================================
 */
 
-const int USERCMD_HZ_SP			= 60;			// 60 frames per second
-const int USERCMD_MSEC_SP		= 1000 / USERCMD_HZ_SP;
+const int USERCMD_HZ			= 60;			// 60 frames per second
+const int USERCMD_MSEC			= 1000 / USERCMD_HZ;
 
-//const int USERCMD_HZ_MP			= 30;			// 30 frames per second
-//const int USERCMD_MSEC_MP		= 1000 / USERCMD_HZ_MP;
-
-//const int USERCMD_HZ_MP			= 60;			// 60 frames per second
-//const int USERCMD_MSEC_MP		= 1000 / USERCMD_HZ_MP;
 
 // usercmd_t->button bits
-const int BUTTON_ATTACK			= BIT(0);
-const int BUTTON_RUN			= BIT(1);
-const int BUTTON_ZOOM			= BIT(2);
-const int BUTTON_SCORES			= BIT(3);
-const int BUTTON_MLOOK			= BIT(4);
+const int BUTTON_ATTACK = BIT(0);
+const int BUTTON_RUN = BIT(1);
+const int BUTTON_ZOOM = BIT(2);
+const int BUTTON_SCORES = BIT(3);
+const int BUTTON_MLOOK = BIT(4);
 // RAVEN BEGIN
 // ddynerman: stats
-const int BUTTON_INGAMESTATS	= BIT(5);
+const int BUTTON_INGAMESTATS = BIT(5);
 // jscott: for voicechat
-const int BUTTON_VOICECHAT		= BIT(6);
+const int BUTTON_VOICECHAT = BIT(6);
 // ddynerman: tourney display
-const int BUTTON_TOURNEY		= BIT(7);
+const int BUTTON_TOURNEY = BIT(7);
 // twhitaker: strafe
-const int BUTTON_STRAFE			= BIT(8);
+const int BUTTON_STRAFE = BIT(8);
 // RAVEN END
-
 
 // usercmd_t->impulse commands
 const int IMPULSE_0				= 0;			// weap 0
@@ -61,7 +80,7 @@ const int IMPULSE_17			= 17;			// ready to play ( toggles ui_ready )
 const int IMPULSE_18			= 18;			// center view
 const int IMPULSE_19			= 19;			// show PDA/INV/MAP
 const int IMPULSE_20			= 20;			// toggle team ( toggles ui_team )
-const int IMPULSE_21			= 21;			// tourney toggle waiting room/spec
+const int IMPULSE_21			= 21;			// <unused>
 const int IMPULSE_22			= 22;			// spectate
 const int IMPULSE_23			= 23;			// <unused>
 const int IMPULSE_24			= 24;			// <unused>
@@ -70,62 +89,7 @@ const int IMPULSE_26			= 26;			// <unused>
 const int IMPULSE_27			= 27;			// <unused>
 const int IMPULSE_28			= 28;			// vote yes
 const int IMPULSE_29			= 29;			// vote no
-const int IMPULSE_40			= 40;			// repeast last radio chatter
-
-// RAVEN BEGIN
-// bdube: added flashlight
-const int IMPULSE_50			= 50;			// activate flashlight
-const int IMPULSE_51			= 51;			// switch to last weapon
-// ddynerman: mp stats
-const int IMPULSE_52			= 52;			// mp statistics
-// RAVEN END
-
-
-// RAVEN BEGIN
-// asalmon: impulses for weapons combos for xbox
-#ifdef _XBOX
-const int IMPULSE_70			= 70;			//Weapon switch up
-const int IMPULSE_71			= 71;			//Weapon switch down
-const int IMPULSE_72			= 72;			//Weapon switch right
-const int IMPULSE_73			= 73;			//Weapon Switch left
-#endif
-//RAVEN END
-
-
-// RITUAL BEGIN
-// squirrel: Mode-agnostic buymenus
-const int IMPULSE_100			= 100;			// Buy weapon_shotgun
-const int IMPULSE_101			= 101;			// Buy weapon_machinegun
-const int IMPULSE_102			= 102;			// Buy weapon_hyperblaster
-const int IMPULSE_103			= 103;			// Buy weapon_grenadelauncher
-const int IMPULSE_104			= 104;			// Buy weapon_nailgun
-const int IMPULSE_105			= 105;			// Buy weapon_rocketlauncher
-const int IMPULSE_106			= 106;			// Buy weapon_railgun
-const int IMPULSE_107			= 107;			// Buy weapon_lightninggun
-const int IMPULSE_108			= 108;			// UNUSED
-const int IMPULSE_109			= 109;			// Buy weapon_napalmgun
-const int IMPULSE_110			= 110;			// Buy weapon_dmg
-const int IMPULSE_111			= 111;			// UNUSED
-const int IMPULSE_112			= 112;			// UNUSED
-const int IMPULSE_113			= 113;			// UNUSED
-const int IMPULSE_114			= 114;			// UNUSED
-const int IMPULSE_115			= 115;			// UNUSED
-const int IMPULSE_116			= 116;			// UNUSED
-const int IMPULSE_117			= 117;			// UNUSED
-const int IMPULSE_118			= 118;			// Buy item_armor_small
-const int IMPULSE_119			= 119;			// Buy item_armor_large
-const int IMPULSE_120			= 120;			// Buy ammorefill
-const int IMPULSE_121			= 121;			// UNUSED
-const int IMPULSE_122			= 122;			// UNUSED
-const int IMPULSE_123			= 123;			// Buy team powerup: ammo_regen
-const int IMPULSE_124			= 124;			// Buy team powerup: health_regen
-const int IMPULSE_125			= 125;			// Buy team powerup: damage_boost
-const int IMPULSE_126			= 126;			// UNUSED
-const int IMPULSE_127			= 127;			// UNUSED
-// RITUAL END
-
-
-const int KEY_MOVESPEED			= 127;
+const int IMPULSE_40			= 40;			// use vehicle
 
 // usercmd_t->flags
 const int UCF_IMPULSE_SEQUENCE	= 0x0001;		// toggled every time an impulse command is sent
@@ -134,12 +98,8 @@ class usercmd_t {
 public:
 	int			gameFrame;						// frame number
 	int			gameTime;						// game time
-	int			realTime;						// real game time
 	int			duplicateCount;					// duplication count for networking
-// RAVEN BEGIN
-// ddynerman: expand buttons to 2 bytes
-	short		buttons;						// buttons
-// RAVEN END
+	byte		buttons;						// buttons
 	signed char	forwardmove;					// forward/backward movement
 	signed char	rightmove;						// left/right movement
 	signed char	upmove;							// up/down movement
@@ -210,22 +170,7 @@ public:
 	virtual int			KeyState( int key ) = 0;
 
 	// Directly sample a usercmd.
-	virtual usercmd_t	GetUsercmd( void ) = 0;
-
-//RAVEN BEGIN
-//asalmon: slow down the joystick movement for aim assist on xenon
-	virtual void		SetSlowJoystick(int slow) = 0;
-
-// nrausch: Stuff an arbitrary impulse in, which will override any other impulse this cycle
-	virtual void		StuffImpulse( int impulse ) = 0;
-	
-	virtual void		StuffKey( const char *keyName, bool down ) = 0;
-
-#ifdef _XENON	
-	virtual void		GetInputs( int &y, int &p, int &r, int &f ) = 0;
-#endif
-
-//RAVEN END
+	virtual usercmd_t	GetDirectUsercmd( void ) = 0;
 };
 
 extern idUsercmdGen	*usercmdGen;
