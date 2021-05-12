@@ -174,6 +174,8 @@ public:
 	int				CheckTokenString( const char *string );
 					// returns true an reads the token when a token with the given type is available
 	int				CheckTokenType( int type, int subtype, idToken *token );
+					// returns true if the next token equals the given string but does not remove the token from the source
+	int				PeekTokenString(const char* string);
 					// skip tokens until the given token string is read
 	int				SkipUntilString( const char *string );
 					// skip the rest of the current line

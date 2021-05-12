@@ -2077,7 +2077,8 @@ bool idEntity::StartSoundShader( const idSoundShader *shader, const s_channelTyp
 
 	UpdateSound();
 
-	idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+	idSoundEmitter* emitter = NULL;
+	emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 	if ( emitter ) {
 		emitter->UpdateEmitter( refSound.origin, refSound.velocity, refSound.listenerId, &refSound.parms );
         len = emitter->StartSound( shader, channel, diversity, soundShaderFlags );
@@ -2144,7 +2145,9 @@ idEntity::UpdateSound
 */
 void idEntity::UpdateSound( void ) {
 // RAVEN BEGIN
-	idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+	idSoundEmitter* emitter = NULL;
+	
+	emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 	if ( emitter ) {
 // RAVEN END
 		idVec3 origin;

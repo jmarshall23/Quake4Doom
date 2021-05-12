@@ -292,7 +292,6 @@ void idCollisionModelManagerLocal::LoadProcBSP( const char *name ) {
 		return;
 	}
 
-// jmarshall - check for legacy doom 3 map iden.
 	if (!src->ReadToken(&token)) {
 		common->Printf("idRenderWorldLocal::InitFromMap: Invalid EOF in world file\n");
 		delete src;
@@ -305,7 +304,17 @@ void idCollisionModelManagerLocal::LoadProcBSP( const char *name ) {
 		delete src;
 		return;
 	}
-	// jmarshall end
+
+// jmarshall: quake 4 proc format
+	if (!src->ReadToken(&token) || token.Icmp(PROC_FILEVERSION)) {
+		common->Printf("idRenderWorldLocal::InitFromMap: bad version '%s' instead of '%s'\n", token.c_str(), PROC_FILEVERSION);
+		delete src;
+		return;
+	}
+
+	// Map CRC, we aren't going to use it.
+	src->ReadToken(&token);
+// jmarshall end
 
 	// parse the file
 	while ( 1 ) {
@@ -314,9 +323,7 @@ void idCollisionModelManagerLocal::LoadProcBSP( const char *name ) {
 		}
 
 		if ( token == "model" ) {
-// jmarshall
-			CheckProcModelSurfClip(isLegacyWorldFile, src);
-// jmarshall end
+			src->SkipBracedSection();
 			continue;
 		}
 

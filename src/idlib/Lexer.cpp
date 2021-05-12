@@ -3278,6 +3278,29 @@ int Lexer::CheckTokenType(int type, int subtype, idToken *token)
 	}
 }
 
+/*
+================
+idLexer::PeekTokenString
+================
+*/
+int idLexer::PeekTokenString(const char* string) {
+	idToken tok;
+
+	if (!ReadToken(&tok)) {
+		return 0;
+	}
+
+	// unread token
+	script_p = lastScript_p;
+	line = lastline;
+
+	// if the given string is available
+	if (tok == string) {
+		return 1;
+	}
+	return 0;
+}
+
 int Lexer::CheckTokenString(char const *string)
 {
 	if(mDelegate)

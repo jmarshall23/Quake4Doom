@@ -19,7 +19,7 @@ class idDemoFile;
 //#define	PROC_FILE_ID					"mapProcFile003"
 #define PROC_FILE_ID					"PROC"
 #define PROC_FILE_EXT					"proc"
-#define PROC_FILEVERSION				4
+#define PROC_FILEVERSION				"4" // jmarshall: changed to string. 
 // RAVEN END
 
 // RAVEN BEGIN

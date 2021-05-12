@@ -135,6 +135,12 @@ idRenderModel *idRenderWorldLocal::ParseModel( idLexer *src ) {
 		src->Error( "R_ParseModel: bad numSurfaces" );
 	}
 
+// jmarshall - quake 4 proc format
+	if (!src->PeekTokenString("{") && !src->PeekTokenString("}")) {
+		int sky = src->ParseInt();
+	}
+// jmarshall end
+
 	for ( i = 0 ; i < numSurfaces ; i++ ) {
 		src->ExpectTokenString( "{" );
 
@@ -152,18 +158,32 @@ idRenderModel *idRenderWorldLocal::ParseModel( idLexer *src ) {
 
 		R_AllocStaticTriSurfVerts( tri, tri->numVerts );
 		for ( j = 0 ; j < tri->numVerts ; j++ ) {
-			float	vec[8];
+// jmarshall - quake 4 proc format
+			//float	vec[8];
+			//src->Parse1DMatrix( 8, vec );
 
-			src->Parse1DMatrix( 8, vec );
+			src->ExpectTokenString("(");
 
-			tri->verts[j].xyz[0] = vec[0];
-			tri->verts[j].xyz[1] = vec[1];
-			tri->verts[j].xyz[2] = vec[2];
-			tri->verts[j].st[0] = vec[3];
-			tri->verts[j].st[1] = vec[4];
-			tri->verts[j].normal[0] = vec[5];
-			tri->verts[j].normal[1] = vec[6];
-			tri->verts[j].normal[2] = vec[7];
+			tri->verts[j].xyz[0] = src->ParseFloat();
+			tri->verts[j].xyz[1] = src->ParseFloat();
+			tri->verts[j].xyz[2] = src->ParseFloat();
+			tri->verts[j].st[0] = src->ParseFloat();
+			tri->verts[j].st[1] = src->ParseFloat();
+			tri->verts[j].normal[0] = src->ParseFloat();
+			tri->verts[j].normal[1] = src->ParseFloat();
+			tri->verts[j].normal[2] = src->ParseFloat();
+
+			if (src->PeekTokenString(")")) {
+				src->ExpectTokenString(")");
+			}
+			else {
+				while (!src->PeekTokenString(")")) {
+					src->ParseFloat(); // jmarshall: not sure what the extra values here are for.
+				}
+
+				src->ExpectTokenString(")");
+			}
+// jmarshall end
 		}
 
 		R_AllocStaticTriSurfIndexes( tri, tri->numIndexes );
@@ -535,6 +555,17 @@ bool idRenderWorldLocal::InitFromMap( const char *name ) {
 		delete src;
 		return false;
 	}
+
+// jmarshall: quake 4 proc format
+	if (!src->ReadToken(&token) || token.Icmp(PROC_FILEVERSION)) {
+		common->Printf("idRenderWorldLocal::InitFromMap: bad version '%s' instead of '%s'\n", token.c_str(), PROC_FILEVERSION);
+		delete src;
+		return false;
+	}
+
+	// Map CRC, we aren't going to use it.
+	src->ReadToken(&token);
+// jmarshall end
 
 	// parse the file
 	while ( 1 ) {

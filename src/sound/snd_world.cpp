@@ -1388,9 +1388,11 @@ idSoundWorldLocal::EmitterForIndex
 ===================
 */
 idSoundEmitter	*idSoundWorldLocal::EmitterForIndex( int index ) {
-	if ( index == 0 ) {
+// jmarshall
+	if ( index == 0 || index == -1 ) {
 		return NULL;
 	}
+// jmarshall end
 	if ( index >= emitters.Num() ) {
 		common->Error( "idSoundWorldLocal::EmitterForIndex: %i > %i", index, emitters.Num() );
 	}
