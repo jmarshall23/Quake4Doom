@@ -98,7 +98,8 @@ enum {
 
 	RD_MAX_STATS
 };
-
+struct renderEntity_s;
+struct renderView_s;
 typedef bool(*deferredEntityCallback_t)( renderEntity_s *, const renderView_s * );
 
 

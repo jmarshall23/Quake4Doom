@@ -12219,8 +12219,8 @@ void idPlayer::PredictionErrorDecay( void ) {
 			predictionErrorTime = gameLocal.time;
 
 			if ( net_showPredictionError.GetInteger() == entityNumber ) {
-				renderSystem->DebugGraph( predictionOriginError.Length(), 0.0f, 100.0f, colorGreen );
-				renderSystem->DebugGraph( predictionAnglesError.Length(), 0.0f, 180.0f, colorBlue );
+				//renderSystem->DebugGraph( predictionOriginError.Length(), 0.0f, 100.0f, colorGreen );
+				//renderSystem->DebugGraph( predictionAnglesError.Length(), 0.0f, 180.0f, colorBlue );
 			}
 		}
 

@@ -63,10 +63,11 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 	#ifdef Q4SDK
 		// the SDK can't be compiled with _MD5R_SUPPORT, but since the PC version is we need to maintain ABI
 		// to make things worse, only the windows version was compiled with _MD5R enabled, the Linux and Mac builds didn't
-		#define Q4SDK_MD5R
+		//#define Q4SDK_MD5R
 	#else	// Q4SDK
-		#define _MD5R_SUPPORT
-		#define _MD5R_WRITE_SUPPORT
+		//#define Q4SDK_MD5R
+		//#define _MD5R_SUPPORT
+		//#define _MD5R_WRITE_SUPPORT
 	#endif	// !Q4SDK
 	#define _GLVAS_SUPPPORT
 	//#define RV_BINARYDECLS

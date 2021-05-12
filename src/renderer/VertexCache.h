@@ -128,7 +128,7 @@ private:
 	vertCache_t		*tempBuffers[NUM_VERTEX_FRAMES];		// allocated at startup
 	bool			tempOverflow;			// had to alloc a temp in static memory
 
-	idBlockAlloc<vertCache_t,1024>	headerAllocator;
+	idBlockAlloc<vertCache_t,1024, 0>	headerAllocator;
 
 	vertCache_t		freeStaticHeaders;		// head of doubly linked list
 	vertCache_t		freeDynamicHeaders;		// head of doubly linked list

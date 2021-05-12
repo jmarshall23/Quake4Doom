@@ -154,9 +154,9 @@ public:
 	idList<idRenderEntityLocal*>	entityDefs;
 	idList<idRenderLightLocal*>		lightDefs;
 
-	idBlockAlloc<areaReference_t, 1024> areaReferenceAllocator;
-	idBlockAlloc<idInteraction, 256>	interactionAllocator;
-	idBlockAlloc<areaNumRef_t, 1024>	areaNumRefAllocator;
+	idBlockAlloc<areaReference_t, 1024, 0> areaReferenceAllocator;
+	idBlockAlloc<idInteraction, 256, 0>	interactionAllocator;
+	idBlockAlloc<areaNumRef_t, 1024, 0>	areaNumRefAllocator;
 
 	// all light / entity interactions are referenced here for fast lookup without
 	// having to crawl the doubly linked lists.  EnntityDefs are sequential for better

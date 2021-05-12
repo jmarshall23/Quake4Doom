@@ -2453,7 +2453,7 @@ void idGameLocal::MapShutdown( void ) {
 
 // RAVEN BEGIN
 // rjohnson: new blur special effect
-	renderSystem->ShutdownSpecialEffects();
+	//renderSystem->ShutdownSpecialEffects();
 // RAVEN END
 
 	// clear out camera if we're in a cinematic
