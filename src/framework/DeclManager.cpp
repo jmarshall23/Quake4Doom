@@ -1207,7 +1207,9 @@ void idDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *ext
 	int i, j;
 	idStr fileName;
 	idDeclFolder *declFolder;
-	idFileList *fileList;
+// jmarshall - decls subfolders
+	idList<idStr> fileList;
+// jmarshall end
 	idDeclFile *df;
 
 	// check whether this folder / extension combination already exists
@@ -1226,12 +1228,36 @@ void idDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *ext
 		declFolders.Append( declFolder );
 	}
 
-	// scan for decl files
-	fileList = fileSystem->ListFiles( declFolder->folder, declFolder->extension, true );
+// jmarshall - decls subfolders	
+	idFileList* localList = fileSystem->ListFiles(declFolder->folder, declFolder->extension, true);
+
+	for (int i = 0; i < localList->GetNumFiles(); i++)
+	{
+		fileList.Append(localList->GetFile(i));;
+	}
+	fileSystem->FreeFileList(localList);
+	
+
+	idFileList* dirList = fileSystem->ListFiles(declFolder->folder, "/", true);
+	for (int i = 0; i < dirList->GetNumFiles(); i++)
+	{
+		idFileList* list = fileSystem->ListFiles(va("%s/%s", declFolder->folder.c_str(), dirList->GetFile(i)), declFolder->extension, true);
+		
+		for (int d = 0; d < list->GetNumFiles(); d++)
+		{
+			fileList.Append(va("%s/%s", dirList->GetFile(i), list->GetFile(d)));
+		}
+
+		fileSystem->FreeFileList(list);
+	}
+
+	fileSystem->FreeFileList(dirList);
+	
+// jmarshall end
 
 	// load and parse decl files
-	for ( i = 0; i < fileList->GetNumFiles(); i++ ) {
-		fileName = declFolder->folder + "/" + fileList->GetFile( i );
+	for ( i = 0; i < fileList.Num(); i++ ) {
+		fileName = declFolder->folder + "/" + fileList[ i ];
 
 		// check whether this file has already been loaded
 		for ( j = 0; j < loadedFiles.Num(); j++ ) {
@@ -1247,8 +1273,6 @@ void idDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *ext
 		}
 		df->LoadAndParse();
 	}
-
-	fileSystem->FreeFileList( fileList );
 }
 
 /*
