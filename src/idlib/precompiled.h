@@ -73,7 +73,7 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 	//#define RV_SINGLE_DECL_FILE
 	// this can't be used with _RV_MEM_SYS_SUPPORT and actually shouldn't be used at all on the Xenon at present
 	#if !defined(_RV_MEM_SYS_SUPPORT) && !defined(ID_REDIRECT_NEWDELETE)
-		#define RV_UNIFIED_ALLOCATOR
+		//#define RV_UNIFIED_ALLOCATOR
 	#endif
 
 	// SMP support for running the backend on a 2nd thread

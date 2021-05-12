@@ -29,7 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "precompiled.h"
 #pragma hdrstop
 
-#include "../renderer/Image.h"
+//#include "../renderer/Image.h"
 
 #define	MAX_PRINT_MSG_SIZE	4096
 #define MAX_WARNING_LIST	256
@@ -48,7 +48,7 @@ typedef enum {
 #endif
 
 struct version_s {
-			version_s( void ) { sprintf( string, "%s.%d%s %s %s %s", ENGINE_VERSION, BUILD_NUMBER, BUILD_DEBUG, BUILD_STRING, __DATE__, __TIME__ ); }
+			version_s( void ) { sprintf( string, "%s.%d%s %s %s %s", "v4.1", BUILD_NUMBER, BUILD_DEBUG, BUILD_STRING, __DATE__, __TIME__ ); }
 	char	string[256];
 } version;
 
@@ -365,7 +365,7 @@ void idCommonLocal::VPrintf( const char *fmt, va_list args ) {
 	console->Print( msg );
 
 	// remove any color codes
-	idStr::RemoveColors( msg );
+	//idStr::RemoveColors( msg );
 
 	// echo to dedicated console and early console
 	Sys_Printf( "%s", msg );
@@ -598,7 +598,7 @@ void idCommonLocal::DumpWarnings( void ) {
 		warningFile->Printf( "during %s...\n", warningCaption.c_str() );
 		warningList.Sort();
 		for ( i = 0; i < warningList.Num(); i++ ) {
-			warningList[i].RemoveColors();
+		//	warningList[i].RemoveColors();
 			warningFile->Printf( "WARNING: %s\n", warningList[i].c_str() );
 		}
 		if ( warningList.Num() >= MAX_WARNING_LIST ) {
@@ -610,7 +610,7 @@ void idCommonLocal::DumpWarnings( void ) {
 		warningFile->Printf( "\n\n-------------- Errors ---------------\n\n" );
 		errorList.Sort();
 		for ( i = 0; i < errorList.Num(); i++ ) {
-			errorList[i].RemoveColors();
+			//errorList[i].RemoveColors();
 			warningFile->Printf( "ERROR: %s", errorList[i].c_str() );
 		}
 
@@ -1190,37 +1190,7 @@ This prints out memory debugging data
 ============
 */
 static void PrintMemInfo_f( const idCmdArgs &args ) {
-	MemInfo_t mi;
 
-	memset( &mi, 0, sizeof( mi ) );
-	mi.filebase = session->GetCurrentMapName();
-
-	renderSystem->PrintMemInfo( &mi );			// textures and models
-	soundSystem->PrintMemInfo( &mi );			// sounds
-
-	common->Printf( " Used image memory: %s bytes\n", idStr::FormatNumber( mi.imageAssetsTotal ).c_str() );
-	mi.assetTotals += mi.imageAssetsTotal;
-
-	common->Printf( " Used model memory: %s bytes\n", idStr::FormatNumber( mi.modelAssetsTotal ).c_str() );
-	mi.assetTotals += mi.modelAssetsTotal;
-
-	common->Printf( " Used sound memory: %s bytes\n", idStr::FormatNumber( mi.soundAssetsTotal ).c_str() );
-	mi.assetTotals += mi.soundAssetsTotal;
-
-	common->Printf( " Used asset memory: %s bytes\n", idStr::FormatNumber( mi.assetTotals ).c_str() );
-
-	// write overview file
-	idFile *f;
-
-	f = fileSystem->OpenFileAppend( "maps/printmeminfo.txt" );
-	if ( !f ) {
-		return;
-	}
-
-	f->Printf( "total(%s ) image(%s ) model(%s ) sound(%s ): %s\n", idStr::FormatNumber( mi.assetTotals ).c_str(), idStr::FormatNumber( mi.imageAssetsTotal ).c_str(), 
-		idStr::FormatNumber( mi.modelAssetsTotal ).c_str(), idStr::FormatNumber( mi.soundAssetsTotal ).c_str(), mi.filebase.c_str() );
-
-	fileSystem->CloseFile( f );
 }
 
 #ifdef ID_ALLOW_TOOLS
@@ -2276,7 +2246,7 @@ Com_StartBuild_f
 =================
 */
 void Com_StartBuild_f( const idCmdArgs &args ) {
-	globalImages->StartBuild();
+	//globalImages->StartBuild();
 }
 
 /*
@@ -2285,10 +2255,7 @@ Com_FinishBuild_f
 =================
 */
 void Com_FinishBuild_f( const idCmdArgs &args ) {
-	if ( game ) {
-		game->CacheDictionaryMedia( NULL );
-	}
-	globalImages->FinishBuild( ( args.Argc() > 1 ) );
+	
 }
 
 /*
@@ -2452,7 +2419,7 @@ void idCommonLocal::Frame( void ) {
 
 		eventLoop->RunEventLoop();
 
-		com_frameTime = com_ticNumber * USERCMD_MSEC;
+		com_frameTime = com_ticNumber * GetUserCmdMSec();
 
 		idAsyncNetwork::RunFrame();
 
@@ -2504,7 +2471,7 @@ idCommonLocal::GUIFrame
 void idCommonLocal::GUIFrame( bool execCmd, bool network ) {
 	Sys_GenerateEvents();
 	eventLoop->RunEventLoop( execCmd );	// and execute any commands
-	com_frameTime = com_ticNumber * USERCMD_MSEC;
+	com_frameTime = com_ticNumber * GetUserCmdMSec();
 	if ( network ) {
 		idAsyncNetwork::RunFrame();
 	}
@@ -2588,7 +2555,7 @@ void idCommonLocal::Async( void ) {
 
 	int	msec = Sys_Milliseconds();
 	if ( !lastTicMsec ) {
-		lastTicMsec = msec - USERCMD_MSEC;
+		lastTicMsec = msec - GetUserCmdMSec();
 	}
 
 	if ( !com_preciseTic.GetBool() ) {
@@ -2597,7 +2564,7 @@ void idCommonLocal::Async( void ) {
 		return;
 	}
 
-	int ticMsec = USERCMD_MSEC;
+	int ticMsec = GetUserCmdMSec();
 
 	// the number of msec per tic can be varies with the timescale cvar
 	float timescale = com_timescale.GetFloat();
@@ -2610,8 +2577,8 @@ void idCommonLocal::Async( void ) {
 
 	// don't skip too many
 	if ( timescale == 1.0f ) {
-		if ( lastTicMsec + 10 * USERCMD_MSEC < msec ) {
-			lastTicMsec = msec - 10*USERCMD_MSEC;
+		if ( lastTicMsec + 10 * GetUserCmdMSec() < msec ) {
+			lastTicMsec = msec - 10* GetUserCmdMSec();
 		}
 	}
 
@@ -3051,10 +3018,10 @@ idCommonLocal::ShutdownGame
 void idCommonLocal::ShutdownGame( bool reloading ) {
 
 	// kill sound first
-	idSoundWorld *sw = soundSystem->GetPlayingSoundWorld();
-	if ( sw ) {
-		sw->StopAllSounds();
-	}
+	//idSoundWorld *sw = soundSystem->GetPlayingSoundWorld();
+	//if ( sw ) {
+	//	sw->StopAllSounds();
+	//}
 	soundSystem->ClearBuffer();
 
 	// shutdown the script debugger
