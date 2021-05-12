@@ -177,7 +177,6 @@ public:
 	int					timeHitch;
 
 	bool				menuActive;
-	idSoundWorld *		menuSoundWorld;			// so the game soundWorld can be muted
 
 	bool				insideExecuteMapChange;	// draw loading screen and update
 												// screen on prints

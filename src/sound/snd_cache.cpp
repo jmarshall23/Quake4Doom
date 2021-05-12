@@ -33,7 +33,7 @@ If you have questions concerning this license or the applicable additional terms
 #define USE_SOUND_CACHE_ALLOCATOR
 
 #ifdef USE_SOUND_CACHE_ALLOCATOR
-static idDynamicBlockAlloc<byte, 1<<20, 1<<10>	soundCacheAllocator;
+static idDynamicBlockAlloc<byte, 1<<20, 1<<10, 1>	soundCacheAllocator;
 #else
 static idDynamicAlloc<byte, 1<<20, 1<<10>		soundCacheAllocator;
 #endif

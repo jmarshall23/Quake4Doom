@@ -1044,6 +1044,22 @@ int idSoundSystemLocal::GetSoundDecoderInfo( int index, soundDecoderInfo_t &deco
 	return -1;
 }
 
+// jmarshall: Quake 4 specific code
+idSoundWorld* idSoundSystemLocal::GetSoundWorldFromId(int worldId) {
+	switch (worldId)
+	{
+	case SOUNDWORLD_GAME:
+	case SOUNDWORLD_ANY:
+		return session->sw;
+	case SOUNDWORLD_MENU:
+		return session->menuSoundWorld;
+
+	default:
+		return session->sw;
+	}
+}
+// jmarshall 
+
 /*
 ===================
 idSoundSystemLocal::AllocSoundWorld

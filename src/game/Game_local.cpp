@@ -2448,7 +2448,7 @@ void idGameLocal::MapShutdown( void ) {
 	gamestate = GAMESTATE_SHUTDOWN;
 
 	if ( soundSystem ) {
-		soundSystem->ResetListener();
+	//	soundSystem->ResetListener();
 	}
 
 // RAVEN BEGIN
@@ -3744,7 +3744,7 @@ TIME_THIS_SCOPE("idGameLocal::RunFrame - gameDebug.BeginFrame()");
 
 	ret.syncNextGameFrame = skipCinematic;
 	if ( skipCinematic ) {
-		soundSystem->EndCinematic();
+		//soundSystem->EndCinematic();
 		soundSystem->SetMute( false );
 		skipCinematic = false;		
 	}

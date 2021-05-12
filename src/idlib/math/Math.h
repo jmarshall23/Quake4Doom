@@ -206,6 +206,7 @@ public:
 	static float				Rint( float f );			// returns the nearest integer
 	static int					Ftoi( float f );			// float to int conversion
 	static int					FtoiFast( float f );		// fast float to int conversion but uses current FPU round mode (default round nearest)
+	static unsigned long		Ftol(float f);			// float to long conversion
 	static byte					Ftob( float f );			// float to byte conversion, the result is clamped to the range [0-255]
 
 	static signed char			ClampChar( int i );
@@ -1005,6 +1006,10 @@ ID_INLINE int idMath::FloatHash( const float *array, const int numFloats ) {
 		hash ^= ptr[i];
 	}
 	return hash;
+}
+
+ID_INLINE unsigned long idMath::Ftol(float f) {
+	return (unsigned long)f;
 }
 
 // RAVEN BEGIN

@@ -140,55 +140,12 @@ bool idMultiplayerGame::CanTalk( idPlayer *from, idPlayer *to, bool echo ) {
 
 void idMultiplayerGame::XmitVoiceData( void )
 {
-	idBitMsg	outMsg;
-	int			count;
-	byte		work;
-	byte		buffer[MAX_VOICE_PACKET_SIZE];
-	byte		msgBuf[MAX_VOICE_PACKET_SIZE + 1];
-
-	if( !gameLocal.serverInfo.GetBool( "si_voiceChat" ) )
-	{
-		return;
-	}
-
-	outMsg.Init( msgBuf, sizeof( msgBuf ) );
-
-	// Grab any new input and send up to the server
-	count = soundSystem->GetVoiceData( buffer, MAX_VOICE_PACKET_SIZE );
-	if( count )
-	{
-		outMsg.BeginWriting();
-		outMsg.BeginReading();
-
-		work = GAME_RELIABLE_MESSAGE_VOICEDATA_CLIENT + cvarSystem->GetCVarBool( "s_voiceChatEcho" ) + ( cvarSystem->GetCVarInteger( "s_voiceChatTest" ) * 2 );
-		outMsg.WriteByte( work );
-		outMsg.WriteData( buffer, count );
-
-		// FIXME!!! FIXME!!! This should be unreliable - this is very bad
-		networkSystem->ClientSendReliableMessage( outMsg );
-
-		if( g_voiceChatDebug.GetInteger() & 1 )
-		{
-			common->Printf( "VC: sent %d bytes at %d\n", count, gameLocal.time );
-		}
-	}
+	
 }
 
 void idMultiplayerGame::ReceiveAndPlayVoiceData( const idBitMsg &inMsg )
 {
-	int		clientNum;
-
-	if( !gameLocal.serverInfo.GetBool( "si_voiceChat" ) )
-	{
-		return;
-	}
 	
-	clientNum = inMsg.ReadByte();
-	soundSystem->PlayVoiceData( clientNum, inMsg.GetReadData(), inMsg.GetRemainingData() );
-	if( g_voiceChatDebug.GetInteger() & 4 )
-	{
-		common->Printf( "VC: Playing %d bytes\n", inMsg.GetRemainingData() );
-	}
 }
 
 #endif

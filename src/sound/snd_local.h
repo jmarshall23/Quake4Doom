@@ -62,7 +62,7 @@ typedef enum {
 } soundDemoCommand_t;
 
 const int SOUND_MAX_CHANNELS		= 8;
-const int SOUND_DECODER_FREE_DELAY	= 1000 * MIXBUFFER_SAMPLES / USERCMD_MSEC;		// four seconds
+#define SOUND_DECODER_FREE_DELAY	(1000 * MIXBUFFER_SAMPLES / common->GetUserCmdMSec())		// four seconds
 
 const int PRIMARYFREQ				= 44100;			// samples per second
 const float SND_EPSILON				= 1.0f / 32768.0f;	// if volume is below this, it will always multiply to zero
@@ -712,6 +712,8 @@ public:
 	// some tools, like the sound dialog, may be used in both the game and the editor
 	// This can return NULL, so check!
 	virtual idSoundWorld	*GetPlayingSoundWorld( void );
+
+	virtual idSoundWorld* GetSoundWorldFromId(int worldId);
 
 	virtual	void			BeginLevelLoad( void );
 	virtual	void			EndLevelLoad( const char *mapString );

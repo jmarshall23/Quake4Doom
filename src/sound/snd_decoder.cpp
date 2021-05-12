@@ -44,7 +44,7 @@ If you have questions concerning this license or the applicable additional terms
 ===================================================================================
 */
 
-idDynamicBlockAlloc<byte, 1<<20, 128>		decoderMemoryAllocator;
+idDynamicBlockAlloc<byte, 1<<20, 128, 1>		decoderMemoryAllocator;
 
 const int MIN_OGGVORBIS_MEMORY				= 768 * 1024;
 
@@ -301,7 +301,7 @@ private:
 	OggVorbis_File			ogg;				// OggVorbis file
 };
 
-idBlockAlloc<idSampleDecoderLocal, 64>		sampleDecoderAllocator;
+idBlockAlloc<idSampleDecoderLocal, 64, 1>		sampleDecoderAllocator;
 
 /*
 ====================

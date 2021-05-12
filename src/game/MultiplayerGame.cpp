@@ -2792,60 +2792,8 @@ void idMultiplayerGame::CommonRun( void ) {
 			iconManager->UpdateIcons();
 		}
 
-#ifdef _USE_VOICECHAT
-		float	micLevel;
-		bool	sending, testing;
-
-		// jscott: enable the voice recording
-		testing = cvarSystem->GetCVarBool( "s_voiceChatTest" );
-		sending = soundSystem->EnableRecording( !!( player->usercmd.buttons & BUTTON_VOICECHAT ), testing, micLevel );
-
-		if( mainGui ) {
-			mainGui->SetStateFloat( "s_micLevel", micLevel );
-			mainGui->SetStateFloat( "s_micInputLevel", cvarSystem->GetCVarFloat( "s_micInputLevel" ) );
-		}
-
-// RAVEN BEGIN
-// shouchard:  let the UI know about voicechat states
-		if ( !testing && sending ) {
-			player->mphud->HandleNamedEvent( "show_transmit_self" );
-		} else {
-			player->mphud->HandleNamedEvent( "hide_transmit_self" );
-		}
-
-		if( player->GetUserInfo()->GetBool( "s_voiceChatReceive" ) ) {
-			int maxChannels = soundSystem->GetNumVoiceChannels();
-			int clientNum = -1;
-			for (int channels = 0; channels < maxChannels; channels++ ) {
-				clientNum = soundSystem->GetCommClientNum( channels );
-				if ( -1 != clientNum ) {
-					break;
-				}
-			}
-
-			// Sanity check for network errors
-			assert( clientNum > -2 && clientNum < MAX_CLIENTS );
-
-			if ( clientNum > -1 && clientNum < MAX_CLIENTS ) {
-				idPlayer *from = ( idPlayer * )gameLocal.entities[clientNum];
-				if( from ) {
-					player->mphud->SetStateString( "audio_name", from->GetUserInfo()->GetString( "ui_name" ) );
-					player->mphud->HandleNamedEvent( "show_transmit" );
-				}
-			} else {
-				player->mphud->HandleNamedEvent( "hide_transmit" );
-			}
-		}
-		else {
-			player->mphud->HandleNamedEvent( "hide_transmit" );
-		}
-#endif // _USE_VOICECHAT
-// RAVEN END
 	}
-#ifdef _USE_VOICECHAT
-	// jscott: Send any new voice data
-	XmitVoiceData();
-#endif
+
 
 	int oldRank = -1;
 	int oldLeadingTeam = -1;

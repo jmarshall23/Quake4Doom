@@ -154,6 +154,7 @@ public:
 	// The render world and sound world used for this session.
 	idRenderWorld *	rw;
 	idSoundWorld *	sw;
+	idSoundWorld*	menuSoundWorld;			// so the game soundWorld can be muted
 
 	// The renderer and sound system will write changes to writeDemo.
 	// Demos can be recorded and played at the same time when splicing.

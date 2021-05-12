@@ -2981,22 +2981,22 @@ void Cmd_SetPMCVars_f ( const idCmdArgs &args ) {
 }
 
 void Cmd_FadeSound_f( const idCmdArgs &args )	{
-
-	if( args.Argc() < 2)	{
-		return;
-	}
-
-	float fadeDB = 0.0f;
-	float fadeTime = 0.0f;
-
-	idStr _fadeDB = args.Argv( 1);
-	fadeDB = atof( _fadeDB );
-
-	idStr _fadeTime = args.Argv( 2);
-	fadeTime = atof( _fadeTime );
-
-	soundSystem->FadeSoundClasses( SOUNDWORLD_GAME, SOUND_CLASS_MUSICAL, 0.0f - fadeDB, fadeTime );
-
+// jmarshall: eval is this needed?
+	//if( args.Argc() < 2)	{
+	//	return;
+	//}
+	//
+	//float fadeDB = 0.0f;
+	//float fadeTime = 0.0f;
+	//
+	//idStr _fadeDB = args.Argv( 1);
+	//fadeDB = atof( _fadeDB );
+	//
+	//idStr _fadeTime = args.Argv( 2);
+	//fadeTime = atof( _fadeTime );
+	//
+	//soundSystem->FadeSoundClasses( SOUNDWORLD_GAME, SOUND_CLASS_MUSICAL, 0.0f - fadeDB, fadeTime );
+// jmarshall end
 }
 
 void Cmd_TestClientModel_f( const idCmdArgs& args ) {
