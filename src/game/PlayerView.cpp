@@ -505,9 +505,9 @@ void idPlayerView::SingleView( idUserInterface *hud, const renderView_t *view, i
 		if( portalSky ) {
 			renderView_t portalSkyView = *view;
 			portalSky->GetViewParms( &portalSkyView );
-			gameRenderWorld->RenderScene( &portalSkyView, ( renderFlags & ( ~RF_PRIMARY_VIEW ) ) | RF_DEFER_COMMAND_SUBMIT | RF_PORTAL_SKY );
+			gameRenderWorld->RenderScene( &portalSkyView );
 		}
-		gameRenderWorld->RenderScene( view, renderFlags | RF_PENUMBRA_MAP );
+		gameRenderWorld->RenderScene( view );
 	}
 
 	if ( RF_NO_GUI & renderFlags ) {

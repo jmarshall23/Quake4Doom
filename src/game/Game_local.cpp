@@ -3133,37 +3133,40 @@ bool idGameLocal::SetupPortalSkyPVS( idPlayer *player ) {
 
 		return( false );
 	}
-
+// jmarshall - this was a nice optimization but not needed
 	// Allocate room for the area flags
-	numAreas = gameRenderWorld->NumAreas();
-	visibleAreas = ( bool * )_alloca( numAreas );
-	memset( visibleAreas, 0, numAreas );
+	//numAreas = gameRenderWorld->NumAreas();
+	//visibleAreas = ( bool * )_alloca( numAreas );
+	//memset( visibleAreas, 0, numAreas );
+	//
+	//// Grab the areas the player can see....
+	//count = player->GetNumPVSAreas();
+	//areaNums = player->GetPVSAreas();
+	//for( i = 0; i < count; i++ ) {
+	//
+	//	// Work out the referenced areas
+	//	gameRenderWorld->FindVisibleAreas( player->GetPhysics()->GetOrigin(), areaNums[i], visibleAreas );
+	//}
+	//
+	//// Do any of the visible areas have a skybox?
+	//for( i = 0; i < numAreas; i++ ) {
+	//
+	//	if( !visibleAreas[i] ) {
+	//
+	//		continue;
+	//	}
+	//
+	//	if( gameRenderWorld->HasSkybox( i ) ) {
+	//
+	//		break;
+	//	}
+	//}
+	//
+	//// .. if any one has a skybox component, then merge in the portal sky
+	//return ( i != numAreas );
 
-	// Grab the areas the player can see....
-	count = player->GetNumPVSAreas();
-	areaNums = player->GetPVSAreas();
-	for( i = 0; i < count; i++ ) {
-
-		// Work out the referenced areas
-		gameRenderWorld->FindVisibleAreas( player->GetPhysics()->GetOrigin(), areaNums[i], visibleAreas );
-	}
-
-	// Do any of the visible areas have a skybox?
-	for( i = 0; i < numAreas; i++ ) {
-
-		if( !visibleAreas[i] ) {
-
-			continue;
-		}
-
-		if( gameRenderWorld->HasSkybox( i ) ) {
-
-			break;
-		}
-	}
-
-	// .. if any one has a skybox component, then merge in the portal sky
-	return ( i != numAreas );
+	return true;
+// jmarshall end
 }
 // RAVEN END
 

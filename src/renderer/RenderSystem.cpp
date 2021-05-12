@@ -431,7 +431,7 @@ void idRenderSystemLocal::DrawSmallStringExt( int x, int y, const char *string, 
 	xx = x;
 	SetColor( setColor );
 	while ( *s ) {
-		if ( idStr::IsColor( (const char*)s ) ) {
+		{
 			if ( !forceColor ) {
 				if ( *(s+1) == C_COLOR_DEFAULT ) {
 					SetColor( setColor );
@@ -504,7 +504,7 @@ void idRenderSystemLocal::DrawBigStringExt( int x, int y, const char *string, co
 	xx = x;
 	SetColor( setColor );
 	while ( *s ) {
-		if ( idStr::IsColor( s ) ) {
+		{
 			if ( !forceColor ) {
 				if ( *(s+1) == C_COLOR_DEFAULT ) {
 					SetColor( setColor );
@@ -1019,7 +1019,7 @@ void idRenderSystemLocal::PrintMemInfo( MemInfo_t *mi ) {
 	globalImages->PrintMemInfo( mi );
 
 	// sum up model totals
-	renderModelManager->PrintMemInfo( mi );
+//	renderModelManager->PrintMemInfo( mi );
 
 	// compute render totals
 

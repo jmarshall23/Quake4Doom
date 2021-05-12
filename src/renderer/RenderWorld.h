@@ -508,15 +508,15 @@ public:
 	// It would also be acceptable to render a scene multiple times, for "rear view mirrors", etc
 // RAVEN BEGIN
 // AReis: Modified RenderScene() signature to include renderFlags variable.
-	virtual void			RenderScene( const renderView_t *renderView, int renderFlags = RF_NORMAL ) = 0;
+	virtual void			RenderScene( const renderView_t *renderView ) = 0;
 // jscott: for portal skies
 	virtual bool			HasSkybox( int areaNum ) = 0;
-	virtual void			FindVisibleAreas( idVec3 origin, int areaNum, bool *visibleAreas ) = 0;
+	//virtual void			FindVisibleAreas( idVec3 origin, int areaNum, bool *visibleAreas ) = 0;
 // AReis: This is where we draw the portal fadeout polygon
-	virtual void			RenderPortalFades( void ) = 0;
+	//virtual void			RenderPortalFades( void ) = 0;
 // ddynerman: Helper function
-	virtual idVec3			WorldToScreen( renderView_t* view, idVec3 point ) = 0;
-	virtual idBounds		WorldToScreen( renderView_t* view, idBounds bounds ) = 0;
+	//virtual idVec3			WorldToScreen( renderView_t* view, idVec3 point ) = 0;
+	//virtual idBounds		WorldToScreen( renderView_t* view, idBounds bounds ) = 0;
 // RAVEN END
 
 	//-------------- Portal Area Information -----------------
@@ -555,8 +555,8 @@ public:
 	virtual	int				NumPortalsInArea( int areaNum ) = 0;
 
 	// returns one portal from an area
-	virtual void			GetPortals( int areaNum, exitPortal_t *ret, int size ) = 0;
-	virtual void			GetPortal( int areaNum, int portalNum, exitPortal_t *ret ) = 0;
+	//virtual void			GetPortals( int areaNum, exitPortal_t *ret, int size ) = 0;
+	//virtual void			GetPortal( int areaNum, int portalNum, exitPortal_t *ret ) = 0;
 	virtual exitPortal_t	GetPortal( int areaNum, int portalNum ) = 0;
 
 	//-------------- Tracing  -----------------
@@ -589,7 +589,7 @@ public:
 	// is less than 30hz
 	// demoTimeOffset will be set if a new map load command was processed before
 	// the next renderScene
-	virtual bool			ProcessDemoCommand( idDemoFile *readDemo, renderView_t *demoRenderView, renderView_t *portalSkyRenderView, int *demoTimeOffset ) = 0;
+	//virtual bool			ProcessDemoCommand( idDemoFile *readDemo, renderView_t *demoRenderView, renderView_t *portalSkyRenderView, int *demoTimeOffset ) = 0;
 
 	// this is used to regenerate all interactions ( which is currently only done during influences ), there may be a less 
 	// expensive way to do it
@@ -598,21 +598,23 @@ public:
 	//-------------- Debug Visualization  -----------------
 
 	// Line drawing for debug visualization
-	virtual void			DebugClear( int time ) = 0;		// a time of 0 will clear all lines and text
-	virtual void			DebugLine( const idVec4 &color, const idVec3 &start, const idVec3 &end, const int lifetime = 0, const bool depthTest = false ) = 0;
+	virtual void			DebugClear(int time) { };		// a time of 0 will clear all lines and text
+	virtual void			DebugLine(const idVec4& color, const idVec3& start, const idVec3& end, const int lifetime = 0, const bool depthTest = false) { }
 	virtual void			DebugArrow( const idVec4 &color, const idVec3 &start, const idVec3 &end, int size, const int lifetime = 0 ) = 0;
 	virtual void			DebugWinding( const idVec4 &color, const idWinding &w, const idVec3 &origin, const idMat3 &axis, const int lifetime = 0, const bool depthTest = false ) = 0;
 	virtual void			DebugCircle( const idVec4 &color, const idVec3 &origin, const idVec3 &dir, const float radius, const int numSteps, const int lifetime = 0, const bool depthTest = false ) = 0;
 	virtual void			DebugSphere( const idVec4 &color, const idSphere &sphere, const int lifetime = 0, bool depthTest = false ) = 0;
 // RAVEN BEGIN
 // jscott: want to be able to specify depth test
-	virtual void			DebugBounds( const idVec4 &color, const idBounds &bounds, const idVec3 &org = vec3_origin, const int lifetime = 0, bool depthTest = false ) = 0;
-	virtual size_t			MemorySummary( const idCmdArgs &args ) = 0;
-	virtual void			ShowDebugLines( void ) = 0;
-	virtual void			ShowDebugPolygons( void ) = 0;
-	virtual void			ShowDebugText( void ) = 0;
+	virtual void			DebugBounds(const idVec4& color, const idBounds& bounds, const idVec3& org = vec3_origin, const int lifetime = 0, bool depthTest = false) {
+		DebugBox(color, idBox(bounds) + org, lifetime);
+	}
+//	virtual size_t			MemorySummary( const idCmdArgs &args ) = 0;
+//	virtual void			ShowDebugLines( void ) = 0;
+//	virtual void			ShowDebugPolygons( void ) = 0;
+//	virtual void			ShowDebugText( void ) = 0;
 // cdr: added debug FOV
- 	virtual void			DebugFOV( const idVec4 &color, const idVec3 &origin, const idVec3 &dir, float farDot, float farDist, float nearDot=1.0f, float nearDist=0.0f, float alpha=0.3f, int lifetime = 0 ) = 0;
+	virtual void			DebugFOV(const idVec4& color, const idVec3& origin, const idVec3& dir, float farDot, float farDist, float nearDot = 1.0f, float nearDist = 0.0f, float alpha = 0.3f, int lifetime = 0) { }
 // RAVEN END
 	virtual void			DebugBox( const idVec4 &color, const idBox &box, const int lifetime = 0 ) = 0;
 	virtual void			DebugFrustum( const idVec4 &color, const idFrustum &frustum, const bool showFromOrigin = false, const int lifetime = 0 ) = 0;

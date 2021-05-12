@@ -132,6 +132,26 @@ public:
 
 	virtual void			DrawText( const char *text, const idVec3 &origin, float scale, const idVec4 &color, const idMat3 &viewAxis, const int align = 1, const int lifetime = 0, bool depthTest = false );
 
+	virtual void			WriteRenderLight(idDemoFile* writeDemo, const renderLight_t* light) { };
+	virtual void			ReadRenderLight(idDemoFile* readDemo, renderLight_t& light) { };
+
+	// jscott: handling of effects
+	virtual qhandle_t		AddEffectDef(const renderEffect_t* reffect, int time) { return 1; }
+	virtual bool			UpdateEffectDef(qhandle_t effectHandle, const renderEffect_t* reffect, int time) { return true; }
+	virtual void			StopEffectDef(qhandle_t effectHandle)  { }
+	virtual const class rvRenderEffectLocal* GetEffectDef(qhandle_t effectHandle) const { return NULL;  }
+	virtual void			FreeEffectDef(qhandle_t effectHandle) { }
+	virtual bool			EffectDefHasSound(const renderEffect_s* reffect) { return false; }
+
+	// jscott: for optimised pushes
+	virtual void			PushMarkedDefs(void) { }
+	virtual void			ClearMarkedDefs(void) { }
+
+	// jscott: fix for FreeWorld crash
+	virtual void			RemoveAllModelReferences(idRenderModel* model) { }
+
+	virtual bool			HasSkybox(int areaNum) { return true; }
+
 	//-----------------------
 
 	idStr					mapName;				// ie: maps/tim_dm2.proc, written to demoFile
