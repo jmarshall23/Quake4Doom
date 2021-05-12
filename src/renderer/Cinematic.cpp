@@ -214,7 +214,7 @@ idCinematic::~idCinematic( ) {
 idCinematicLocal::InitFromFile
 ==============
 */
-bool idCinematic::InitFromFile( const char *qpath, bool looping ) {
+bool idCinematic::InitFromFile( const char *qpath, bool looping) {
 	return false;
 }
 

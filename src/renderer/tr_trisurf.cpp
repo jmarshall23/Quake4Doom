@@ -124,18 +124,18 @@ static silEdge_t *	silEdges;
 static idHashIndex	silEdgeHash( SILEDGE_HASH_SIZE, MAX_SIL_EDGES );
 static int			numPlanes;
 
-static idBlockAlloc<srfTriangles_t, 1<<8>				srfTrianglesAllocator;
+static idBlockAlloc<srfTriangles_t, 1<<8, 0>				srfTrianglesAllocator;
 
 #ifdef USE_TRI_DATA_ALLOCATOR
-static idDynamicBlockAlloc<idDrawVert, 1<<20, 1<<10>	triVertexAllocator;
-static idDynamicBlockAlloc<glIndex_t, 1<<18, 1<<10>		triIndexAllocator;
-static idDynamicBlockAlloc<shadowCache_t, 1<<18, 1<<10>	triShadowVertexAllocator;
-static idDynamicBlockAlloc<idPlane, 1<<17, 1<<10>		triPlaneAllocator;
-static idDynamicBlockAlloc<glIndex_t, 1<<17, 1<<10>		triSilIndexAllocator;
-static idDynamicBlockAlloc<silEdge_t, 1<<17, 1<<10>		triSilEdgeAllocator;
-static idDynamicBlockAlloc<dominantTri_t, 1<<16, 1<<10>	triDominantTrisAllocator;
-static idDynamicBlockAlloc<int, 1<<16, 1<<10>			triMirroredVertAllocator;
-static idDynamicBlockAlloc<int, 1<<16, 1<<10>			triDupVertAllocator;
+static idDynamicBlockAlloc<idDrawVert, 1<<20, 1<<10, 0>	triVertexAllocator;
+static idDynamicBlockAlloc<glIndex_t, 1<<18, 1<<10, 0>		triIndexAllocator;
+static idDynamicBlockAlloc<shadowCache_t, 1<<18, 1<<10, 0>	triShadowVertexAllocator;
+static idDynamicBlockAlloc<idPlane, 1<<17, 1<<10, 0>		triPlaneAllocator;
+static idDynamicBlockAlloc<glIndex_t, 1<<17, 1<<10, 0>		triSilIndexAllocator;
+static idDynamicBlockAlloc<silEdge_t, 1<<17, 1<<10, 0>		triSilEdgeAllocator;
+static idDynamicBlockAlloc<dominantTri_t, 1<<16, 1<<10, 0>	triDominantTrisAllocator;
+static idDynamicBlockAlloc<int, 1<<16, 1<<10, 0>			triMirroredVertAllocator;
+static idDynamicBlockAlloc<int, 1<<16, 1<<10, 0>			triDupVertAllocator;
 #else
 static idDynamicAlloc<idDrawVert, 1<<20, 1<<10>			triVertexAllocator;
 static idDynamicAlloc<glIndex_t, 1<<18, 1<<10>			triIndexAllocator;

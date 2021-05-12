@@ -392,8 +392,9 @@ viewEntity_t *R_SetEntityDefViewEntity( idRenderEntityLocal *def ) {
 
 	// copy the model and weapon depth hack for back-end use
 	vModel->modelDepthHack = def->parms.modelDepthHack;
-	vModel->weaponDepthHack = def->parms.weaponDepthHack;
-
+// jmarshall
+	//vModel->weaponDepthHack = def->parms.weaponDepthHack;
+// jmarshall end
 	R_AxisToModelMatrix( def->parms.axis, def->parms.origin, vModel->modelMatrix );
 
 	// we may not have a viewDef if we are just creating shadows at entity creation time
@@ -687,7 +688,7 @@ void R_LinkLightSurf( const drawSurf_t **link, const srfTriangles_t *tri, const 
 			// FIXME: share with the ambient surface?
 			float *regs = (float *)R_FrameAlloc( shader->GetNumRegisters() * sizeof( float ) );
 			drawSurf->shaderRegisters = regs;
-			shader->EvaluateRegisters( regs, space->entityDef->parms.shaderParms, tr.viewDef, space->entityDef->parms.referenceSound );
+			shader->EvaluateRegisters( regs, space->entityDef->parms.shaderParms, tr.viewDef, NULL );
 		}
 
 		// calculate the specular coordinates if we aren't using vertex programs
@@ -907,7 +908,7 @@ void R_AddLightSurfaces( void ) {
 		// evaluate the light shader registers
 		float *lightRegs =(float *)R_FrameAlloc( lightShader->GetNumRegisters() * sizeof( float ) );
 		vLight->shaderRegisters = lightRegs;
-		lightShader->EvaluateRegisters( lightRegs, light->parms.shaderParms, tr.viewDef, light->parms.referenceSound );
+		lightShader->EvaluateRegisters( lightRegs, light->parms.shaderParms, tr.viewDef, NULL);
 
 		// if this is a purely additive light and no stage in the light shader evaluates
 		// to a positive light value, we can completely skip the light
@@ -1234,7 +1235,7 @@ void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const 
 			// evaluate the reference shader to find our shader parms
 			const shaderStage_t *pStage;
 
-			renderEntity->referenceShader->EvaluateRegisters( refRegs, renderEntity->shaderParms, tr.viewDef, renderEntity->referenceSound );
+			renderEntity->referenceShader->EvaluateRegisters( refRegs, renderEntity->shaderParms, tr.viewDef, NULL);
 			pStage = renderEntity->referenceShader->GetStage(0);
 
 			memcpy( generatedShaderParms, renderEntity->shaderParms, sizeof( generatedShaderParms ) );
@@ -1250,21 +1251,22 @@ void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const 
 
 		float oldFloatTime;
 		int oldTime;
-
-		if ( space->entityDef && space->entityDef->parms.timeGroup ) {
-			oldFloatTime = tr.viewDef->floatTime;
-			oldTime = tr.viewDef->renderView.time;
-
-			tr.viewDef->floatTime = game->GetTimeGroupTime( space->entityDef->parms.timeGroup ) * 0.001;
-			tr.viewDef->renderView.time = game->GetTimeGroupTime( space->entityDef->parms.timeGroup );
-		}
-
-		shader->EvaluateRegisters( regs, shaderParms, tr.viewDef, renderEntity->referenceSound );
-
-		if ( space->entityDef && space->entityDef->parms.timeGroup ) {
-			tr.viewDef->floatTime = oldFloatTime;
-			tr.viewDef->renderView.time = oldTime;
-		}
+// jmarshall
+		//if ( space->entityDef && space->entityDef->parms.timeGroup ) {
+		//	oldFloatTime = tr.viewDef->floatTime;
+		//	oldTime = tr.viewDef->renderView.time;
+		//
+		//	tr.viewDef->floatTime = game->GetTimeGroupTime( space->entityDef->parms.timeGroup ) * 0.001;
+		//	tr.viewDef->renderView.time = game->GetTimeGroupTime( space->entityDef->parms.timeGroup );
+		//}
+// jmarshall
+		shader->EvaluateRegisters( regs, shaderParms, tr.viewDef, NULL);
+		// jmarshall
+		//if ( space->entityDef && space->entityDef->parms.timeGroup ) {
+		//	tr.viewDef->floatTime = oldFloatTime;
+		//	tr.viewDef->renderView.time = oldTime;
+		//}
+		// jmarshall
 	}
 
 	// check for deformations
@@ -1302,9 +1304,10 @@ void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const 
 
 		oldFloatTime = tr.viewDef->floatTime;
 		oldTime = tr.viewDef->renderView.time;
-
-		tr.viewDef->floatTime = game->GetTimeGroupTime( 1 ) * 0.001;
-		tr.viewDef->renderView.time = game->GetTimeGroupTime( 1 );
+// jmarshall - gui time
+		//tr.viewDef->floatTime = game->GetTimeGroupTime( 1 ) * 0.001;
+		//tr.viewDef->renderView.time = game->GetTimeGroupTime( 1 );
+// jmarshall end
 
 		idBounds ndcBounds;
 
@@ -1483,39 +1486,41 @@ void R_AddModelSurfaces( void ) {
 
 		float oldFloatTime;
 		int oldTime;
+// jmarshall
+		//game->SelectTimeGroup( vEntity->entityDef->parms.timeGroup );
+		//
+		//if ( vEntity->entityDef->parms.timeGroup ) {
+		//	oldFloatTime = tr.viewDef->floatTime;
+		//	oldTime = tr.viewDef->renderView.time;
+		//
+		//	tr.viewDef->floatTime = game->GetTimeGroupTime( vEntity->entityDef->parms.timeGroup ) * 0.001;
+		//	tr.viewDef->renderView.time = game->GetTimeGroupTime( vEntity->entityDef->parms.timeGroup );
+		//}
 
-		game->SelectTimeGroup( vEntity->entityDef->parms.timeGroup );
-
-		if ( vEntity->entityDef->parms.timeGroup ) {
-			oldFloatTime = tr.viewDef->floatTime;
-			oldTime = tr.viewDef->renderView.time;
-
-			tr.viewDef->floatTime = game->GetTimeGroupTime( vEntity->entityDef->parms.timeGroup ) * 0.001;
-			tr.viewDef->renderView.time = game->GetTimeGroupTime( vEntity->entityDef->parms.timeGroup );
-		}
-
-		if ( tr.viewDef->isXraySubview && vEntity->entityDef->parms.xrayIndex == 1 ) {
-			if ( vEntity->entityDef->parms.timeGroup ) {
-				tr.viewDef->floatTime = oldFloatTime;
-				tr.viewDef->renderView.time = oldTime;
-			}
-			continue;
-		} else if ( !tr.viewDef->isXraySubview && vEntity->entityDef->parms.xrayIndex == 2 ) {
-			if ( vEntity->entityDef->parms.timeGroup ) {
-				tr.viewDef->floatTime = oldFloatTime;
-				tr.viewDef->renderView.time = oldTime;
-			}
-			continue;
-		}
-
+		//if ( tr.viewDef->isXraySubview && vEntity->entityDef->parms.xrayIndex == 1 ) {
+		//	if ( vEntity->entityDef->parms.timeGroup ) {
+		//		tr.viewDef->floatTime = oldFloatTime;
+		//		tr.viewDef->renderView.time = oldTime;
+		//	}
+		//	continue;
+		//} else if ( !tr.viewDef->isXraySubview && vEntity->entityDef->parms.xrayIndex == 2 ) {
+		//	if ( vEntity->entityDef->parms.timeGroup ) {
+		//		tr.viewDef->floatTime = oldFloatTime;
+		//		tr.viewDef->renderView.time = oldTime;
+		//	}
+		//	continue;
+		//}
+// jmarshall end
 		// add the ambient surface if it has a visible rectangle
 		if ( !vEntity->scissorRect.IsEmpty() ) {
 			model = R_EntityDefDynamicModel( vEntity->entityDef );
 			if ( model == NULL || model->NumSurfaces() <= 0 ) {
-				if ( vEntity->entityDef->parms.timeGroup ) {
-					tr.viewDef->floatTime = oldFloatTime;
-					tr.viewDef->renderView.time = oldTime;
-				}
+// jmarshall
+				//if ( vEntity->entityDef->parms.timeGroup ) {
+				//	tr.viewDef->floatTime = oldFloatTime;
+				//	tr.viewDef->renderView.time = oldTime;
+				//}
+// jmarshall
 				continue;
 			}
 
@@ -1528,17 +1533,20 @@ void R_AddModelSurfaces( void ) {
 		//
 		// for all the entity / light interactions on this entity, add them to the view
 		//
-		if ( tr.viewDef->isXraySubview ) {
-			if ( vEntity->entityDef->parms.xrayIndex == 2 ) {
-				for ( inter = vEntity->entityDef->firstInteraction; inter != NULL && !inter->IsEmpty(); inter = next ) {
-					next = inter->entityNext;
-					if ( inter->lightDef->viewCount != tr.viewCount ) {
-						continue;
-					}
-					inter->AddActiveInteraction();
-				}
-			}
-		} else {
+// jmarshall
+		//if ( tr.viewDef->isXraySubview ) {
+		//	if ( vEntity->entityDef->parms.xrayIndex == 2 ) {
+		//		for ( inter = vEntity->entityDef->firstInteraction; inter != NULL && !inter->IsEmpty(); inter = next ) {
+		//			next = inter->entityNext;
+		//			if ( inter->lightDef->viewCount != tr.viewCount ) {
+		//				continue;
+		//			}
+		//			inter->AddActiveInteraction();
+		//		}
+		//	}
+		//} else {
+// jmarshall end
+		{
 			// all empty interactions are at the end of the list so once the
 			// first is encountered all the remaining interactions are empty
 			for ( inter = vEntity->entityDef->firstInteraction; inter != NULL && !inter->IsEmpty(); inter = next ) {
@@ -1553,12 +1561,12 @@ void R_AddModelSurfaces( void ) {
 				inter->AddActiveInteraction();
 			}
 		}
-
-		if ( vEntity->entityDef->parms.timeGroup ) {
-			tr.viewDef->floatTime = oldFloatTime;
-			tr.viewDef->renderView.time = oldTime;
-		}
-
+// jmarshall
+		//if ( vEntity->entityDef->parms.timeGroup ) {
+		//	tr.viewDef->floatTime = oldFloatTime;
+		//	tr.viewDef->renderView.time = oldTime;
+		//}
+// jmarshall
 	}
 }
 

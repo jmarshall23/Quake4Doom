@@ -99,6 +99,7 @@ public:
 	VIRTUAL void VPCALL TransformVertsAndTangents( idDrawVert * RESTRICT verts, const int numVerts, idBounds &bounds, const idJointMat * RESTRICT joints, const idVec4 * RESTRICT base, const jointWeight_t * RESTRICT weights, const int numWeights );
 	VIRTUAL void VPCALL TransformVertsAndTangentsFast( idDrawVert * RESTRICT verts, const int numVerts, idBounds &bounds, const idJointMat * RESTRICT joints, const idVec4 * RESTRICT base, const jointWeight_t * RESTRICT weights, const int numWeights );
 	VIRTUAL void VPCALL TracePointCull( byte * RESTRICT cullBits, byte &totalOr, const float radius, const idPlane * RESTRICT planes, const idDrawVert * RESTRICT verts, const int numVerts );
+	virtual void VPCALL TransformVerts(idDrawVert* verts, const int numVerts, const idJointMat* joints, const idVec4* weights, const int* index, const int numWeights);
 	VIRTUAL void VPCALL DecalPointCull( byte * RESTRICT cullBits, const idPlane * RESTRICT planes, const idDrawVert * RESTRICT verts, const int numVerts );
 	VIRTUAL void VPCALL OverlayPointCull( byte * RESTRICT cullBits, idVec2 * RESTRICT texCoords, const idPlane * RESTRICT planes, const idDrawVert * RESTRICT verts, const int numVerts );
 	VIRTUAL void VPCALL DeriveTriPlanes( idPlane * RESTRICT planes, const idDrawVert * RESTRICT verts, const int numVerts, const int * RESTRICT indexes, const int numIndexes );

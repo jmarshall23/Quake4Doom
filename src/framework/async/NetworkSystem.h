@@ -65,25 +65,25 @@ class idNetworkSystem {
 public:
 	virtual					~idNetworkSystem( void ) {}
 
-	virtual void			Shutdown( void );
+	//virtual void			Shutdown( void );
 
-	virtual void			ServerSendReliableMessage( int clientNum, const idBitMsg &msg, bool inhibitRepeater = false );
-	virtual void			RepeaterSendReliableMessage( int clientNum, const idBitMsg &msg, bool inhibitHeader = false, int including = -1 );
-	virtual void			RepeaterSendReliableMessageExcluding( int excluding, const idBitMsg &msg, bool inhibitHeader = false, int clientNum = -1 ); // NOTE: Message is sent to all viewers if clientNum is -1; excluding is used for playback.
-	virtual void			ServerSendReliableMessageExcluding( int clientNum, const idBitMsg &msg, bool inhibitRepeater = false );
+	virtual void			ServerSendReliableMessage( int clientNum, const idBitMsg &msg, bool inhibitRepeater = false ) { }
+	virtual void			RepeaterSendReliableMessage( int clientNum, const idBitMsg &msg, bool inhibitHeader = false, int including = -1 ) { }
+	virtual void			RepeaterSendReliableMessageExcluding( int excluding, const idBitMsg &msg, bool inhibitHeader = false, int clientNum = -1 ) { } // NOTE: Message is sent to all viewers if clientNum is -1; excluding is used for playback.
+	virtual void			ServerSendReliableMessageExcluding( int clientNum, const idBitMsg &msg, bool inhibitRepeater = false ) { }
 	virtual int				ServerGetClientPing( int clientNum );
 	virtual int				ServerGetClientTimeSinceLastPacket( int clientNum );
 	virtual int				ServerGetClientTimeSinceLastInput( int clientNum );
 	virtual int				ServerGetClientOutgoingRate( int clientNum );
 	virtual int				ServerGetClientIncomingRate( int clientNum );
 	virtual float			ServerGetClientIncomingPacketLoss( int clientNum );
-	virtual int				ServerGetClientNum( int clientId );
-	virtual	int				ServerGetServerTime( void );
+	virtual int				ServerGetClientNum(int clientId) { return 0; }
+	virtual	int				ServerGetServerTime(void) { return 0; }
 
 	// returns the new clientNum or -1 if there weren't any free.
-	virtual int				ServerConnectBot( void );
+	virtual int				ServerConnectBot(void) { return 0; }
 
-	virtual int				RepeaterGetClientNum( int clientId );
+	virtual int				RepeaterGetClientNum( int clientId ) { return 0; }
 
 	virtual void			ClientSendReliableMessage( const idBitMsg &msg );
 	virtual int				ClientGetPrediction( void );
@@ -94,34 +94,34 @@ public:
 // RAVEN BEGIN
 // ddynerman: added some utility functions
 	// uses a static buffer, copy it before calling in game again
-	virtual const char*		GetServerAddress( void );
-	virtual const char*		GetClientAddress( int clientNum );
-	virtual	void			AddFriend( int clientNum );
-	virtual void			RemoveFriend( int clientNum );
+	virtual const char*		GetServerAddress( void ) { return 0; }
+	virtual const char*		GetClientAddress( int clientNum ) { return 0; }
+	virtual	void			AddFriend( int clientNum ) { }
+	virtual void			RemoveFriend( int clientNum ) { }
 	// for MP games
-	virtual void			SetLoadingText( const char* loadingText );
-	virtual void			AddLoadingIcon( const char* icon );
-	virtual const char*		GetClientGUID( int clientNum );
+	virtual void			SetLoadingText( const char* loadingText ) { }
+	virtual void			AddLoadingIcon( const char* icon ) { }
+	virtual const char*		GetClientGUID( int clientNum ) { return 0; }
 // RAVEN END
 
-	virtual void			GetTrafficStats(  int &bytesSent, int &packetsSent, int &bytesReceived, int &packetsReceived ) const;
+	virtual void			GetTrafficStats(  int &bytesSent, int &packetsSent, int &bytesReceived, int &packetsReceived ) const { }
 
 	// server browser
-	virtual int				GetNumScannedServers( void );
-	virtual const scannedServer_t*	GetScannedServerInfo( int serverNum );
-	virtual const scannedClient_t*	GetScannedServerClientInfo( int serverNum, int clientNum );
-	virtual void			AddSortFunction( const sortInfo_t &sortInfo );
-	virtual bool			RemoveSortFunction( const sortInfo_t &sortInfo );
-	virtual void			UseSortFunction( const sortInfo_t &sortInfo, bool use = true );
-	virtual bool			SortFunctionIsActive( const sortInfo_t &sortInfo );
+	virtual int				GetNumScannedServers( void ) { return 0; }
+	virtual const scannedServer_t*	GetScannedServerInfo( int serverNum ) { return 0; }
+	virtual const scannedClient_t*	GetScannedServerClientInfo( int serverNum, int clientNum ) { return 0; }
+	virtual void			AddSortFunction( const sortInfo_t &sortInfo ) { }
+	virtual bool			RemoveSortFunction( const sortInfo_t &sortInfo ) { return 0; }
+	virtual void			UseSortFunction( const sortInfo_t &sortInfo, bool use = true ) { }
+	virtual bool			SortFunctionIsActive( const sortInfo_t &sortInfo ) { return 0; }
 
 	// returns true if enabled
-	virtual bool			HTTPEnable( bool enable );
+	virtual bool			HTTPEnable( bool enable ) { return 0; }
 
-	virtual void			ClientSetServerInfo( const idDict &serverSI );
-	virtual void			RepeaterSetInfo( const idDict &info );
+	virtual void			ClientSetServerInfo( const idDict &serverSI ) { }
+	virtual void			RepeaterSetInfo( const idDict &info ) { }
 
-	virtual const char*		GetViewerGUID( int clientNum );
+	virtual const char*		GetViewerGUID( int clientNum ) { return 0; }
 
 private:
 	scannedServer_t			scannedServer;

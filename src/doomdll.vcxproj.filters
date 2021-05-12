@@ -52,6 +52,18 @@
     <Filter Include="BSE">
       <UniqueIdentifier>{6582a8ed-b0fb-4901-a878-86b7c470ebfa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AAS">
+      <UniqueIdentifier>{d2d8213a-097e-4005-aa39-96be2cd3dbd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{884c03fe-42eb-4449-aa34-ea3ab8ce851b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools\compilers">
+      <UniqueIdentifier>{2c41be4c-6190-4da0-a659-c35fd316a465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools\compilers\dmap">
+      <UniqueIdentifier>{673af182-b53c-4514-b760-3e3c6574c914}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cm\CollisionModel.h">
@@ -513,12 +525,6 @@
     <ClInclude Include="ui\Winvar.h">
       <Filter>Ui</Filter>
     </ClInclude>
-    <ClInclude Include="bse\BSEInterface.h">
-      <Filter>BSE</Filter>
-    </ClInclude>
-    <ClInclude Include="bse\BSE.h">
-      <Filter>BSE</Filter>
-    </ClInclude>
     <ClInclude Include="framework\DeclPlayerModel.h">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -527,6 +533,15 @@
     </ClInclude>
     <ClInclude Include="framework\declPlayback.h">
       <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\declMatType.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="idlib\precompiled.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="bse\BSE.h">
+      <Filter>BSE</Filter>
     </ClInclude>
     <ClInclude Include="bse\BSE_Envelope.h">
       <Filter>BSE</Filter>
@@ -537,11 +552,20 @@
     <ClInclude Include="bse\BSE_SpawnDomains.h">
       <Filter>BSE</Filter>
     </ClInclude>
-    <ClInclude Include="framework\declMatType.h">
-      <Filter>Framework</Filter>
+    <ClInclude Include="bse\BSEInterface.h">
+      <Filter>BSE</Filter>
     </ClInclude>
-    <ClInclude Include="idlib\precompiled.h">
-      <Filter>Framework</Filter>
+    <ClInclude Include="aas\AASFile.h">
+      <Filter>AAS</Filter>
+    </ClInclude>
+    <ClInclude Include="aas\AASFile_local.h">
+      <Filter>AAS</Filter>
+    </ClInclude>
+    <ClInclude Include="aas\AASFileManager.h">
+      <Filter>AAS</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\compilers\dmap\dmap.h">
+      <Filter>tools\compilers\dmap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1136,9 +1160,6 @@
     <ClCompile Include="ui\Winvar.cpp">
       <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="bse\BSE_Manager.cpp">
-      <Filter>BSE</Filter>
-    </ClCompile>
     <ClCompile Include="idlib\precompiled.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
@@ -1154,11 +1175,71 @@
     <ClCompile Include="framework\DeclPlayback.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="framework\DeclMatType.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
     <ClCompile Include="bse\BSE_EffectTemplate.cpp">
       <Filter>BSE</Filter>
     </ClCompile>
-    <ClCompile Include="framework\DeclMatType.cpp">
-      <Filter>Framework</Filter>
+    <ClCompile Include="bse\BSE_Manager.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="aas\AASFile.cpp">
+      <Filter>AAS</Filter>
+    </ClCompile>
+    <ClCompile Include="aas\AASFile_optimize.cpp">
+      <Filter>AAS</Filter>
+    </ClCompile>
+    <ClCompile Include="aas\AASFile_sample.cpp">
+      <Filter>AAS</Filter>
+    </ClCompile>
+    <ClCompile Include="aas\AASFileManager.cpp">
+      <Filter>AAS</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\dmap.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\facebsp.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\gldraw.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\glfile.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\leakfile.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\map.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\optimize.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\optimize_gcc.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\output.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\portals.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\shadowopt3.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\tritjunction.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\tritools.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\ubrush.cpp">
+      <Filter>tools\compilers\dmap</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\compilers\dmap\usurface.cpp">
+      <Filter>tools\compilers\dmap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

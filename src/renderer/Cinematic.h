@@ -1,16 +1,33 @@
-// Copyright (C) 2004 Id Software, Inc.
-//
+/*
+===========================================================================
+
+Doom 3 GPL Source Code
+Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+
+This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+
+Doom 3 Source Code is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Doom 3 Source Code is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
+
+In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
+
+If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+
+===========================================================================
+*/
+
 #ifndef __CINEMATIC_H__
 #define __CINEMATIC_H__
-
-// RAVEN BEGIN
-//nrausch: I made some semi-heavy changes to this entire file
-//	- changed to idCinematic to use a private implementation which 
-//	is determined & allocated when InitFromFile is called. A different
-//	PIMPL is used depending on if the video file is a roq or a wmv.
-//	This replaces the functionality that was in a few versions ago under the
-//	"StandaloneCinematic" name.
-// RAVEN END
 
 /*
 ===============================================================================
@@ -42,13 +59,6 @@ typedef struct {
 } cinData_t;
 
 class idCinematic {
-	idCinematic* PIMPL;
-	
-	// Store off the current mode - wmv or roq
-	// If the cinematic is in the same mode if InitFromFile
-	// is called again on it, this will prevent reallocation 
-	// of the PIMPL
-	int mode;
 public:
 	// initialize cinematic play back data
 	static void			InitCinematic( void );
@@ -60,51 +70,23 @@ public:
 	// This should be used instead of new
 	static idCinematic	*Alloc();
 
-						idCinematic();
-	
 	// frees all allocated memory
 	virtual				~idCinematic();
 
-	enum {
-		SUPPORT_DRAW = 1,
-		SUPPORT_IMAGEFORTIME = 2,
-		SUPPORT_DEFAULT = SUPPORT_IMAGEFORTIME
-	};
-	
 	// returns false if it failed to load
-	// this interface can take either a wmv or roq file
-	// wmv will imply movie audio, unless there is no audio encoded in the stream
-	// right now there is no way to disable this.
-	virtual bool		InitFromFile(const char *qpath, bool looping, int options = SUPPORT_DEFAULT);
+	virtual bool		InitFromFile( const char *qpath, bool looping );
 
 	// returns the length of the animation in milliseconds
 	virtual int			AnimationLength();
 
 	// the pointers in cinData_t will remain valid until the next UpdateForTime() call
-	// will do nothing if InitFromFile was not called with SUPPORT_IMAGEFORTIME
-	virtual cinData_t	ImageForTime(int milliseconds);
+	virtual cinData_t	ImageForTime( int milliseconds );
 
 	// closes the file and frees all allocated memory
 	virtual void		Close();
 
 	// closes the file and frees all allocated memory
 	virtual void		ResetTime(int time);
-
-	// draw the current animation frame to screen
-	// will do nothing if InitFromFile was not called with SUPPORT_DRAW
-	virtual void		Draw();
-	
-	// Set draw position & size
-	// will do nothing if InitFromFile was not called with SUPPORT_DRAW
-	virtual void		SetScreenRect(int left, int right, int bottom, int top);
-	
-	// Get draw position & size
-	// will do nothing if InitFromFile was not called with SUPPORT_DRAW
-	virtual void		GetScreenRect(int &left, int &right, int &bottom, int &top);
-	
-	// True if the video is playing
-	// will do nothing if InitFromFile was not called with SUPPORT_DRAW
-	virtual bool		IsPlaying();
 };
 
 /*
@@ -121,7 +103,7 @@ public:
 						idSndWindow() { showWaveform = false; }
 						~idSndWindow() {}
 
-	bool				InitFromFile( const char *qpath, bool looping, int options );
+	bool				InitFromFile( const char *qpath, bool looping );
 	cinData_t			ImageForTime( int milliseconds );
 	int					AnimationLength();
 

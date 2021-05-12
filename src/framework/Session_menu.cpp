@@ -681,6 +681,8 @@ void idSessionLocal::HandleMainMenuCommands( const char *menuCommand ) {
 		}
 
 		if ( !idStr::Icmp( cmd, "MAPScan" ) ) {
+// jmarshall - server scan fix
+/*
 			const char *gametype = cvarSystem->GetCVarString( "si_gameType" );
 			if ( gametype == NULL || *gametype == 0 || idStr::Icmp( gametype, "singleplayer" ) == 0 ) {
 				gametype = "Deathmatch";
@@ -717,6 +719,7 @@ void idSessionLocal::HandleMainMenuCommands( const char *menuCommand ) {
 
 			// set the current level shot
 			UpdateMPLevelShot();
+*/
 			continue;
 		}
 
@@ -1602,7 +1605,7 @@ void idSessionLocal::HandleNoteCommands( const char *menuCommand ) {
 			workName += "/";
 			workName += p;
 			int workNote = noteNumber;
-			R_ScreenshotFilename( workNote, workName, shotName );
+		//	R_ScreenshotFilename( workNote, workName, shotName );
 
 			noteNum = shotName;
 			noteNum.StripPath();
@@ -1619,7 +1622,7 @@ void idSessionLocal::HandleNoteCommands( const char *menuCommand ) {
 			cmdSystem->ExecuteCommandBuffer();
 
 			UpdateScreen();
-			renderSystem->TakeScreenshot( renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight(), shotName, 1, NULL );
+			//renderSystem->TakeScreenshot( renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight(), shotName, 1, NULL );
 		}
 		noteNumber++;
 

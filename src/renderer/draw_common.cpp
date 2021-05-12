@@ -1013,9 +1013,9 @@ int RB_STD_DrawShaderPasses( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 		}
 
 		if ( backEnd.viewDef->isXraySubview && drawSurfs[i]->space->entityDef ) {
-			if ( drawSurfs[i]->space->entityDef->parms.xrayIndex != 2 ) {
-				continue;
-			}
+			//if ( drawSurfs[i]->space->entityDef->parms.xrayIndex != 2 ) {
+			//	continue;
+			//}
 		}
 
 		// we need to draw the post process shaders after we have drawn the fog lights

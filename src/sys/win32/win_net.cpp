@@ -853,7 +853,7 @@ public:
 	udpMsg_t *			sendLast;
 	udpMsg_t *			recieveFirst;
 	udpMsg_t *			recieveLast;
-	idBlockAlloc<udpMsg_t, 64> udpMsgAllocator;
+	idBlockAlloc<udpMsg_t, 64, 0> udpMsgAllocator;
 };
 
 idUDPLag::idUDPLag( void ) {

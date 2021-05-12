@@ -385,7 +385,7 @@ public:
 
 // rjohnson: added debugging code to try and catch a free error
 	// purges all the data before deleting
-	virtual						~idRenderModel( void );
+	//virtual						~idRenderModel( void );
 // RAVEN END
 
 	// Loads static models only, dynamic models must be loaded by the modelManager

@@ -48,7 +48,7 @@ typedef enum {
 #endif
 
 struct version_s {
-			version_s( void ) { sprintf( string, "%s.%d%s %s %s %s", "v4.1", BUILD_NUMBER, BUILD_DEBUG, BUILD_STRING, __DATE__, __TIME__ ); }
+			version_s( void ) { sprintf( string, "%s.%d%s %s %s %s", ENGINE_VERSION, BUILD_NUMBER, BUILD_DEBUG, BUILD_STRING, __DATE__, __TIME__ ); }
 	char	string[256];
 } version;
 

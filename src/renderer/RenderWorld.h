@@ -214,6 +214,10 @@ typedef struct renderEntity_s {
 	float					shadowLODDistance;
 	int						suppressLOD;
 // RAVEN END
+
+// jmarshall
+	int						referenceSound;
+// jmarshall end
 } renderEntity_t;
 
 typedef struct renderLight_s {
@@ -278,6 +282,10 @@ typedef struct renderLight_s {
 	idList<idMaterial *>	allMaterials;
 #endif
 // RAVEN END
+
+// jmarshall
+	int						referenceSound;
+// jmarshall end
 } renderLight_t;
 
 // RAVEN BEGIN

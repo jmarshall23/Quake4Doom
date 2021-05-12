@@ -358,7 +358,7 @@ void Dmap( const idCmdArgs &args ) {
 			start = Sys_Milliseconds();
 
 			collisionModelManager->LoadMap( dmapGlobals.dmapFile );
-			collisionModelManager->FreeMap();
+			collisionModelManager->FreeMap(NULL);
 
 			end = Sys_Milliseconds();
 			common->Printf( "-------------------------------------\n" );
@@ -367,7 +367,7 @@ void Dmap( const idCmdArgs &args ) {
 
 		if ( !noAAS && !region ) {
 			// create AAS files
-			RunAAS_f( args );
+		//	RunAAS_f( args );
 		}
 	}
 

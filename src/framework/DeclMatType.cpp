@@ -18,7 +18,7 @@ const char* rvDeclMatType::DefaultDefinition(void) const {
 rvDeclMatType::Parse
 =======================
 */
-bool rvDeclMatType::Parse(const char* text, const int textLength, bool noCaching) {
+bool rvDeclMatType::Parse(const char* text, const int textLength) {
 	idLexer src;
 	idToken	token, token2;
 

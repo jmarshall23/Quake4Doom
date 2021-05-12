@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 
 #include "DeviceContext.h"
+#include "../renderer/tr_local.h"
 
 idVec4 idDeviceContext::colorPurple;
 idVec4 idDeviceContext::colorOrange;
@@ -352,7 +353,7 @@ void idDeviceContext::DrawStretchPic(float x, float y, float w, float h, float s
 		verts[3].xyz += origin;
 	}
 
-	renderSystem->DrawStretchPic( &verts[0], &indexes[0], 4, 6, shader, ident );
+	tr.DrawStretchPic( &verts[0], &indexes[0], 4, 6, shader, ident );
 	
 }
 
@@ -562,7 +563,7 @@ void idDeviceContext::DrawStretchPicRotated(float x, float y, float w, float h, 
 	}
 
 
-	renderSystem->DrawStretchPic( &verts[0], &indexes[0], 4, 6, shader, (angle == 0.0) ? false : true );
+	tr.DrawStretchPic( &verts[0], &indexes[0], 4, 6, shader, (angle == 0.0) ? false : true );
 }
 
 void idDeviceContext::DrawFilledRect( float x, float y, float w, float h, const idVec4 &color) {

@@ -238,6 +238,7 @@ public:
 	int					Replace( const char *old, const char *nw );
 // RAVEN END
 
+	bool				IsColor(void) const;
 
 	// file name methods
 	int					FileNameHash( void ) const;						// hash key for the filename (skips extension)
@@ -266,6 +267,8 @@ public:
 	bool				CheckExtension( const char *ext );
 	void				ScrubFileName( void );							// Turns a bad file name into a good one or your money back
 
+	idStr& RemoveColors(void);
+
 // RAVEN BEGIN
 // jscott: like the declManager version, but globally accessable
 	void				MakeNameCanonical( void );
@@ -281,6 +284,8 @@ public:
 	static int			Length( const char *s );
 	static char *		ToLower( char *s );
 	static char *		ToUpper( char *s );
+	static bool			IsColor(const char* s);
+	static char*		RemoveColors(char* s);
 	static bool			IsNumeric( const char *s );
 	static bool			HasLower( const char *s );
 	static bool			HasUpper( const char *s );
@@ -376,6 +381,15 @@ char *					va( const char *fmt, ... ) id_attribute((format(printf,1,2)));
 // abahr
 char*					fe( int errorId );
 // RAVEN END
+
+ID_INLINE bool idStr::IsColor(void) const {
+	return idStr::IsColor(data);
+}
+
+ID_INLINE bool idStr::IsColor(const char* s) {
+	return (s[0] == C_COLOR_ESCAPE && s[1] != '\0' && s[1] != ' ');
+}
+
 
 ID_INLINE void idStr::EnsureAlloced( int amount, bool keepold ) {
 	if ( amount > alloced ) {
@@ -895,6 +909,12 @@ ID_INLINE bool idStr::HasLower( void ) const {
 
 ID_INLINE bool idStr::HasUpper( void ) const {
 	return idStr::HasUpper( data );
+}
+
+ID_INLINE idStr& idStr::RemoveColors(void) {
+	idStr::RemoveColors(data);
+	len = Length(data);
+	return *this;
 }
 
 ID_INLINE int idStr::IsEscape( int* type ) const {

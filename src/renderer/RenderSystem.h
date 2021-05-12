@@ -51,6 +51,7 @@ typedef struct glconfig_s {
 	bool				envDot3Available;
 	bool				texture3DAvailable;
 	bool				sharedTexturePaletteAvailable;
+	bool				textureCompressionAvailable;
 // RAVEN BEGIN
 // dluetscher: added
 	bool				drawRangeElementsAvailable;
@@ -113,53 +114,49 @@ typedef struct glconfig_s {
 
 
 // font support 
-#define GLYPH_COUNT			256
+const int GLYPH_START = 0;
+const int GLYPH_END = 255;
+const int GLYPH_CHARSTART = 32;
+const int GLYPH_CHAREND = 127;
+const int GLYPHS_PER_FONT = GLYPH_END - GLYPH_START + 1;
 
-typedef struct glyphInfo_s
-{
-	float			width;					// number of pixels wide
-	float			height;					// number of scan lines
-	float			horiAdvance;			// number of pixels to advance to the next char
-	float			horiBearingX;			// x offset into space to render glyph
-	float			horiBearingY;			// y offset 
-	float			s1;						// x start tex coord
-	float			t1;						// y start tex coord
-	float			s2;						// x end tex coord
-	float			t2;						// y end tex coord
+typedef struct {
+	int					height;			// number of scan lines
+	int					top;			// top of glyph in buffer
+	int					bottom;			// bottom of glyph in buffer
+	int					pitch;			// width for copying
+	int					xSkip;			// x adjustment
+	int					imageWidth;		// width of actual image
+	int					imageHeight;	// height of actual image
+	float				s;				// x offset in image where glyph starts
+	float				t;				// y offset in image where glyph starts
+	float				s2;
+	float				t2;
+	const idMaterial* glyph;			// shader with the glyph
+	char				shaderName[32];
 } glyphInfo_t;
 
-typedef struct fontInfo_s
-{
-	glyphInfo_t		glyphs[GLYPH_COUNT];
-
-	float			pointSize;
-	float			fontHeight;				// max height of font
-	float			ascender;
-	float			descender;
-
-	idMaterial		*material;
+typedef struct {
+	glyphInfo_t			glyphs[GLYPHS_PER_FONT];
+	float				glyphScale;
+	char				name[64];
 } fontInfo_t;
 
 typedef struct {
 	fontInfo_t			fontInfoSmall;
 	fontInfo_t			fontInfoMedium;
 	fontInfo_t			fontInfoLarge;
-	float				maxHeight;
-	float				maxWidth;
-	float				maxHeightSmall;
-	float				maxWidthSmall;
-	float				maxHeightMedium;
-	float				maxWidthMedium;
-	float				maxHeightLarge;
-	float				maxWidthLarge;
+	int					maxHeight;
+	int					maxWidth;
+	int					maxHeightSmall;
+	int					maxWidthSmall;
+	int					maxHeightMedium;
+	int					maxWidthMedium;
+	int					maxHeightLarge;
+	int					maxWidthLarge;
 	char				name[64];
-// RAVEN BEGIN
-// mwhitlock: Xenon texture streaming
-#if defined(_XENON)
-	idList<idMaterial*> allMaterials;
-#endif
-// RAVEN END
 } fontInfoEx_t;
+
 
 const int TINYCHAR_WIDTH		= 4;
 const int TINYCHAR_HEIGHT		= 8;

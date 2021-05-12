@@ -959,7 +959,7 @@ static void UniqueVerts( void ) {
 		}
 	}
 }
-
+void R_LightProjectionMatrix(const idVec3& origin, const idPlane& rearPlane, idVec4 mat[4]);
 /*
 ======================
 ProjectUniqued

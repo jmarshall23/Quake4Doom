@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "/precompiled.h"
+#include "precompiled.h"
 #pragma hdrstop
 
 #include "MsgChannel.h"
@@ -54,191 +54,6 @@ All fragments will have the same sequence numbers.
 
 idCVar net_channelShowPackets( "net_channelShowPackets", "0", CVAR_SYSTEM | CVAR_BOOL, "show all packets" );
 idCVar net_channelShowDrop( "net_channelShowDrop", "0", CVAR_SYSTEM | CVAR_BOOL, "show dropped packets" );
-
-/*
-===============
-idMsgQueue::idMsgQueue
-===============
-*/
-idMsgQueue::idMsgQueue( void ) {
-	Init( 0 );
-}
-
-/*
-===============
-idMsgQueue::Init
-===============
-*/
-void idMsgQueue::Init( int sequence ) {
-	first = last = sequence;
-	startIndex = endIndex = 0;
-}
-
-/*
-===============
-idMsgQueue::Add
-===============
-*/
-bool idMsgQueue::Add( const byte *data, const int size ) {
-	if ( GetSpaceLeft() < size + 8 ) {
-		return false;
-	}
-	int sequence = last;
-	WriteShort( size );
-	WriteLong( sequence );
-	WriteData( data, size );
-	last++;
-	return true;
-}
-
-/*
-===============
-idMsgQueue::Get
-===============
-*/
-bool idMsgQueue::Get( byte *data, int &size ) {
-	if ( first == last ) {
-		size = 0;
-		return false;
-	}
-	int sequence;
-	size = ReadShort();
-	sequence = ReadLong();
-	ReadData( data, size );
-	assert( sequence == first );
-	first++;
-	return true;
-}
-
-/*
-===============
-idMsgQueue::GetTotalSize
-===============
-*/
-int idMsgQueue::GetTotalSize( void ) const {
-	if ( startIndex <= endIndex ) {
-		return ( endIndex - startIndex );
-	} else {
-		return ( sizeof( buffer ) - startIndex + endIndex );
-	}
-}
-
-/*
-===============
-idMsgQueue::GetSpaceLeft
-===============
-*/
-int idMsgQueue::GetSpaceLeft( void ) const {
-	if ( startIndex <= endIndex ) {
-		return sizeof( buffer ) - ( endIndex - startIndex ) - 1;
-	} else {
-		return ( startIndex - endIndex ) - 1;
-	}
-}
-
-/*
-===============
-idMsgQueue::CopyToBuffer
-===============
-*/
-void idMsgQueue::CopyToBuffer( byte *buf ) const {
-	if ( startIndex <= endIndex ) {
-		memcpy( buf, buffer + startIndex, endIndex - startIndex );
-	} else {
-		memcpy( buf, buffer + startIndex, sizeof( buffer ) - startIndex );
-		memcpy( buf + sizeof( buffer ) - startIndex, buffer, endIndex );
-	}
-}
-
-/*
-===============
-idMsgQueue::WriteByte
-===============
-*/
-void idMsgQueue::WriteByte( byte b ) {
-	buffer[endIndex] = b;
-	endIndex = ( endIndex + 1 ) & ( MAX_MSG_QUEUE_SIZE - 1 );
-}
-
-/*
-===============
-idMsgQueue::ReadByte
-===============
-*/
-byte idMsgQueue::ReadByte( void ) {
-	byte b = buffer[startIndex];
-	startIndex = ( startIndex + 1 ) & ( MAX_MSG_QUEUE_SIZE - 1 );
-	return b;
-}
-
-/*
-===============
-idMsgQueue::WriteShort
-===============
-*/
-void idMsgQueue::WriteShort( int s ) {
-	WriteByte( ( s >>  0 ) & 255 );
-	WriteByte( ( s >>  8 ) & 255 );
-}
-
-/*
-===============
-idMsgQueue::ReadShort
-===============
-*/
-int idMsgQueue::ReadShort( void ) {
-	return ReadByte() | ( ReadByte() << 8 );
-}
-
-/*
-===============
-idMsgQueue::WriteLong
-===============
-*/
-void idMsgQueue::WriteLong( int l ) {
-	WriteByte( ( l >>  0 ) & 255 );
-	WriteByte( ( l >>  8 ) & 255 );
-	WriteByte( ( l >> 16 ) & 255 );
-	WriteByte( ( l >> 24 ) & 255 );
-}
-
-/*
-===============
-idMsgQueue::ReadLong
-===============
-*/
-int idMsgQueue::ReadLong( void ) {
-	return ReadByte() | ( ReadByte() << 8 ) | ( ReadByte() << 16 ) | ( ReadByte() << 24 );
-}
-
-/*
-===============
-idMsgQueue::WriteData
-===============
-*/
-void idMsgQueue::WriteData( const byte *data, const int size ) {
-	for ( int i = 0; i < size; i++ ) {
-		WriteByte( data[i] );
-	}
-}
-
-/*
-===============
-idMsgQueue::ReadData
-===============
-*/
-void idMsgQueue::ReadData( byte *data, const int size ) {
-	if ( data ) {
-		for ( int i = 0; i < size; i++ ) {
-			data[i] = ReadByte();
-		}
-	} else {
-		for ( int i = 0; i < size; i++ ) {
-			ReadByte();
-		}
-	}
-}
-
 
 /*
 ===============
@@ -381,7 +196,7 @@ bool idMsgChannel::ReadMessageData( idBitMsg &out, const idBitMsg &msg ) {
 
 	// remove acknowledged reliable messages
 	while( reliableSend.GetFirst() <= reliableAcknowledge ) {
-		if ( !reliableSend.Get( NULL, reliableMessageSize ) ) {
+		if ( !reliableSend.Get( NULL, 0,  reliableMessageSize, false ) ) {
 			break;
 		}
 	}
@@ -395,7 +210,7 @@ bool idMsgChannel::ReadMessageData( idBitMsg &out, const idBitMsg &msg ) {
 		}
 		reliableSequence = out.ReadLong();
 		if ( reliableSequence == reliableReceive.GetLast() + 1 ) {
-			reliableReceive.Add( out.GetData() + out.GetReadCount(), reliableMessageSize );
+			reliableReceive.Add( out.GetData() + out.GetReadCount(), reliableMessageSize, false);
 		}
 		out.ReadData( NULL, reliableMessageSize );
 		reliableMessageSize = out.ReadShort();
@@ -674,7 +489,7 @@ bool idMsgChannel::SendReliableMessage( const idBitMsg &msg ) {
 	if ( remoteAddress.type == NA_BAD ) {
 		return false;
 	}
-	result = reliableSend.Add( msg.GetData(), msg.GetSize() );
+	result = reliableSend.Add( msg.GetData(), msg.GetSize(), false);
 	if ( !result ) {
 		common->Warning( "idMsgChannel::SendReliableMessage: overflowed" );
 		return false;
@@ -690,8 +505,8 @@ idMsgChannel::GetReliableMessage
 bool idMsgChannel::GetReliableMessage( idBitMsg &msg ) {
 	int size;
 	bool result;
-
-	result = reliableReceive.Get( msg.GetData(), size );
+	// jmarshall: added msg.getsize
+	result = reliableReceive.Get( msg.GetData(), msg.GetSize(), size, false);
 	msg.SetSize( size );
 	msg.BeginReading();
 	return result;

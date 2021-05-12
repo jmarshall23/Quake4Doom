@@ -3,6 +3,14 @@
 
 #include "precompiled.h"
 
+rvDeclPlayback::rvDeclPlayback() {
+
+}
+
+rvDeclPlayback::~rvDeclPlayback() {
+
+}
+
 /*
 =====================
 rvDeclPlayback::ParseSample

@@ -255,7 +255,9 @@ void idAsyncServer::ExecuteMapChange( void ) {
 	fileSystem->ClearPureChecksums();
 
 	// make sure the map/gametype combo is good
-	game->GetBestGameType( cvarSystem->GetCVarString("si_map"), cvarSystem->GetCVarString("si_gametype"), bestGameType );
+// jmarshall - best game type
+	//game->GetBestGameType( cvarSystem->GetCVarString("si_map"), cvarSystem->GetCVarString("si_gametype"), bestGameType );
+// jmarshall end
 	cvarSystem->SetCVarString("si_gametype", bestGameType );
 
 	// initialize map settings
@@ -722,7 +724,7 @@ idAsyncServer::BeginLocalClient
 */
 void idAsyncServer::BeginLocalClient( void ) {
 	game->SetLocalClient( localClientNum );
-	game->SetUserInfo( localClientNum, sessLocal.mapSpawnData.userInfo[localClientNum], false, false );
+	game->SetUserInfo( localClientNum, sessLocal.mapSpawnData.userInfo[localClientNum], false );
 	game->ServerClientBegin( localClientNum );
 }
 
@@ -894,7 +896,7 @@ void idAsyncServer::SendUserInfoBroadcast( int userInfoNum, const idDict &info, 
 	const idDict	*gameInfo;
 	bool			gameModifiedInfo;
 
-	gameInfo = game->SetUserInfo( userInfoNum, info, false, true );
+	gameInfo = game->SetUserInfo( userInfoNum, info, false );
 	if ( gameInfo ) {
 		gameModifiedInfo = true;
 	} else {
@@ -1152,7 +1154,7 @@ bool idAsyncServer::SendSnapshotToClient( int clientNum ) {
 	idBitMsg	msg;
 	byte		msgBuf[MAX_MESSAGE_SIZE];
 	usercmd_t *	last;
-	byte		clientInPVS[MAX_ASYNC_CLIENTS >> 3];
+	dword		clientInPVS[MAX_ASYNC_CLIENTS >> 3];
 
 	serverClient_t &client = clients[clientNum];
 
@@ -1178,7 +1180,7 @@ bool idAsyncServer::SendSnapshotToClient( int clientNum ) {
 	msg.WriteShort( idMath::ClampShort( client.clientAheadTime ) );
 
 	// write the game snapshot
-	game->ServerWriteSnapshot( clientNum, client.snapshotSequence, msg, clientInPVS, MAX_ASYNC_CLIENTS );
+	game->ServerWriteSnapshot( clientNum, client.snapshotSequence, msg, &clientInPVS[0], MAX_ASYNC_CLIENTS, 0 ); // jmarshall: eval
 
 	// write the latest user commands from the other clients in the PVS to the snapshot
 	for ( last = NULL, i = 0; i < MAX_ASYNC_CLIENTS; i++ ) {
@@ -1777,7 +1779,7 @@ void idAsyncServer::ProcessConnectMessage( const netadr_t from, const idBitMsg &
 	// but meanwhile, the max players may have been reached
 	msg.ReadString( password, sizeof( password ) );
 	char reason[MAX_STRING_CHARS];
-	allowReply_t reply = game->ServerAllowClient( numClients, Sys_NetAdrToString( from ), guid, password, reason );
+	allowReply_t reply = game->ServerAllowClient(clientId, numClients, Sys_NetAdrToString( from ), guid, password, NULL, reason ); // jmarshall: added clientid
 	if ( reply != ALLOW_YES ) {
 		common->DPrintf( "game denied connection for %s\n", Sys_NetAdrToString( from ) );
 
@@ -2463,7 +2465,7 @@ void idAsyncServer::RunFrame( void ) {
 		DuplicateUsercmds( gameFrame, gameTime );
 
 		// advance game
-		gameReturn_t ret = game->RunFrame( userCmds[gameFrame & ( MAX_USERCMD_BACKUP - 1 ) ] );
+		gameReturn_t ret = game->RunFrame( userCmds[gameFrame & ( MAX_USERCMD_BACKUP - 1 ) ], 0, 0, 0 ); // jmarshall server frame.
 
 		idAsyncNetwork::ExecuteSessionCommand( ret.sessionCommand );
 

@@ -110,6 +110,8 @@ public:
 	idReachability *			next;				// next reachability in list
 	idReachability *			rev_next;			// next reachability in reversed list
 	unsigned short *			areaTravelTimes;	// travel times within the fromAreaNum from reachabilities that lead towards this area
+
+	void CopyBase(idReachability& reach);
 };
 
 class idReachability_Walk : public idReachability {
@@ -132,7 +134,7 @@ class idReachability_Fly : public idReachability {
 
 class idReachability_Special : public idReachability {
 	friend class idAASFileLocal;
-private:
+public:
 	idDict						dict;
 };
 
@@ -292,7 +294,7 @@ public:
 	bool						FromFile( const idStr &fileName );
 // RAVEN BEGIN
 // jsinger: changed to be Lexer instead of idLexer so that we have the ability to read binary files
-	bool						FromParser( Lexer &src );
+	bool						FromParser(idLexer&src );
 // RAVEN END
 	bool						FromDict( const char *name, const idDict *dict );
 	bool						WriteToFile( idFile *fp ) const;
@@ -307,11 +309,11 @@ public:
 private:
 // RAVEN BEGIN
 // jsinger: changed to be Lexer instead of idLexer so that we have the ability to read binary files
-	bool						ParseBool( Lexer &src, bool &b );
-	bool						ParseInt( Lexer &src, int &i );
-	bool						ParseFloat( Lexer &src, float &f );
-	bool						ParseVector( Lexer &src, idVec3 &vec );
-	bool						ParseBBoxes( Lexer &src );
+	bool						ParseBool(idLexer&src, bool &b );
+	bool						ParseInt(idLexer& src, int& i);
+	bool						ParseFloat(idLexer& src, float& f);
+	bool						ParseVector(idLexer&src, idVec3 &vec );
+	bool						ParseBBoxes(idLexer&src );
 // RAVEN END
 };
 
@@ -346,122 +348,95 @@ typedef struct sizeEstimate_s {
 } sizeEstimate_t;
 
 
+
 class idAASFile {
-public:	
-	virtual 						~idAASFile( void ) {}
-// RAVEN BEGIN
-// jscott: made pure virtual
-	virtual class idAASFile	*		CreateNew( void ) = 0;
-	virtual class idAASSettings *	CreateAASSettings( void ) = 0;
-	virtual class idReachability *	CreateReachability( int type ) = 0;
-// RAVEN BEGIN
-// jsinger: changed to be Lexer instead of idLexer so that we have the ability to read binary files
-	virtual bool					FromParser( class idAASSettings *edit, Lexer &src ) = 0;
-// RAVEN END
+public:
+	virtual 					~idAASFile(void) {}
 
-	virtual	const char *			GetName( void ) const = 0;
-	virtual	unsigned int			GetCRC( void ) const = 0;
-	virtual	void					SetSizes( sizeEstimate_t size ) = 0;
+	const char* GetName(void) const { return name.c_str(); }
+	unsigned int				GetCRC(void) const { return crc; }
 
-	virtual	int						GetNumPlanes( void ) const = 0;
-	virtual	idPlane &				GetPlane( int index ) = 0;
-	virtual int						FindPlane( const idPlane &plane, const float normalEps, const float distEps ) = 0;
+	int							GetNumPlanes(void) const { return planeList.Num(); }
+	const idPlane& GetPlane(int index) const { return planeList[index]; }
+	int							GetNumVertices(void) const { return vertices.Num(); }
+	const aasVertex_t& GetVertex(int index) const { return vertices[index]; }
+	int							GetNumEdges(void) const { return edges.Num(); }
+	const aasEdge_t& GetEdge(int index) const { return edges[index]; }
+	int							GetNumEdgeIndexes(void) const { return edgeIndex.Num(); }
+	const aasIndex_t& GetEdgeIndex(int index) const { return edgeIndex[index]; }
+	int							GetNumFaces(void) const { return faces.Num(); }
+	const aasFace_t& GetFace(int index) const { return faces[index]; }
+	int							GetNumFaceIndexes(void) const { return faceIndex.Num(); }
+	const aasIndex_t& GetFaceIndex(int index) const { return faceIndex[index]; }
+	int							GetNumAreas(void) const { return areas.Num(); }
+	const aasArea_t& GetArea(int index) const { return areas[index]; }
+	int							GetNumNodes(void) const { return nodes.Num(); }
+	const aasNode_t& GetNode(int index) const { return nodes[index]; }
+	int							GetNumPortals(void) const { return portals.Num(); }
+	const aasPortal_t& GetPortal(int index) { return portals[index]; }
+	int							GetNumPortalIndexes(void) const { return portalIndex.Num(); }
+	const aasIndex_t& GetPortalIndex(int index) const { return portalIndex[index]; }
+	int							GetNumClusters(void) const { return clusters.Num(); }
+	const aasCluster_t& GetCluster(int index) const { return clusters[index]; }
 
-	virtual	int						GetNumVertices( void ) const = 0;
-	virtual	aasVertex_t &			GetVertex( int index ) = 0;
-	virtual int						AppendVertex( aasVertex_t &vert ) = 0;
+	const idAASSettings& GetSettings(void) const { return settings; }
 
-	virtual	int						GetNumEdges( void ) const = 0;
-	virtual	aasEdge_t &				GetEdge( int index ) = 0;
-	virtual int						AppendEdge( aasEdge_t &edge ) = 0;
+	void						SetPortalMaxTravelTime(int index, int time) { portals[index].maxAreaTravelTime = time; }
+	void						SetAreaTravelFlag(int index, int flag) { areas[index].travelFlags |= flag; }
+	void						RemoveAreaTravelFlag(int index, int flag) { areas[index].travelFlags &= ~flag; }
 
-	virtual	int						GetNumEdgeIndexes( void ) const = 0;
-	virtual	aasIndex_t &			GetEdgeIndex( int index ) = 0;
-	virtual int						AppendEdgeIndex( aasIndex_t &edgeIdx ) = 0;
+	virtual idVec3				EdgeCenter(int edgeNum) const = 0;
+	virtual idVec3				FaceCenter(int faceNum) const = 0;
+	virtual idVec3				AreaCenter(int areaNum) const = 0;
 
-	virtual	int						GetNumFaces( void ) const = 0;
-	virtual	aasFace_t &				GetFace( int index ) = 0;
-	virtual int						AppendFace( aasFace_t &face ) = 0;
+	virtual idBounds			EdgeBounds(int edgeNum) const = 0;
+	virtual idBounds			FaceBounds(int faceNum) const = 0;
+	virtual idBounds			AreaBounds(int areaNum) const = 0;
 
-	virtual	int						GetNumFaceIndexes( void ) const = 0;
-	virtual	aasIndex_t &			GetFaceIndex( int index ) = 0;
-	virtual int						AppendFaceIndex( aasIndex_t &faceIdx ) = 0;
-
-	virtual	int						GetNumAreas( void ) const = 0;
-	virtual	aasArea_t &				GetArea( int index ) = 0;
-	virtual int						AppendArea( aasArea_t &area ) = 0;
-
-	virtual	int						GetNumNodes( void ) const = 0;
-	virtual	aasNode_t &				GetNode( int index ) = 0;
-	virtual int						AppendNode( aasNode_t &node ) = 0;
-	virtual void					SetNumNodes( int num ) = 0;
-
-	virtual	int						GetNumPortals( void ) const = 0;
-	virtual	aasPortal_t &			GetPortal( int index ) = 0;
-	virtual int						AppendPortal( aasPortal_t &portal ) = 0;
-
-	virtual	int						GetNumPortalIndexes( void ) const = 0;
-	virtual	aasIndex_t &			GetPortalIndex( int index ) = 0;
-	virtual int						AppendPortalIndex( aasIndex_t &portalIdx, int clusterNum ) = 0;
-
-	virtual	int						GetNumClusters( void ) const = 0;
-	virtual	aasCluster_t &			GetCluster( int index ) = 0;
-	virtual int						AppendCluster( aasCluster_t &cluster ) = 0;
+	virtual int					PointAreaNum(const idVec3& origin) const = 0;
+	virtual int					PointReachableAreaNum(const idVec3& origin, const idBounds& searchBounds, const int areaFlags, const int excludeTravelFlags) const = 0;
+	virtual int					BoundsReachableAreaNum(const idBounds& bounds, const int areaFlags, const int excludeTravelFlags) const = 0;
+	virtual void				PushPointIntoAreaNum(int areaNum, idVec3& point) const = 0;
+	virtual bool				Trace(aasTrace_t& trace, const idVec3& start, const idVec3& end) const = 0;
+	virtual void				PrintInfo(void) const = 0;
 
 	// RAVEN BEGIN
-	// cdr: AASTactical
-	virtual void					ClearTactical( void ) = 0;
+		// cdr: AASTactical
+	virtual void					ClearTactical(void) { }
 
-	virtual	int						GetNumFeatureIndexes( void ) const = 0;
-	virtual	aasIndex_t &			GetFeatureIndex( int index ) = 0;
-	virtual int						AppendFeatureIndex( aasIndex_t &featureIdx ) = 0;
+	virtual	int						GetNumFeatureIndexes(void) const { return 0; }
+	virtual	aasIndex_t& GetFeatureIndex(int index) { aasIndex_t i; return i; }
+	virtual int						AppendFeatureIndex(aasIndex_t& featureIdx) { return 0; }
 
-	virtual	int						GetNumFeatures( void ) const = 0;
-	virtual	aasFeature_t &			GetFeature( int index ) = 0;
-	virtual int						AppendFeature( aasFeature_t &cluster ) = 0;
+	virtual	int						GetNumFeatures(void) const { return 0; }
+	virtual	aasFeature_t& GetFeature(int index) { aasFeature_t f; return f; }
+	virtual int						AppendFeature(aasFeature_t& cluster) { return 0; }
 	// RAVEN END
 
-	virtual	idAASSettings &			GetSettings( void ) = 0;
-	virtual	void					SetSettings( const idAASSettings &in ) = 0;
+	virtual	idAASSettings& GetSettings(void) {
+		return settings;
+	}
+	virtual	void					SetSettings(const idAASSettings& in) {
+		settings = in;
+	}
 
-	virtual void					SetPortalMaxTravelTime( int index, int time ) = 0;
-	virtual void					SetAreaTravelFlag( int index, int flag ) = 0;
-	virtual void					RemoveAreaTravelFlag( int index, int flag ) = 0;
-// RAVEN END
+	// RAVEN END
+protected:
+	idStr						name;
+	unsigned int				crc;
 
-	virtual idVec3					EdgeCenter( int edgeNum ) const = 0;
-	virtual idVec3					FaceCenter( int faceNum ) const = 0;
-	virtual idVec3					AreaCenter( int areaNum ) const = 0;
-
-	virtual idBounds				EdgeBounds( int edgeNum ) const = 0;
-	virtual idBounds				FaceBounds( int faceNum ) const = 0;
-	virtual idBounds				AreaBounds( int areaNum ) const = 0;
-
-	virtual int						PointAreaNum( const idVec3 &origin ) const = 0;
-	virtual int						PointReachableAreaNum( const idVec3 &origin, const idBounds &searchBounds, const int areaFlags, const int excludeTravelFlags ) const = 0;
-	virtual int						BoundsReachableAreaNum( const idBounds &bounds, const int areaFlags, const int excludeTravelFlags ) const = 0;
-	virtual void					PushPointIntoAreaNum( int areaNum, idVec3 &point ) const = 0;
-	virtual bool					Trace( aasTrace_t &trace, const idVec3 &start, const idVec3 &end ) const = 0;
-	virtual void					PrintInfo( void ) const = 0;
-// RAVEN BEGIN
-// jscott: added
-	virtual size_t					GetMemorySize( void ) = 0;
-
-	virtual	void					Init( void ) = 0;
-	virtual bool					Load( const idStr &fileName, unsigned int mapFileCRC ) = 0;
-	virtual	bool					Write( const idStr &fileName, unsigned int mapFileCRC ) = 0;
-	virtual	void					Clear( void ) = 0;
-	virtual	void					FinishAreas( void ) = 0;
-	virtual	void					ReportRoutingEfficiency( void ) const = 0;
-	virtual	void					LinkReversedReachability( void ) = 0;
-	virtual	void					DeleteReachabilities( void ) = 0;
-	virtual	void					DeleteClusters( void ) = 0;
-	virtual	void					Optimize( void ) = 0;
-	virtual bool					IsDummyFile( unsigned int mapFileCRC ) = 0;
-// RAVEN END
-
-	virtual const idDict &			GetReachabilitySpecialDict( idReachability *reach ) const = 0;
-	virtual void					SetReachabilitySpecialDictKeyValue( idReachability *reach, const char *key, const char *value ) = 0;
+	idPlaneSet					planeList;
+	idList<aasVertex_t>			vertices;
+	idList<aasEdge_t>			edges;
+	idList<aasIndex_t>			edgeIndex;
+	idList<aasFace_t>			faces;
+	idList<aasIndex_t>			faceIndex;
+	idList<aasArea_t>			areas;
+	idList<aasNode_t>			nodes;
+	idList<aasPortal_t>			portals;
+	idList<aasIndex_t>			portalIndex;
+	idList<aasCluster_t>		clusters;
+	idAASSettings				settings;
 };
 
 // RAVEN BEGIN

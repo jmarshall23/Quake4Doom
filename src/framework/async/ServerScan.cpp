@@ -432,6 +432,8 @@ idServerScan::GUIAdd
 ================
 */
 void idServerScan::GUIAdd( int id, const networkServer_t server ) {
+// jmarshall - server scan fix
+/*
 	idStr name = server.serverInfo.GetString( "si_name", GAME_NAME " Server" );
 	bool d3xp = false;
 	bool mod = false;
@@ -467,6 +469,8 @@ void idServerScan::GUIAdd( int id, const networkServer_t server ) {
 	name += server.serverInfo.GetString( "si_mapName" );
 	name += "\t";
 	listGUI->Add( id, name );
+*/
+// jmarshall end
 }
 
 /*
@@ -599,7 +603,7 @@ int idServerScan::Cmp( const int *a, const int *b ) {
 		case SORT_SERVERNAME:
 			serv1.serverInfo.GetString( "si_name", "", s1 );
 			serv2.serverInfo.GetString( "si_name", "", s2 );
-			return s1.IcmpNoColor( s2 );
+			return false; // s1.IcmpNoColor(s2); // jmarshall: eval server strings.
 		case SORT_PLAYERS:
 			ret = serv1.clients < serv2.clients ? -1 : ( serv1.clients > serv2.clients ? 1 : 0 );
 			return ret;

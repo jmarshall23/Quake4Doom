@@ -1791,6 +1791,8 @@ idSessionLocal::TakeNotes
 ===============
 */
 void idSessionLocal::TakeNotes( const char *p, bool extended ) {
+// jmarshall - notes
+/*
 	if ( !mapSpawned ) {
 		common->Printf( "No map loaded!\n" );
 		return;
@@ -1830,6 +1832,7 @@ void idSessionLocal::TakeNotes( const char *p, bool extended ) {
 	guiActive->SetStateString( "notefile", p );
 	guiActive->SetStateBool( "extended", extended );
 	guiActive->Activate( true, com_frameTime );
+*/
 }
 
 /*
@@ -2274,11 +2277,13 @@ void idSessionLocal::AdvanceRenderDemo( bool singleFrameOnly ) {
 			break;
 		}
 		if ( ds == DS_RENDER ) {
-			if ( rw->ProcessDemoCommand( readDemo, &currentDemoRenderView, NULL, &demoTimeOffset ) ) {
-				// a view is ready to render
-				skipFrames--;
-				numDemoFrames++;
-			}
+// jmarshall - demos
+			//if ( rw->ProcessDemoCommand( readDemo, &currentDemoRenderView, NULL, &demoTimeOffset ) ) {
+			//	// a view is ready to render
+			//	skipFrames--;
+			//	numDemoFrames++;
+			//}
+// jmarshall end
 			continue;
 		}
 		if ( ds == DS_SOUND ) {
@@ -2545,7 +2550,7 @@ void idSessionLocal::Frame() {
 			// skipped frames so write them out
 			int c = aviDemoFrameCount - aviTicStart;
 			while ( c-- ) {
-				renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), NULL );
+				//renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), NULL );
 				name = va("demos/%s/%s_%05i.tga", aviDemoShortName.c_str(), aviDemoShortName.c_str(), ++aviTicStart );
 			}
 		}
@@ -2555,7 +2560,7 @@ void idSessionLocal::Frame() {
 		console->ClearNotifyLines();
 
 		// this will call Draw, possibly multiple times if com_aviDemoSamples is > 1
-		renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), NULL );
+	//	renderSystem->TakeScreenshot( com_aviDemoWidth.GetInteger(), com_aviDemoHeight.GetInteger(), name, com_aviDemoSamples.GetInteger(), NULL );
 	}
 
 	// at startup, we may be backwards

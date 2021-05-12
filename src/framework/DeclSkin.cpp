@@ -29,6 +29,9 @@ If you have questions concerning this license or the applicable additional terms
 #include "precompiled.h"
 #pragma hdrstop
 
+idDeclSkin::idDeclSkin() {
+
+}
 
 /*
 =================
@@ -131,27 +134,6 @@ const char *idDeclSkin::DefaultDefinition( void ) const {
 		"{\n"
 	"\t"	"\"*\"\t\"_default\"\n"
 		"}";
-}
-
-/*
-================
-idDeclSkin::GetNumModelAssociations
-================
-*/
-const int idDeclSkin::GetNumModelAssociations(void ) const {
-	return associatedModels.Num(); 
-}
-
-/*
-================
-idDeclSkin::GetAssociatedModel
-================
-*/
-const char *idDeclSkin::GetAssociatedModel( int index ) const {
-	if ( index >= 0 && index < associatedModels.Num() ) {
-		return associatedModels[ index ];
-	}
-	return "";
 }
 
 /*

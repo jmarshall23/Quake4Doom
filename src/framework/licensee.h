@@ -12,6 +12,8 @@
 #define GAME_NAME						"Quake4"			// appears on window titles and errors
 #define GAME_ICON						"q4icon.bmp"
 
+#define ENGINE_VERSION					GAME_NAME "-ICED-0.01"
+
 // jnewquist: build type
 #if defined(_DEBUG)
 #define GAME_BUILD_TYPE					"Debug"

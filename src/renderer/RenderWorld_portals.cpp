@@ -109,7 +109,7 @@ bool idRenderWorldLocal::PortalIsFoggedOut( const portal_t *p ) {
 	int		size = sizeof( float ) *lightShader->GetNumRegisters();
 	float	*regs =(float *)_alloca( size );
 
-	lightShader->EvaluateRegisters( regs, ldef->parms.shaderParms, tr.viewDef, ldef->parms.referenceSound );
+	lightShader->EvaluateRegisters( regs, ldef->parms.shaderParms, tr.viewDef, NULL);
 
 	const shaderStage_t	*stage = lightShader->GetStage(0);
 

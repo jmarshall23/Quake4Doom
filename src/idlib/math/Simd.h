@@ -200,6 +200,8 @@ public:
 	virtual void VPCALL MixSoundSixSpeakerStereo( float *mixBuffer, const float *samples, const int numSamples, const float lastV[6], const float currentV[6] ) = 0;
 	virtual void VPCALL MixedSoundToSamples( short *samples, const float *mixBuffer, const int numSamples ) = 0;
 
+	virtual void VPCALL TransformVerts(idDrawVert* verts, const int numVerts, const idJointMat* joints, const idVec4* weights, const int* index, const int numWeights) = 0;
+
 	// rvSilTraceVertT operations
 // RAVEN BEGIN
 // dluetscher: added support for operations on idSilTraceVerts

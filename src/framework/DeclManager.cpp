@@ -1792,6 +1792,10 @@ const rvDeclEffect* idDeclManagerLocal::FindEffect(const char* name, bool makeDe
 	return static_cast<const rvDeclEffect*>(FindType(DECL_EFFECT, name, makeDefault));
 }
 
+const idDeclTable* idDeclManagerLocal::FindTable(const char* name, bool makeDefault) {
+	return static_cast<const idDeclTable*>(FindType(DECL_TABLE, name, makeDefault));
+}
+
 const rvDeclMatType* idDeclManagerLocal::MaterialTypeByIndex(int index, bool forceParse) {
 	return static_cast<const rvDeclMatType*>(DeclByIndex(DECL_MATERIALTYPE, index, forceParse));
 }
@@ -1806,6 +1810,9 @@ const rvDeclPlayback* idDeclManagerLocal::PlaybackByIndex(int index, bool forceP
 
 const rvDeclEffect* idDeclManagerLocal::EffectByIndex(int index, bool forceParse) {
 	return static_cast<const rvDeclEffect*>(DeclByIndex(DECL_EFFECT, index, forceParse));
+}
+const idDeclTable* idDeclManagerLocal::TableByIndex(int index, bool forceParse) {
+	return static_cast<const idDeclTable*>(DeclByIndex(DECL_TABLE, index, forceParse));
 }
 // RAVEN END
 

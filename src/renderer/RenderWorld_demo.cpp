@@ -213,17 +213,19 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile *readDemo, renderView_t
 
 	case DC_DEFINE_MODEL:
 		{
-		idRenderModel	*model = renderModelManager->AllocModel();
-		model->ReadFromDemoFile( session->readDemo );
-		// add to model manager, so we can find it
-		renderModelManager->AddModel( model );
-
-		// save it in the list to free when clearing this map
-		localModels.Append( model );
-
-		if ( r_showDemo.GetBool() ) {
-			common->Printf( "DC_DEFINE_MODEL\n" );
-		}
+	// jmarshall: demos broken
+		//idRenderModel	*model = renderModelManager->AllocModel();
+		//model->ReadFromDemoFile( session->readDemo );
+		//// add to model manager, so we can find it
+		//renderModelManager->AddModel( model );
+		//
+		//// save it in the list to free when clearing this map
+		//localModels.Append( model );
+		//
+		//if ( r_showDemo.GetBool() ) {
+		//	common->Printf( "DC_DEFINE_MODEL\n" );
+		//}
+	// jmarshall end
 		break;
 		}
 	case DC_SET_PORTAL_STATE:
@@ -452,8 +454,8 @@ void	idRenderWorldLocal::WriteRenderLight( qhandle_t handle, const renderLight_t
 		session->writeDemo->WriteHashString( light->shader->GetName() );
 	}
 	if ( light->referenceSound ) {
-		int	index = light->referenceSound->Index();
-		session->writeDemo->WriteInt( index );
+		//int	index = light->referenceSound->Index();
+		//session->writeDemo->WriteInt( index );
 	}
 
 	if ( r_showDemo.GetBool() ) {
@@ -505,7 +507,7 @@ void	idRenderWorldLocal::ReadRenderLight( ) {
 	if ( light.referenceSound ) {
 		int	index;
 		session->readDemo->ReadInt( index );
-		light.referenceSound = session->sw->EmitterForIndex( index );
+	//	light.referenceSound = session->sw->EmitterForIndex( index );
 	}
 
 	UpdateLightDef( index, &light );
@@ -560,7 +562,7 @@ void	idRenderWorldLocal::WriteRenderEntity( qhandle_t handle, const renderEntity
 	session->writeDemo->WriteBool( ent->noSelfShadow );
 	session->writeDemo->WriteBool( ent->noShadow );
 	session->writeDemo->WriteBool( ent->noDynamicInteractions );
-	session->writeDemo->WriteBool( ent->weaponDepthHack );
+	//session->writeDemo->WriteBool( ent->weaponDepthHack );
 	session->writeDemo->WriteInt( ent->forceUpdate );
 
 	if ( ent->customShader ) {
@@ -576,8 +578,8 @@ void	idRenderWorldLocal::WriteRenderEntity( qhandle_t handle, const renderEntity
 		session->writeDemo->WriteHashString( ent->referenceShader->GetName() );
 	}
 	if ( ent->referenceSound ) {
-		int	index = ent->referenceSound->Index();
-		session->writeDemo->WriteInt( index );
+		//int	index = ent->referenceSound->Index();
+		//session->writeDemo->WriteInt( index );
 	}
 	if ( ent->numJoints ) {
 		for ( int i = 0; i < ent->numJoints; i++) {
@@ -609,8 +611,8 @@ void	idRenderWorldLocal::WriteRenderEntity( qhandle_t handle, const renderEntity
 #endif
 
 	// RENDERDEMO_VERSION >= 2 ( Doom3 1.2 )
-	session->writeDemo->WriteInt( ent->timeGroup );
-	session->writeDemo->WriteInt( ent->xrayIndex );
+	//session->writeDemo->WriteInt( ent->timeGroup );
+	//session->writeDemo->WriteInt( ent->xrayIndex );
 
 	if ( r_showDemo.GetBool() ) {
 		common->Printf( "write DC_UPDATE_ENTITYDEF: %i = %s\n", handle, ent->hModel ? ent->hModel->Name() : "NULL" );
@@ -661,8 +663,8 @@ void	idRenderWorldLocal::ReadRenderEntity() {
 	session->readDemo->ReadBool( ent.noSelfShadow );
 	session->readDemo->ReadBool( ent.noShadow );
 	session->readDemo->ReadBool( ent.noDynamicInteractions );
-	session->readDemo->ReadBool( ent.weaponDepthHack );
-	session->readDemo->ReadInt( ent.forceUpdate );
+	//session->readDemo->ReadBool( ent.weaponDepthHack );
+	//session->readDemo->ReadInt( ent.forceUpdate );
 	ent.callback = NULL;
 	if ( ent.customShader ) {
 		ent.customShader = declManager->FindMaterial( session->readDemo->ReadHashString() );
@@ -679,7 +681,7 @@ void	idRenderWorldLocal::ReadRenderEntity() {
 	if ( ent.referenceSound ) {
 		int	index;
 		session->readDemo->ReadInt( index );
-		ent.referenceSound = session->sw->EmitterForIndex( index );
+		//ent.referenceSound = session->sw->EmitterForIndex( index );
 	}
 	if ( ent.numJoints ) {
 		ent.joints = (idJointMat *)Mem_Alloc16( ent.numJoints * sizeof( ent.joints[0] ) ); 
@@ -713,13 +715,13 @@ void	idRenderWorldLocal::ReadRenderEntity() {
 	}
 
 	// >= Doom3 v1.2 only
-	if ( session->renderdemoVersion >= 2 ) {
-		session->readDemo->ReadInt( ent.timeGroup );
-		session->readDemo->ReadInt( ent.xrayIndex );
-	} else {
-		ent.timeGroup = 0;
-		ent.xrayIndex = 0;
-	}
+	//if ( session->renderdemoVersion >= 2 ) {
+	//	session->readDemo->ReadInt( ent.timeGroup );
+	//	session->readDemo->ReadInt( ent.xrayIndex );
+	//} else {
+	//	ent.timeGroup = 0;
+	//	ent.xrayIndex = 0;
+	//}
 
 	UpdateEntityDef( index, &ent );
 

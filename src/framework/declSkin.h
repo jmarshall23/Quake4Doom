@@ -34,7 +34,7 @@ public:
 	virtual size_t			Size( void ) const;
 	virtual bool			SetDefaultText( void );
 	virtual const char *	DefaultDefinition( void ) const;
-	virtual bool			Parse( const char *text, const int textLength, bool noCaching );
+	virtual bool			Parse( const char *text, const int textLength ) override;
 	virtual void			FreeData( void );
 // RAVEN BEGIN
 // mwhitlock: Xenon texture streaming
@@ -52,7 +52,7 @@ public:
 // jscott: to prevent a recursive crash
 	virtual	bool			RebuildTextSource( void ) { return( false ); }
 // scork: validation member for more detailed error-checks
-	virtual bool			Validate( const char *psText, int iTextLength, idStr &strReportTo ) const;
+	//virtual bool			Validate( const char *psText, int iTextLength, idStr &strReportTo ) const;
 // RAVEN END
 	const char *			GetAssociatedModel( int index ) const;
 

@@ -2321,6 +2321,30 @@ void VPCALL idSIMD_Generic::UntransformJoints( idJointMat * RESTRICT jointMats, 
 	}
 }
 
+
+/*
+============
+idSIMD_Generic::TransformVerts
+============
+*/
+void VPCALL idSIMD_Generic::TransformVerts(idDrawVert* verts, const int numVerts, const idJointMat* joints, const idVec4* weights, const int* index, int numWeights) {
+	int i, j;
+	const byte* jointsPtr = (byte*)joints;
+
+	for (j = i = 0; i < numVerts; i++) {
+		idVec3 v;
+
+		v = (*(idJointMat*)(jointsPtr + index[j * 2 + 0])) * weights[j];
+		while (index[j * 2 + 1] == 0) {
+			j++;
+			v += (*(idJointMat*)(jointsPtr + index[j * 2 + 0])) * weights[j];
+		}
+		j++;
+
+		verts[i].xyz = v;
+	}
+}
+
 /*
 ============
 idSIMD_Generic::MultiplyJoints

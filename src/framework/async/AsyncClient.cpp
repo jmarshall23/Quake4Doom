@@ -978,7 +978,7 @@ void idAsyncClient::ProcessReliableServerMessages( void ) {
 					cvarSystem->SetCVarsFromDict( info );
 					cvarSystem->ClearModifiedFlags( CVAR_USERINFO ); // don't emit back
 				}
-				game->SetUserInfo( clientNum, info, true, false );
+				game->SetUserInfo( clientNum, info, true );
 				break;
 			}
 			case SERVER_RELIABLE_MESSAGE_SYNCEDCVARS: {
@@ -1035,7 +1035,7 @@ void idAsyncClient::ProcessReliableServerMessages( void ) {
 			}
 			case SERVER_RELIABLE_MESSAGE_ENTERGAME: {
 				SendUserInfoToServer();
-				game->SetUserInfo( clientNum, sessLocal.mapSpawnData.userInfo[ clientNum ], true, false );
+				game->SetUserInfo( clientNum, sessLocal.mapSpawnData.userInfo[ clientNum ], true );
 				cvarSystem->ClearModifiedFlags( CVAR_USERINFO );
 				break;
 			}
@@ -1681,7 +1681,7 @@ void idAsyncClient::SetupConnection( void ) {
 		msg.WriteShort( clientId );
 		msg.WriteLong( cvarSystem->GetCVarInteger( "net_clientMaxRate" ) );
 		msg.WriteString( cvarSystem->GetCVarString( "com_guid" ) );
-		msg.WriteString( cvarSystem->GetCVarString( "password" ), -1, false );
+		msg.WriteString( cvarSystem->GetCVarString( "password" ), -1 );
 		// do not make the protocol depend on PB
 		msg.WriteShort( 0 );
 		clientPort.SendPacket( serverAddress, msg.GetData(), msg.GetSize() );
@@ -1849,7 +1849,7 @@ void idAsyncClient::RunFrame( void ) {
 	if ( cvarSystem->GetModifiedFlags() & CVAR_USERINFO ) {
 		game->ThrottleUserInfo( );
 		SendUserInfoToServer( );
-		game->SetUserInfo( clientNum, sessLocal.mapSpawnData.userInfo[ clientNum ], true, false );
+		game->SetUserInfo( clientNum, sessLocal.mapSpawnData.userInfo[ clientNum ], true );
 		cvarSystem->ClearModifiedFlags( CVAR_USERINFO );
 	}
 

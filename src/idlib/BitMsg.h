@@ -107,6 +107,10 @@ public:
 	static int		DirToBits( const idVec3 &dir, int numBits );
 	static idVec3	BitsToDir( int bits, int numBits );
 
+	int				GetRemaingData(void) const {
+		return curSize - readCount;
+	}
+
 private:
 	byte *			writeData;			// pointer to data for writing
 	const byte *	readData;			// pointer to data for reading

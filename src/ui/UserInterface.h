@@ -80,7 +80,7 @@ public:
 
 //	virtual void				DeleteState( const char *varName ) = 0;
 
-	virtual idVec4				GetLightColor ( void ) { }
+	virtual idVec4				GetLightColor(void) { idVec4 zero; zero.Zero(); return zero; }
 
 								// Gets a gui state variable
 	virtual const char*			GetStateString( const char *varName, const char* defaultString = "" ) const = 0;

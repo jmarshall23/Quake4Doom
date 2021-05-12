@@ -43,6 +43,21 @@ If you have questions concerning this license or the applicable additional terms
 
 /*
 ================
+idReachability::CopyBase
+================
+*/
+void idReachability::CopyBase(idReachability& reach) {
+	travelType = reach.travelType;
+	toAreaNum = reach.toAreaNum;
+	start = reach.start;
+	end = reach.end;
+	edgeNum = reach.edgeNum;
+	travelTime = reach.travelTime;
+}
+
+
+/*
+================
 Reachability_Write
 ================
 */
@@ -73,14 +88,14 @@ bool Reachability_Read( idLexer &src, idReachability *reach ) {
 idReachability::CopyBase
 ================
 */
-void idReachability::CopyBase( idReachability &reach ) {
-	travelType = reach.travelType;
-	toAreaNum = reach.toAreaNum;
-	start = reach.start;
-	end = reach.end;
-	edgeNum = reach.edgeNum;
-	travelTime = reach.travelTime;
-}
+//void idReachability::CopyBase( idReachability &reach ) {
+//	travelType = reach.travelType;
+//	toAreaNum = reach.toAreaNum;
+//	start = reach.start;
+//	end = reach.end;
+//	edgeNum = reach.edgeNum;
+//	travelTime = reach.travelTime;
+//}
 
 
 /*
@@ -519,7 +534,8 @@ bool idAASSettings::ValidForBounds( const idBounds &bounds ) const {
 idAASSettings::ValidEntity
 ============
 */
-bool idAASSettings::ValidEntity( const char *classname ) const {
+// jmarshall: needFlyReachabilities
+bool idAASSettings::ValidEntity( const char *classname, bool* needFlyReachabilities) const {
 	idStr			use_aas;
 	idVec3			size;
 	idBounds		bounds;

@@ -160,6 +160,33 @@ const char idStr::lowerCaseCharacter[256] =
 };
 // RAVEN END
 
+
+/*
+================
+idStr::RemoveColors
+================
+*/
+char* idStr::RemoveColors(char* string) {
+	char* d;
+	char* s;
+	int c;
+
+	s = string;
+	d = string;
+	while ((c = *s) != 0) {
+		if (idStr::IsColor(s)) {
+			s++;
+		}
+		else {
+			*d++ = c;
+		}
+		s++;
+	}
+	*d = '\0';
+
+	return string;
+}
+
 /*
 ============
 idStr::ColorForIndex
