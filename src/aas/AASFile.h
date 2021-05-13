@@ -404,13 +404,13 @@ public:
 		// cdr: AASTactical
 	virtual void					ClearTactical(void) { }
 
-	virtual	int						GetNumFeatureIndexes(void) const { return 0; }
-	virtual	aasIndex_t& GetFeatureIndex(int index) { aasIndex_t i; return i; }
-	virtual int						AppendFeatureIndex(aasIndex_t& featureIdx) { return 0; }
+	virtual	int						GetNumFeatureIndexes(void) const { return featureIndexes.Num(); }
+	virtual	aasIndex_t& GetFeatureIndex(int index) { return featureIndexes[index]; }
+	virtual int						AppendFeatureIndex(aasIndex_t& featureIdx) { return featureIndexes.Append(featureIdx); }
 
-	virtual	int						GetNumFeatures(void) const { return 0; }
-	virtual	aasFeature_t& GetFeature(int index) { aasFeature_t f; return f; }
-	virtual int						AppendFeature(aasFeature_t& cluster) { return 0; }
+	virtual	int						GetNumFeatures(void) const { return features.Num(); }
+	virtual	aasFeature_t& GetFeature(int index) { return features[index]; }
+	virtual int						AppendFeature(aasFeature_t& cluster) { return features.Append(cluster); }
 	// RAVEN END
 
 	virtual	idAASSettings& GetSettings(void) {
@@ -436,6 +436,10 @@ protected:
 	idList<aasPortal_t>			portals;
 	idList<aasIndex_t>			portalIndex;
 	idList<aasCluster_t>		clusters;
+// jmarshall - AAS 1.08
+	idList<int>					featureIndexes;
+	idList<aasFeature_t>		features;
+// jmarshall end
 	idAASSettings				settings;
 };
 

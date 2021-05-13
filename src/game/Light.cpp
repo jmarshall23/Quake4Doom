@@ -696,7 +696,8 @@ void idLight::Off( void ) {
 	{
 		currentLevel = 0;
 		// kill any sound it was making
-		idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+		idSoundEmitter* emitter = NULL;
+		emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 		if ( emitter && emitter->CurrentlyPlaying() ) {
 			StopSound( SND_CHANNEL_ANY, false );
 			soundWasPlaying = true;

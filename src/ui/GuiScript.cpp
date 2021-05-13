@@ -639,7 +639,9 @@ void idGuiScript::FixupParms(idWindow *win) {
 			if ( dest ) {	
 				idWindow* ownerparent;
 				idWindow* destparent;
-				if ( owner ) {
+// jmarshall - quake 4 guis
+				if ( owner && destowner) {
+// jmarshall end
 					ownerparent = owner->simp?owner->simp->GetParent():owner->win->GetParent();
 					destparent  = destowner->simp?destowner->simp->GetParent():destowner->win->GetParent();
 

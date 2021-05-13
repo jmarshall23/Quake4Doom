@@ -1143,6 +1143,12 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 			continue;
 		}
 
+// jmarshall: quake 4 materials
+		if (!token.Icmp("nomips")) {
+			continue;
+		}
+// jmarshall end
+
 		if (  !token.Icmp( "remoteRenderMap" ) ) {
 			ts->dynamic = DI_REMOTE_RENDER;
 			ts->width = src.ParseInt();
@@ -1531,8 +1537,9 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 			continue;
 		}
 
-
-		common->Warning( "unknown token '%s' in material '%s'", token.c_str(), GetName() );
+// jmarshall - make this more informative
+		src.Warning( "unknown token '%s' in material '%s'", token.c_str(), GetName() );
+// jmarshall end
 		SetMaterialFlag( MF_DEFAULTED );
 		return;
 	}
@@ -1800,6 +1807,12 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 			src.SkipRestOfLine();
 			continue;
 		}
+// jmarshall - quake 4 materials.
+		else if (!token.Icmp("materialImage")) {
+			src.ReadTokenOnLine(&token);
+			continue;
+		}
+// jmarshall end
 		// description
 		else if ( !token.Icmp( "description") ) {
 			src.ReadTokenOnLine( &token );
@@ -1832,6 +1845,13 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 			suppressInSubview = true;
 			continue;
 		}
+// jmarshall
+		else if (!token.Icmp("materialType")) {
+			src.ReadToken(&token);
+			materialType = declManager->FindMaterialType(token);
+			continue;
+		}
+// jmarshall end
 		else if ( !token.Icmp( "portalSky" ) ) {
 			portalSky = true;
 			continue;
@@ -2039,7 +2059,9 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 			continue;
 		}
 		else {
-			common->Warning( "unknown general material parameter '%s' in '%s'", token.c_str(), GetName() );
+// jmarshall - make this feedback more informative.
+			src.Warning( "unknown general material parameter '%s' in '%s'", token.c_str(), GetName() );
+// jmarshall end
 			SetMaterialFlag( MF_DEFAULTED );
 			return;
 		}
