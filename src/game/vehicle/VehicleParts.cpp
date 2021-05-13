@@ -189,7 +189,7 @@ rvVehicleSound::RunPostPhysics
 =====================
 */
 void rvVehicleSound::RunPostPhysics ( void ) {
-	Update ( );
+	//Update ( );
 }
 
 /*
@@ -219,7 +219,8 @@ void rvVehicleSound::Play ( void ) {
 		return;
 	}
 
-	idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+	idSoundEmitter* emitter = NULL;
+	emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 	if ( !emitter )  {
 		refSound.referenceSoundHandle = soundSystem->AllocSoundEmitter( SOUNDWORLD_GAME );
 	}
@@ -264,7 +265,8 @@ void rvVehicleSound::Update ( bool force ) {
 		return;
 	}
 
-	idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+	idSoundEmitter* emitter = NULL;
+	emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 	if( !emitter ) {
 		return;
 	}

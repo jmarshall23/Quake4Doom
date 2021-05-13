@@ -204,11 +204,12 @@ void idClipModel::ReplaceTraceModel( int index, const idTraceModel &trm, const i
 	entry->refCount = 1;
 	entry->hash = 0xffffffff;
 	entry->material = material;
-
-	if(entry->collisionModel)
-	{
-		collisionModelManager->FreeModel( entry->collisionModel );
-	}
+// jmarshall
+	//if(entry->collisionModel)
+	//{
+	//	collisionModelManager->FreeModel( entry->collisionModel );
+	//}
+// jmarshall end
 	entry->collisionModel = collisionModelManager->ModelFromTrm( gameLocal.GetMapName(), va( "traceModel%d", index ), trm, material );
 }
 

@@ -124,7 +124,8 @@ void idSound::Event_Trigger( idEntity *activator ) {
 	} else {
 		if ( gameLocal.isMultiplayer ) {
 // RAVEN BEGIN
-			idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+			idSoundEmitter* emitter = NULL;
+			emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 			if ( emitter && ( gameLocal.time < playingUntilTime ) ) {
 // RAVEN END
 				DoSound( false );
@@ -133,7 +134,8 @@ void idSound::Event_Trigger( idEntity *activator ) {
 			}
 		} else {
 // RAVEN BEGIN
-			idSoundEmitter *emitter = soundSystem->EmitterForIndex( SOUNDWORLD_GAME, refSound.referenceSoundHandle );
+			idSoundEmitter* emitter = NULL;
+			emitter = soundSystem->EmitterForIndex(SOUNDWORLD_GAME, refSound.referenceSoundHandle);
 			if ( emitter && emitter->CurrentlyPlaying() ) {
 // RAVEN END
 				DoSound( false );
