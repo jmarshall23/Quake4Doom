@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 
 // jmarshall - Raven Decl Support
+#include "../renderer/tr_local.h"
 #include "../bse/BSE_Envelope.h"
 #include "../bse/BSE_Particle.h"
 #include "../bse/BSE.h"

@@ -61,6 +61,7 @@ struct contactInfo_t {
 	contactInfo_t()
 	{
 		material = nullptr;
+		materialType = nullptr;
 	}
 	contactType_t			type;			// contact type
 	idVec3					point;			// point of contact

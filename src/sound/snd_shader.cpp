@@ -201,6 +201,11 @@ bool idSoundShader::ParseShader( idLexer &src ) {
 		else if ( !token.Icmp( "maxdistance" ) ) {
 			parms.maxDistance = src.ParseFloat();
 		}
+// jmarshall - quake 4 sound shader
+		else if (!token.Icmp("volumeDb")) {
+			src.ParseInt();
+		}
+// jmarshall end
 		// shakes screen
 		else if ( !token.Icmp( "shakes" ) ) {
 			src.ExpectAnyToken( &token );
@@ -333,16 +338,24 @@ bool idSoundShader::ParseShader( idLexer &src ) {
 				leadins[ numLeadins ] = soundSystemLocal.soundCache->FindSound( token.c_str(), onDemand );
 				numLeadins++;
 			}
-		} else if ( token.Find( ".wav", false ) != -1 || token.Find( ".ogg", false ) != -1 ) {
+		}
+// jmarshall		
+		else if (token == "shakeData") {
+			src.SkipRestOfLine();
+		} else {
 			// add to the wav list
 			if ( soundSystemLocal.soundCache && numEntries < maxSamples ) {
 				token.BackSlashesToSlashes();
+// jmarshall
+				if (token.Find(".wav", false) == -1 && token.Find(".ogg", false) == -1) {
+					token += ".ogg";
+				}
+// jmarshall end
 				idStr lang = cvarSystem->GetCVarString( "sys_lang" );
-				if ( lang.Icmp( "english" ) != 0 && token.Find( "sound/vo/", false ) >= 0 ) {
+				if ( token.Find( "sound/vo/", false ) >= 0 ) {
 					idStr work = token;
 					work.ToLower();
-					work.StripLeading( "sound/vo/" );
-					work = va( "sound/vo/%s/%s", lang.c_str(), work.c_str() );
+					work.Replace("sound/vo/", va("sound/vo_%s/", lang.c_str()));
 					if ( fileSystem->ReadFile( work, NULL, NULL ) > 0 ) {
 						token = work;
 					} else {
@@ -356,10 +369,12 @@ bool idSoundShader::ParseShader( idLexer &src ) {
 				entries[ numEntries ] = soundSystemLocal.soundCache->FindSound( token.c_str(), onDemand );
 				numEntries++;
 			}
-		} else {
+		} /* else {
 			src.Warning( "unknown token '%s'", token.c_str() );
 			return false;
-		}
+		}*/
+		
+// jmarshall end
 	}
 
 	if ( parms.shakes > 0.0f ) {
