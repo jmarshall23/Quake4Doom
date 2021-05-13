@@ -554,15 +554,8 @@ typedef struct vidmode_s {
 } vidmode_t;
 
 vidmode_t r_vidModes[] = {
-    { "Mode  0: 320x240",		320,	240 },
-    { "Mode  1: 400x300",		400,	300 },
-    { "Mode  2: 512x384",		512,	384 },
-    { "Mode  3: 640x480",		640,	480 },
-    { "Mode  4: 800x600",		800,	600 },
-    { "Mode  5: 1024x768",		1024,	768 },
-    { "Mode  6: 1152x864",		1152,	864 },
-    { "Mode  7: 1280x1024",		1280,	1024 },
-    { "Mode  8: 1600x1200",		1600,	1200 },
+    { "Mode  0: 1280x720",		1280,   720 },
+    { "Mode  1: 1920x1080",		1920,	1080 }    
 };
 static int	s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
@@ -577,7 +570,7 @@ static bool R_GetModeInfo( int *width, int *height, int mode ) {
         return false;
 	}
 	if ( mode >= s_numVidModes ) {
-		return false;
+		mode = 0;
 	}
 
 	if ( mode == -1 ) {
