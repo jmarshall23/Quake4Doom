@@ -116,7 +116,9 @@ void idClipModel::ClearTraceModelCache( void ) {
 	int i;
 
 	for ( i = 0; i < traceModelCache.Num(); i++ ) {
-		collisionModelManager->FreeModel( traceModelCache[i]->collisionModel );
+// jmarshall
+		//collisionModelManager->FreeModel( traceModelCache[i]->collisionModel );
+// jmarshall end
 		traceModelCache[i]->collisionModel = NULL;
 	}
 	traceModelCache.DeleteContents( true );
@@ -345,7 +347,9 @@ void idClipModel::FreeModel( void ) {
 	}
 
 	if ( collisionModel != NULL ) {
-		collisionModelManager->FreeModel( collisionModel );
+// jmarshall
+		//collisionModelManager->FreeModel( collisionModel );
+// jmarshall end
 		collisionModel = NULL;
 	}
 

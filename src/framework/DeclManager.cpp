@@ -698,6 +698,7 @@ idStr idDeclFile::PreprocessGuides(const char* text, int textLength) {
 
 	finalBuffer += text;
 
+	finalBuffer.Replace("inlineGuide", "// inlineGuide"); // todo support me, corpse burn
 	finalBuffer.Replace("guide", "// guide");
 	return finalBuffer;
 }
