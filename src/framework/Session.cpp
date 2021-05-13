@@ -923,7 +923,9 @@ void idSessionLocal::StartPlayingRenderDemo( idStr demoName ) {
 
 	// bring up the loading screen manually, since demos won't
 	// call ExecuteMapChange()
-	guiLoading = uiManager->FindGui( "guis/map/loading.gui", true, false, true );
+// jmarshall - quake 4 loading gui
+	guiLoading = uiManager->FindGui( "guis/loading/generic.gui", true, false, true );
+// jmarshall end
 	guiLoading->SetStateString( "demo", common->GetLanguageDict()->GetString( "#str_02087" ) );
 	readDemo = new idDemoFile;
 	demoName.DefaultFileExtension( ".demo" );
@@ -1351,7 +1353,9 @@ void idSessionLocal::StartPlayingCmdDemo(const char *demoName) {
 		return;
 	}
 
-	guiLoading = uiManager->FindGui( "guis/map/loading.gui", true, false, true );
+// jmarshall - quake 4 loading gui
+	guiLoading = uiManager->FindGui("guis/loading/generic.gui", true, false, true);
+// jmarshall end
 	//cmdDemoFile->Read(&loadGameTime, sizeof(loadGameTime));
 
 	LoadCmdDemoFromFile(cmdDemoFile);
@@ -1452,7 +1456,9 @@ void idSessionLocal::LoadLoadingGui( const char *mapName ) {
 	if ( uiManager->CheckGui( guiMap ) ) {
 		guiLoading = uiManager->FindGui( guiMap, true, false, true );
 	} else {
-		guiLoading = uiManager->FindGui( "guis/map/loading.gui", true, false, true );
+// jmarshall - quake 4 loading gui
+		guiLoading = uiManager->FindGui("guis/loading/generic.gui", true, false, true);
+// jmarshall end
 	}
 	guiLoading->SetStateFloat( "map_loading", 0.0f );
 }
