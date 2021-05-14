@@ -1544,10 +1544,12 @@ void rvVehicleTurret::Spawn ( void ) {
 
 
 	// Find the vehicle part for the turret sound
-	if ( *spawnArgs.GetString ( "snd_loop", "" ) ) {
-		soundPart = position->AddPart ( rvVehicleSound::GetClassType(), spawnArgs );
-		static_cast<rvVehicleSound*>(position->GetPart(soundPart))->SetAutoActivate ( false );
-	}
+// jmarshall - sound parts causing a crash, disabling for now.
+	//if ( *spawnArgs.GetString ( "snd_loop", "" ) ) {
+	//	soundPart = position->AddPart ( rvVehicleSound::GetClassType(), spawnArgs );
+	//	static_cast<rvVehicleSound*>(position->GetPart(soundPart))->SetAutoActivate ( false );
+	//}
+// jmarshall end
 }
 
 /*

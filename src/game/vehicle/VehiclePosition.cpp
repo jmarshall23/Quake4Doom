@@ -107,10 +107,12 @@ void rvVehiclePosition::Init ( rvVehicle* parent, const idDict& args ) {
 	mSoundMaxSpeed = args.GetFloat ( "maxsoundspeed", "0" );
 
 	// Looping sound when occupied?
-	if ( *args.GetString ( "snd_loop", "" ) ) {
-		mSoundPart = AddPart ( rvVehicleSound::GetClassType(), args );
-		static_cast<rvVehicleSound*>(mParts[mSoundPart])->SetAutoActivate ( false );
-	}
+// jmarshall - vehicle sound loops cause a crash, disabling for the time being.
+	//if ( *args.GetString ( "snd_loop", "" ) ) {
+	//	mSoundPart = AddPart ( rvVehicleSound::GetClassType(), args );
+	//	static_cast<rvVehicleSound*>(mParts[mSoundPart])->SetAutoActivate ( false );
+	//}
+// jmarshall end
 
 	SelectWeapon ( 0 );
 	
