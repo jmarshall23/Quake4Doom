@@ -1061,6 +1061,10 @@ bool idRenderWorldLocal::ModelTrace( modelTrace_t &trace, qhandle_t entityHandle
 
 	trace.fraction = 1.0f;
 
+// jmarshall
+	trace.materialType = NULL;
+// jmarshall end
+
 	if ( entityHandle < 0 || entityHandle >= entityDefs.Num() ) {
 //		common->Error( "idRenderWorld::ModelTrace: index = %i", entityHandle );
 		return false;
@@ -1127,6 +1131,9 @@ bool idRenderWorldLocal::ModelTrace( modelTrace_t &trace, qhandle_t entityHandle
 			trace.normal = localTrace.normal * refEnt->axis;
 			trace.material = shader;
 			trace.entity = &def->parms;
+// jmarshall
+			trace.materialType = trace.material->GetMaterialType();
+// jmarshall end
 			trace.jointNumber = refEnt->hModel->NearestJoint( i, localTrace.indexes[0], localTrace.indexes[1], localTrace.indexes[2] );
 		}
 	}

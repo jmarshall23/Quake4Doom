@@ -111,6 +111,9 @@ void idMaterial::CommonInit() {
 	suppressInSubview = false;
 	refCount = 0;
 	portalSky = false;
+// jmarshall - quake 4
+	materialType = nullptr;
+// jmarshall end
 
 	decalInfo.stayTime = 10000;
 	decalInfo.fadeTime = 4000;

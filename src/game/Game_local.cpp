@@ -7583,6 +7583,10 @@ idEntity* idGameLocal::HitScan(
 				// twhitaker: additionalIgnore parameter
 				TracePoint( owner, tr, start, end, contents, additionalIgnore );
 			}
+			if (tr.c.materialType) {
+				tr.c.materialType = tr.c.materialType;
+			}
+
 			//gameRenderWorld->DebugArrow( colorRed, start, end, 10, 5000 );
 // RAVEN END
 			
