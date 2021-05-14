@@ -1844,6 +1844,24 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 			SetMaterialFlag( MF_NOSHADOWS );
 			continue;
 		}
+// jmarshall - possible legacy optimisations that aren't needed for current hardware.
+		else if (!token.Icmp("notfix")) {
+			// Unknown what this is used for.
+			continue;
+		}
+		else if (!token.Icmp("sightClip")) {
+			// Unknown what this is used for.
+			continue;
+		}
+		else if (!token.Icmp("sky")) {
+			// Unknown what this is used for.
+			continue;
+		}
+		else if (!token.Icmp("needCurrentRender")) {
+			// Unknown what this is used for.
+			continue;
+		}
+// jmarshall end
 		else if ( !token.Icmp( "suppressInSubview" ) ) {
 			suppressInSubview = true;
 			continue;
