@@ -257,6 +257,7 @@ public:
 	void			ParseNumericStructArray( int numStructElements, int tokenSubTypeStructElements[], int arrayCount, byte *arrayStorage );
 // RAVEN END
 
+	const char* GetBuffer() { return buffer; }
 private:
 	int				loaded;					// set when a script file is loaded from file or memory
 	idStr			filename;				// file name of the script
