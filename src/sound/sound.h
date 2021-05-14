@@ -384,7 +384,7 @@ public:
 	virtual idSoundWorld*	GetSoundWorldFromId(int worldId) = 0;
 
 	idSoundEmitter*		EmitterForIndex(int worldId, int index) {
-		GetSoundWorldFromId(index)->EmitterForIndex(index);
+		return GetSoundWorldFromId(worldId)->EmitterForIndex(index);
 	}
 
 	void			FadeSoundClasses(int worldId, const int soundClass, const float to, const float over) {
