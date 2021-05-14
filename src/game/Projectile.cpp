@@ -744,9 +744,11 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
 // RAVEN BEGIN
 // abahr: added call to SkipDamageImpulse changed where push comes from
 	damageDefName = NULL;
-	if ( collision.c.materialType ) {
-		damageDefName = spawnArgs.GetString( va("def_damage_%s", collision.c.materialType->GetName()) );
-	}
+// jmarshall - damage material type
+	//if ( collision.c.materialType ) {
+	//	damageDefName = spawnArgs.GetString( va("def_damage_%s", collision.c.materialType->GetName()) );
+	//}
+// jmarshall end
 	if ( !damageDefName || !*damageDefName ) {
 		damageDefName = spawnArgs.GetString ( "def_damage" );
 	}

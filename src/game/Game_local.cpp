@@ -7289,29 +7289,30 @@ const idDecl *idGameLocal::GetEffect ( const idDict& args, const char* effectNam
 	// we should ALWAYS be playing sounds from the def.
 	// hardcoded sounds MUST be avoided at all times because they won't get precached.
 	assert( !idStr::Icmpn( effectName, "fx_", 3 ) );
-
-	if ( materialType )	{
-		idStr		temp;
-		const char*	result = NULL;
-		
-		temp = effectName;
-		temp += "_";
-		temp += materialType->GetName();
-	
-		// See if the given material effect is specified
-		if ( isMultiplayer ) {
-			idStr	testMP = temp;
-			testMP += "_mp";
-
-			result = args.GetString( testMP );
-		}
-		if ( !result || !*result ) {
-			result = args.GetString( temp );
-		}
-		if ( result && *result) {
-			return( ( const idDecl * )declManager->FindEffect( result ) );
-		}
-	}	
+// jmarshall - material type
+	//if ( materialType )	{
+	//	idStr		temp;
+	//	const char*	result = NULL;
+	//	
+	//	temp = effectName;
+	//	temp += "_";
+	//	temp += materialType->GetName();
+	//
+	//	// See if the given material effect is specified
+	//	if ( isMultiplayer ) {
+	//		idStr	testMP = temp;
+	//		testMP += "_mp";
+	//
+	//		result = args.GetString( testMP );
+	//	}
+	//	if ( !result || !*result ) {
+	//		result = args.GetString( temp );
+	//	}
+	//	if ( result && *result) {
+	//		return( ( const idDecl * )declManager->FindEffect( result ) );
+	//	}
+	//}	
+// jmarshall end
 
 	// grab the non material effect name
 	if ( isMultiplayer ) {
