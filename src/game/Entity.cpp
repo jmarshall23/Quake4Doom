@@ -6553,12 +6553,10 @@ void idAnimatedEntity::AddDamageEffect( const trace_t &collision, const idVec3 &
 
 	// blood splats are thrown onto nearby surfaces
 	splat = NULL;
-// jmarshall - material type
-	//if ( collision.c.material->GetMaterialType() ) {
-	//	key = va( "mtr_splat_%s", collision.c.material->GetMaterialType()->GetName() );
-	//	splat = spawnArgs.RandomPrefix( key, gameLocal.random );
-	//}
-// jmarshall end
+	if ( collision.c.material->GetMaterialType() ) {
+		key = va( "mtr_splat_%s", collision.c.material->GetMaterialType()->GetName() );
+		splat = spawnArgs.RandomPrefix( key, gameLocal.random );
+	}
 	if ( !splat || !*splat ) {
 		splat = spawnArgs.RandomPrefix( "mtr_splat", gameLocal.random );
 	}
@@ -6577,12 +6575,10 @@ void idAnimatedEntity::AddDamageEffect( const trace_t &collision, const idVec3 &
 			|| ((idAI*)this)->team != AITEAM_MARINE ) {
 			// place a wound overlay on the model
 			decal = NULL;
-// jmarshall - material type
-			//if ( collision.c.material->GetMaterialType() ) {
-			//	key = va( "mtr_wound_%s", collision.c.material->GetMaterialType()->GetName() );
-			//	decal = spawnArgs.RandomPrefix( key, gameLocal.random );
-			//}
-// jmarshall end
+			if ( collision.c.material->GetMaterialType() ) {
+				key = va( "mtr_wound_%s", collision.c.material->GetMaterialType()->GetName() );
+				decal = spawnArgs.RandomPrefix( key, gameLocal.random );
+			}
 			if ( !decal || !*decal ) {
 				decal = spawnArgs.RandomPrefix( "mtr_wound", gameLocal.random );
 			}
