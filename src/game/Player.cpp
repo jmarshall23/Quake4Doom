@@ -1563,9 +1563,9 @@ void idPlayer::Init( void ) {
 	SetupWeaponEntity( );
 	currentWeapon = -1;
 	previousWeapon = -1;
-	
-	flashlightOn	  = false;
-
+// jmarshall - engine pushed IMPULSE_50 to force on the flashlight, makes more sense just to enable it here(since it was on initially). 
+	flashlightOn	  = true;
+// jmarshall end
 	idealLegsYaw = 0.0f;
 	legsYaw = 0.0f;
 	legsForward = true;
