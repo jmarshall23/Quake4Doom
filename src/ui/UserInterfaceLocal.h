@@ -37,6 +37,7 @@ public:
 	virtual const char *		Name() const;
 	virtual const char *		Comment() const;
 	virtual bool				IsInteractive() const;
+	virtual void				SetInteractive(bool interactive);
 	virtual bool				InitFromFile( const char *qpath, bool rebuild = true, bool cache = true );
 	virtual const char *		HandleEvent( const sysEvent_t *event, int time, bool *updateVisuals );
 	virtual void				HandleNamedEvent( const char* namedEvent );

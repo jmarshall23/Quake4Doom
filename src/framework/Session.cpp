@@ -1672,7 +1672,7 @@ void idSessionLocal::ExecuteMapChange( bool noFadeWipe ) {
 	if ( !idAsyncNetwork::IsActive() && !loadingSaveGame ) {
 		// run a few frames to allow everything to settle
 		for ( i = 0; i < 10; i++ ) {
-			game->RunFrame( mapSpawnData.mapSpawnUsercmd, 0, 0, 0 ); // serverGameFrame isn't used
+			game->RunFrame( mapSpawnData.mapSpawnUsercmd, 0, true, 0 ); // serverGameFrame isn't used
 		}
 	}
 
@@ -2788,7 +2788,7 @@ void idSessionLocal::RunGameTic() {
 
 	// run the game logic every player move
 	int	start = Sys_Milliseconds();
-	gameReturn_t	ret = game->RunFrame( &cmd, 0, 0, 0 ); // jmarshall: serverGameFrame isn't used
+	gameReturn_t	ret = game->RunFrame( &cmd, 0, true, 0 ); // jmarshall: serverGameFrame isn't used
 
 	int end = Sys_Milliseconds();
 	time_gameFrame += end - start;	// note time used for com_speeds

@@ -42,7 +42,7 @@ public:
 // RAVEN BEGIN
 // bdube: added
 								// Changes the interactive of the gui
-	//virtual void				SetInteractive ( bool interactive ) = 0 ;
+	virtual void				SetInteractive ( bool interactive ) = 0 ;
 // RAVEN END
 
 	virtual bool				IsUniqued() const = 0;

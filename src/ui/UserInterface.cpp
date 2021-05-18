@@ -266,6 +266,10 @@ bool idUserInterfaceLocal::IsInteractive() const {
 	return interactive;
 }
 
+void idUserInterfaceLocal::SetInteractive(bool interactive) {
+	this->interactive = interactive;
+}
+
 bool idUserInterfaceLocal::InitFromFile( const char *qpath, bool rebuild, bool cache ) { 
 
 	if ( !( qpath && *qpath ) ) { 
