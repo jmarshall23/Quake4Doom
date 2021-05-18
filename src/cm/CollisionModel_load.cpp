@@ -556,6 +556,11 @@ void idCollisionModelManagerLocal::FreeModel( idCollisionModel *_model ) {
 	cm_nodeBlock_t *nodeBlock, *nextNodeBlock;
 
 	idCollisionModelLocal* model = (idCollisionModelLocal*)_model;
+// jmarshall - quake 4 crash fix - trm models are shared.
+	if (model->isTrmModel) {
+		return;
+	}
+// jmarshall end
 
 	// free the tree structure
 	if ( model->node ) {
@@ -584,17 +589,6 @@ void idCollisionModelManagerLocal::FreeModel( idCollisionModel *_model ) {
 	Mem_Free( model->edges );
 	// free vertices
 	Mem_Free( model->vertices );
-// jmarshall - crash bug
-	for (int i = 0; i < maxModels; i++) {
-		if (!models[i]) {
-			continue;
-		}
-
-		if (models[i] == model) {
-			models[i] = NULL;
-		}
-	}
-// jmarshall end
 
 	// free the model
 	delete model;
@@ -938,7 +932,9 @@ void idCollisionModelManagerLocal::SetupTrmModelStructure( void ) {
 
 	// setup model
 	model = AllocModel();
-
+// jmarshall
+	model->isTrmModel = true;
+// jmarshall end
 	assert( models );
 	models[MAX_SUBMODELS] = model;
 	// create node to hold the collision data

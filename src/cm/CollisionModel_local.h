@@ -209,6 +209,8 @@ public:
 	int						numRemovedPolys;
 	int						numMergedPolys;
 	int						usedMemory;
+
+	bool					isTrmModel;
 };
 
 /*
