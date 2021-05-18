@@ -189,6 +189,7 @@ void Script_Transition(idWindow *window, idList<idGSWinVar> *src) {
 		// 
 		//  added float variable
 		idWinFloat* val = NULL;
+		idWinFloatPtr* valp = NULL;
 		// 
 		if (vec4 == NULL) {
 			rect = dynamic_cast<idWinRectangle*>((*src)[0].var);
@@ -199,12 +200,17 @@ void Script_Transition(idWindow *window, idList<idGSWinVar> *src) {
 			}
 			// 
 		}
+
+		if (val == NULL) {
+			valp = dynamic_cast<idWinFloatPtr*>((*src)[0].var);
+		}
+
 		idWinVec4 *from = dynamic_cast<idWinVec4*>((*src)[1].var);
 		idWinVec4 *to = dynamic_cast<idWinVec4*>((*src)[2].var);
 		idWinStr *timeStr = dynamic_cast<idWinStr*>((*src)[3].var);
 		// 
 		//  added float variable					
-		if (!((vec4 || rect || val) && from && to && timeStr)) {
+		if (!((vec4 || rect || val || valp) && from && to && timeStr)) {
 			// 
 			common->Warning("Bad transition in gui %s in window %s\n", window->GetGui()->GetSourceFile(), window->GetName());
 			return;
@@ -228,6 +234,11 @@ void Script_Transition(idWindow *window, idList<idGSWinVar> *src) {
 		} else if ( val ) {
 			val->SetEval ( false );
 			window->AddTransition(val, *from, *to, time, ac, dc);
+			// 
+		}
+		else if (valp) {
+			valp->SetEval(false);
+			window->AddTransition(valp, *from, *to, time, ac, dc);
 			// 
 		} else {
 			rect->SetEval(false);
@@ -324,6 +335,15 @@ void Script_ResetVideo(idWindow* window, idList<idGSWinVar>* src) {
 		window->EvalRegs(-1, true);
 	}
 }
+
+/*
+===================
+Script_NonInteractive
+===================
+*/
+void Script_NonInteractive(idWindow* window, idList<idGSWinVar>* src) {
+
+}
 // jmarshall end
 
 typedef struct {
@@ -348,7 +368,8 @@ guiCommandDef_t commandList[] = {
 	{ "namedevent", Script_NamedEvent, 1, 1},
 	{ "stoptransitions", Script_StopTransitions, 1, 1},
 	{ "consolecmd", Script_ConsoleCmd, 1, 1},
-	{ "resetVideo", Script_ResetVideo, 1, 1}
+	{ "resetVideo", Script_ResetVideo, 1, 1},
+	{ "nonInteractive", Script_NonInteractive, 1, 1}
 // jmarshall end
 };
 

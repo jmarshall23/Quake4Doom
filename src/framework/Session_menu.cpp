@@ -190,6 +190,9 @@ void idSessionLocal::SetSaveGameGuiVars( void ) {
 	loadGameList.Clear();
 	fileList.Clear();
 	fileTimes.Clear();
+// jmarshall - crash fix
+	return;
+// jmarshall end
 
 	GetSaveGameList( fileList, fileTimes );
 

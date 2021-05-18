@@ -313,6 +313,8 @@ protected:
 
 class idWinFloat : public idWinVar {
 public:
+	friend class idWinFloatPtr;
+
 	idWinFloat() : idWinVar() {};
 	~idWinFloat() {};
 	virtual void Init(const char *_name, idWindow *win) {
@@ -365,6 +367,8 @@ public:
 protected:
 	float data;
 };
+
+
 
 class idWinRectangle : public idWinVar {
 public:
@@ -545,7 +549,9 @@ protected:
 };
 
 class idWinVec4 : public idWinVar {
-public:
+	friend class idWinFloatPtr;
+
+public:	
 	idWinVec4() : idWinVar() {};
 	~idWinVec4() {};
 	virtual void Init(const char *_name, idWindow *win) {
@@ -850,6 +856,65 @@ public:
 	void Set( const char *val );
 	void Update( void );
 	void SetGuiInfo( idDict *dict );
+};
+
+
+
+class idWinFloatPtr : public idWinVar {
+public:
+	idWinFloatPtr() : idWinVar() {};
+	~idWinFloatPtr() {};
+	virtual void Init(const char* _name, idWindow* win) {
+
+	}
+
+	float& operator=(const float& other) {
+		*data = other;
+		if (guiDict) {
+			guiDict->SetFloat(GetName(), *data);
+		}
+		return *data;
+	}
+
+	void Bind(idWinVec4& ptr, int component)
+	{
+		switch (component)
+		{
+		case 0:
+			data = &ptr.data[0];
+			break;
+		case 1:
+			data = &ptr.data[1];
+			break;
+		case 2:
+			data = &ptr.data[2];
+			break;
+		case 3:
+			data = &ptr.data[3];
+			break;
+		}
+	}
+
+	virtual void Set(const char* val) {
+		*data = atof(val);
+		if (guiDict) {
+			guiDict->SetFloat(GetName(), *data);
+		}
+	}
+	virtual void Update() {
+		const char* s = GetName();
+		if (guiDict && s[0] != '\0') {
+			*data = guiDict->GetFloat(s);
+		}
+	}
+	virtual const char* c_str() const {
+		return va("%f", *data);
+	}
+	virtual void WriteToSaveGame(idFile* savefile) { }
+	virtual void ReadFromSaveGame(idFile* savefile) { }
+	virtual float x(void) const { return *data; };
+protected:
+	float* data;
 };
 
 #endif /* !__WINVAR_H__ */

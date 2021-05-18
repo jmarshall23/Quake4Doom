@@ -61,11 +61,31 @@ extern idCVar r_skipGuiShaders;		// 1 = don't render any gui elements on surface
 //  made RegisterVars a member of idWindow
 const idRegEntry idWindow::RegisterVars[] = {
 	{ "forecolor", idRegister::VEC4 },
+	{ "forecolor_r", idRegister::FLOAT },
+	{ "forecolor_g", idRegister::FLOAT },
+	{ "forecolor_b", idRegister::FLOAT },
+	{ "forecolor_w", idRegister::FLOAT },
 	{ "hovercolor", idRegister::VEC4 },
+	{ "hovercolor_r", idRegister::FLOAT },
+	{ "hovercolor_g", idRegister::FLOAT },
+	{ "hovercolor_b", idRegister::FLOAT },
+	{ "hovercolor_w", idRegister::FLOAT },
 	{ "backcolor", idRegister::VEC4 },
+	{ "backcolor_r", idRegister::FLOAT },
+	{ "backcolor_g", idRegister::FLOAT },
+	{ "backcolor_b", idRegister::FLOAT },
+	{ "backcolor_w", idRegister::FLOAT },
 	{ "bordercolor", idRegister::VEC4 },
+	{ "bordercolor_r", idRegister::FLOAT },
+	{ "bordercolor_g", idRegister::FLOAT },
+	{ "bordercolor_b", idRegister::FLOAT },
+	{ "bordercolor_w", idRegister::FLOAT },
 	{ "rect", idRegister::RECTANGLE },
 	{ "matcolor", idRegister::VEC4 },
+	{ "matcolor_r", idRegister::FLOAT },
+	{ "matcolor_g", idRegister::FLOAT },
+	{ "matcolor_b", idRegister::FLOAT },
+	{ "matcolor_w", idRegister::FLOAT },
 	{ "scale", idRegister::VEC2 },
 	{ "translate", idRegister::VEC2 },
 	{ "rotate", idRegister::FLOAT },
@@ -85,7 +105,12 @@ const idRegEntry idWindow::RegisterVars[] = {
 	{ "lightOrigin", idRegister::VEC4 },
 	{ "lightColor", idRegister::VEC4 },
 	{ "viewOffset", idRegister::VEC4 },
-	{ "hideCursor", idRegister::BOOL}
+	{ "hideCursor", idRegister::BOOL},
+	{ "maxchars", idRegister::INT},
+	{ "backgroundHover", idRegister::STRING },
+	{ "backgroundFocus", idRegister::STRING },
+	{ "backgroundLine", idRegister::STRING },
+	{ "itemheight", idRegister::INT },
 };
 
 const int idWindow::NumRegisterVars = sizeof(RegisterVars) / sizeof(idRegEntry);
@@ -101,7 +126,27 @@ const char *idWindow::ScriptNames[] = {
 	"onTrigger",
 	"onActionRelease",
 	"onEnter",
-	"onEnterRelease"
+	"onEnterRelease",
+// jmarshall - quake 4
+	"onBackAction",
+	"onTabRelease",
+	"onGainFocus",
+	"onLoseFocus",
+	"onSelChange",
+	"onInit",
+	"onJoyStart",
+	"onJoySelect",
+	"onJoyBack",
+	"onJoyLShoulder",
+	"onJoyRShoulder",
+	"onJoyUp",
+	"onJoyDown",
+	"onJoyLeft",
+	"onJoyRight",
+	"onJoyButton1",
+	"onJoyButton2",
+	"onJoyBackButton"
+// jmarshall end
 };
 
 /*
@@ -157,6 +202,27 @@ void idWindow::CommonInit() {
 
 // jmarshall - gui crash
 	numOps = 0;
+
+	backColor_r.Bind(backColor, 0);
+	backColor_g.Bind(backColor, 1);
+	backColor_b.Bind(backColor, 2);
+	backColor_w.Bind(backColor, 3);
+	matColor_r.Bind(matColor, 0);
+	matColor_g.Bind(matColor, 1);
+	matColor_b.Bind(matColor, 2);
+	matColor_w.Bind(matColor, 3);
+	foreColor_r.Bind(foreColor, 0);
+	foreColor_g.Bind(foreColor, 1);
+	foreColor_b.Bind(foreColor, 2);
+	foreColor_w.Bind(foreColor, 3);
+	hoverColor_r.Bind(hoverColor, 0);
+	hoverColor_g.Bind(hoverColor, 1);
+	hoverColor_b.Bind(hoverColor, 2);
+	hoverColor_w.Bind(hoverColor, 3);
+	borderColor_r.Bind(borderColor, 0);
+	borderColor_g.Bind(borderColor, 1);
+	borderColor_b.Bind(borderColor, 2);
+	borderColor_w.Bind(borderColor, 3);
 // jmarshall end
 }
 
@@ -1015,10 +1081,15 @@ void idWindow::Transition() {
 		idWinRectangle *r = NULL;
 		idWinVec4 *v4 = dynamic_cast<idWinVec4*>(data->data);
 		idWinFloat* val = NULL;
+		idWinFloatPtr* valp = NULL;
 		if (v4 == NULL) {
 			r = dynamic_cast<idWinRectangle*>(data->data);
 			if ( !r ) {
 				val = dynamic_cast<idWinFloat*>(data->data);
+				if (!val)
+				{
+					valp = dynamic_cast<idWinFloatPtr*>(data->data);
+				}
 			}
 		}
 		if ( data->interp.IsDone( gui->GetTime() ) && data->data) {
@@ -1026,6 +1097,9 @@ void idWindow::Transition() {
 				*v4 = data->interp.GetEndValue();
 			} else if ( val ) {
 				*val = data->interp.GetEndValue()[0];
+			}
+			else if (valp) {
+				*valp = data->interp.GetEndValue()[0];
 			} else {
 				*r = data->interp.GetEndValue();
 			}
@@ -1036,6 +1110,9 @@ void idWindow::Transition() {
 					*v4 = data->interp.GetCurrentValue( gui->GetTime() );
 				} else if ( val ) {
 					*val = data->interp.GetCurrentValue( gui->GetTime() )[0];
+				}
+				else if (valp) {
+					*valp = data->interp.GetCurrentValue(gui->GetTime())[0];
 				} else {
 					*r = data->interp.GetCurrentValue( gui->GetTime() );
 				}
@@ -1806,18 +1883,88 @@ idWinVar *idWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** o
 	if (idStr::Icmp(_name, "backColor") == 0) {
 		retVar = &backColor;
 	}
+// jmarshall
+	if (idStr::Icmp(_name, "backColor_r") == 0) {
+		retVar = &backColor_r;
+	}
+	if (idStr::Icmp(_name, "backColor_g") == 0) {
+		retVar = &backColor_g;
+	}
+	if (idStr::Icmp(_name, "backColor_b") == 0) {
+		retVar = &backColor_b;
+	}
+	if (idStr::Icmp(_name, "backColor_w") == 0) {
+		retVar = &backColor_w;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "matColor") == 0) {
 		retVar = &matColor;
 	}
+// jmarshall
+	if (idStr::Icmp(_name, "matColor_r") == 0) {
+		retVar = &matColor_r;
+	}
+	if (idStr::Icmp(_name, "matColor_g") == 0) {
+		retVar = &matColor_g;
+	}
+	if (idStr::Icmp(_name, "matColor_b") == 0) {
+		retVar = &matColor_b;
+	}
+	if (idStr::Icmp(_name, "matColor_w") == 0) {
+		retVar = &matColor_w;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "foreColor") == 0) {
 		retVar = &foreColor;
 	}
+// jmarshall
+	if (idStr::Icmp(_name, "foreColor_r") == 0) {
+		retVar = &foreColor_r;
+	}
+	if (idStr::Icmp(_name, "foreColor_g") == 0) {
+		retVar = &foreColor_g;
+	}
+	if (idStr::Icmp(_name, "foreColor_b") == 0) {
+		retVar = &foreColor_b;
+	}
+	if (idStr::Icmp(_name, "foreColor_w") == 0) {
+		retVar = &foreColor_w;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "hoverColor") == 0) {
 		retVar = &hoverColor;
 	}
+// jmarshall
+	if (idStr::Icmp(_name, "hoverColor_r") == 0) {
+		retVar = &hoverColor_r;
+	}
+	if (idStr::Icmp(_name, "hoverColor_g") == 0) {
+		retVar = &hoverColor_g;
+	}
+	if (idStr::Icmp(_name, "hoverColor_b") == 0) {
+		retVar = &hoverColor_b;
+	}
+	if (idStr::Icmp(_name, "hoverColor_w") == 0) {
+		retVar = &hoverColor_w;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "borderColor") == 0) {
 		retVar = &borderColor;
 	}
+// jmarshall
+	if (idStr::Icmp(_name, "borderColor_r") == 0) {
+		retVar = &borderColor_r;
+	}
+	if (idStr::Icmp(_name, "borderColor_g") == 0) {
+		retVar = &borderColor_g;
+	}
+	if (idStr::Icmp(_name, "borderColor_b") == 0) {
+		retVar = &borderColor_b;
+	}
+	if (idStr::Icmp(_name, "borderColor_w") == 0) {
+		retVar = &borderColor_w;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "textScale") == 0) {
 		retVar = &textScale;
 	}
@@ -1836,6 +1983,52 @@ idWinVar *idWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** o
 	if (idStr::Icmp(_name, "hidecursor") == 0) {
 		retVar = &hideCursor;
 	}
+
+// jmarshall
+	if (idStr::Icmp(_name, "textspacing") == 0) {
+		retVar = &textspacing;
+	}
+
+	if (idStr::Icmp(_name, "textstyle") == 0) {
+		retVar = &textstyle;
+	}
+
+	if (idStr::Icmp(_name, "itemheight") == 0) {
+		retVar = &itemheight;
+	}
+	if (idStr::Icmp(_name, "scrollbar") == 0) {
+		retVar = &scrollbar;
+	}
+
+	if (idStr::Icmp(_name, "backgroundHover") == 0) {
+		retVar = &backgroundHover;
+	}
+
+	if (idStr::Icmp(_name, "backgroundFocus") == 0) {
+		retVar = &backgroundFocus;
+	}
+
+	if (idStr::Icmp(_name, "backgroundLine") == 0) {
+		retVar = &backgroundLine;
+	}
+
+	if (idStr::Icmp(_name, "tabTextScales") == 0) {
+		retVar = &tabTextScales;
+	}
+
+	if (idStr::Icmp(_name, "cvarMin") == 0) {
+		retVar = &cvarMin;
+	}
+
+	if (idStr::Icmp(_name, "model1") == 0) {
+		retVar = &model1;
+	}
+
+	if (idStr::Icmp(_name, "skin") == 0) {
+		retVar = &skin;
+	}
+// jmarshall end
+
 
 	idStr key = _name;
 	bool guiVar = (key.Find(VAR_GUIPREFIX) >= 0);
@@ -1883,6 +2076,7 @@ idWinVar *idWindow::GetWinVarByName(const char *_name, bool fixup, drawWin_t** o
 			} 
 		}
 	}
+
 	return NULL;
 }
 
@@ -1924,7 +2118,6 @@ idWindow::ParseInternalVar
 ================
 */
 bool idWindow::ParseInternalVar(const char *_name, idParser *src) {
-
 	if (idStr::Icmp(_name, "showtime") == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_SHOWTIME;
@@ -1963,6 +2156,12 @@ bool idWindow::ParseInternalVar(const char *_name, idParser *src) {
 		}
 		return true;
 	}
+// jmarshall - quake 4
+	if (idStr::Icmp(_name, "textSpacing") == 0) {
+		src->ParseInt();
+		return true;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "shadow") == 0) {
 		textShadow = src->ParseInt();
 		return true;
@@ -1990,6 +2189,12 @@ bool idWindow::ParseInternalVar(const char *_name, idParser *src) {
 		shear.y = src->ParseFloat();
 		return true;
 	}
+// jmarshall - quake 4
+	if (idStr::Icmp(_name, "textStyle") == 0) {
+		src->ParseInt();
+		return true;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "wantenter") == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_WANTENTER;
@@ -2026,6 +2231,16 @@ bool idWindow::ParseInternalVar(const char *_name, idParser *src) {
 		}
 		return true;
 	}
+// jmarshall - quake 4
+	if (idStr::Icmp(_name, "alwaysThink") == 0) {
+		src->ParseInt();
+		return true;
+	}
+	if (idStr::Icmp(_name, "chatWindow") == 0) {
+		src->ParseInt();
+		return true;
+	}
+// jmarshall end
 	if (idStr::Icmp(_name, "invertrect") == 0) {
 		if ( src->ParseBool() ) {
 			flags |= WIN_INVERTRECT;
@@ -2113,7 +2328,8 @@ bool idWindow::ParseRegEntry(const char *name, idParser *src) {
 				break;
 		}
 	}
-
+//	src->UnreadToken(&tok);
+	common->Warning("ParseRegEntry: No value for %s - file %s line %d\n", name, src->GetFileName(), src->GetLineNum());
 	return true;
 }
 
@@ -2123,6 +2339,9 @@ idWindow::SetInitialState
 ================
 */
 void idWindow::SetInitialState(const char *_name) {
+	if (strstr(name, "fade")) {
+		name = name;
+	}
 	name = _name;
 	matScalex = 1.0;
 	matScaley = 1.0;
@@ -2471,6 +2690,13 @@ bool idWindow::Parse( idParser *src, bool rebuild) {
 			}
 #endif
 		}
+// jmarshall - quake 4 guis
+		else if (token == "defineicon") {
+			// TODO needs implementation
+			src->ReadToken(&token); // key
+			src->ReadToken(&token); // value
+		}
+// jmarshall end
 		else if ( token == "float" ) {
 			src->ReadToken(&token);
 			work = token;
@@ -2543,10 +2769,8 @@ bool idWindow::Parse( idParser *src, bool rebuild) {
 #endif
 		} 
 		if ( !src->ReadToken( &token ) ) {
-// jmarshall - quake 4 hack
-			//src->Error( "Unexpected end of file" );
-			//ret = false;
-// jmarshall end
+			src->Error( "Unexpected end of file" );
+			ret = false;
 			break;
 		}
 	}
@@ -3906,35 +4130,37 @@ idWindow::IsSimple
 ================
 */
 bool idWindow::IsSimple() {
-
+// jmarshall - quake 4 guis
+	return false;
+// jmarshall end
 	// dont do simple windows when in gui editor
-	if ( com_editors & EDITOR_GUI ) {
-		return false;
-	}
-
-	if (numOps) {
-		return false;
-	}
-	if (flags & (WIN_HCENTER | WIN_VCENTER)) {
-		return false;
-	}
-	if (children.Num() || drawWindows.Num()) {
-		return false;
-	}
-	for (int i = 0; i < SCRIPT_COUNT; i++) {
-		if (scripts[i]) {
-			return false;
-		}
-	}
-	if (timeLineEvents.Num()) {
-		return false;
-	}
-
-	if ( namedEvents.Num() ) {
-		return false;
-	}
-
-	return true;
+	//if ( com_editors & EDITOR_GUI ) {
+	//	return false;
+	//}
+	//
+	//if (numOps) {
+	//	return false;
+	//}
+	//if (flags & (WIN_HCENTER | WIN_VCENTER)) {
+	//	return false;
+	//}
+	//if (children.Num() || drawWindows.Num()) {
+	//	return false;
+	//}
+	//for (int i = 0; i < SCRIPT_COUNT; i++) {
+	//	if (scripts[i]) {
+	//		return false;
+	//	}
+	//}
+	//if (timeLineEvents.Num()) {
+	//	return false;
+	//}
+	//
+	//if ( namedEvents.Num() ) {
+	//	return false;
+	//}
+	//
+	//return true;
 }
 
 /*

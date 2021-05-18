@@ -181,6 +181,26 @@ public:
 		ON_ACTIONRELEASE,
 		ON_ENTER,
 		ON_ENTERRELEASE,
+// jmarshall - quake 4 guis
+		ON_BACKACTION,
+		ON_TABRELEASE,
+		ON_GAINFOCUS,
+		ON_LOSEFOCUS,
+		ON_SELCHANGE,
+		ON_INIT,
+		ON_JOYSTART,
+		ON_JOYSELECT,
+		ON_JOYBACK,
+		ON_JOYLSHOULDER,
+		ON_JOYRSHOULDER,
+		ON_JOYUP,
+		ON_JOYDOWN,
+		ON_JOYLEFT,
+		ON_JOYRIGHT,
+		ON_JOYBUTTON1,
+		ON_JOYBUTTON2,
+		ON_JOYBACKBUTTON,
+// jmarshall end
 		SCRIPT_COUNT
 	};
 
@@ -404,14 +424,45 @@ protected:
 	idWinBool	noEvents;
 	idWinRectangle rect;				// overall rect
 	idWinVec4	backColor;
+	idWinFloatPtr	backColor_r;
+	idWinFloatPtr	backColor_g;
+	idWinFloatPtr	backColor_b;
+	idWinFloatPtr	backColor_w;
 	idWinVec4	matColor;
+	idWinFloatPtr	matColor_r;
+	idWinFloatPtr	matColor_g;
+	idWinFloatPtr	matColor_b;
+	idWinFloatPtr	matColor_w;
 	idWinVec4	foreColor;
+	idWinFloatPtr	foreColor_r;
+	idWinFloatPtr	foreColor_g;
+	idWinFloatPtr	foreColor_b;
+	idWinFloatPtr	foreColor_w;
 	idWinVec4	hoverColor;
+	idWinFloatPtr	hoverColor_r;
+	idWinFloatPtr	hoverColor_g;
+	idWinFloatPtr	hoverColor_b;
+	idWinFloatPtr	hoverColor_w;
 	idWinVec4	borderColor;
+	idWinFloatPtr	borderColor_r;
+	idWinFloatPtr	borderColor_g;
+	idWinFloatPtr	borderColor_b;
+	idWinFloatPtr	borderColor_w;
 	idWinFloat	textScale;
 	idWinFloat	rotate;
 	idWinStr	text;
 	idWinBackground	backGroundName;			// 
+	idWinFloat textspacing;
+	idWinFloat textstyle;
+	idWinInt itemheight;
+	idWinInt scrollbar;
+	idWinStr backgroundHover;
+	idWinStr backgroundFocus;
+	idWinStr backgroundLine;
+	idWinStr tabTextScales;
+	idWinInt cvarMin;
+	idWinStr model1;
+	idWinStr skin;
 
 	idList<idWinVar*> definedVars;
 	idList<idWinVar*> updateVars;

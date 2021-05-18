@@ -305,6 +305,9 @@ bool idUserInterfaceLocal::InitFromFile( const char *qpath, bool rebuild, bool c
 				}
 				continue;
 			}
+			else {
+				common->Error("Parsing gui %s invalid token %s\n", qpath, token.c_str());
+			}
 		}
 
 		state.Set( "name", qpath );
