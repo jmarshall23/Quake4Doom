@@ -2369,7 +2369,7 @@ void idCommonLocal::InitRenderSystem( void ) {
 	}
 
 	renderSystem->InitOpenGL();
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04343" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104343" ) );
 }
 
 /*
@@ -2384,7 +2384,7 @@ void idCommonLocal::PrintLoadingMessage( const char *msg ) {
 	renderSystem->BeginFrame( renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight() );
 	renderSystem->DrawStretchPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 1, 1, declManager->FindMaterial( "gfx/splashScreen" ) );
 	int len = strlen( msg );
-	renderSystem->DrawSmallStringExt( ( 640 - len * SMALLCHAR_WIDTH ) / 2, 410, msg, idVec4( 0.0f, 0.81f, 0.94f, 1.0f ), true, declManager->FindMaterial( "fonts/english/bigchars" ) );
+	renderSystem->DrawSmallStringExt( ( 640 - len * SMALLCHAR_WIDTH ) / 2, 410, msg, idVec4(0.94f, 0.62f, 0.05f, 1.0f), true, declManager->FindMaterial( "fonts/english/bigchars", false ) );
 	renderSystem->EndFrame( NULL, NULL );
 }
 
@@ -2919,7 +2919,7 @@ void idCommonLocal::InitGame( void ) {
 	// initialize string database right off so we can use it for loading messages
 	InitLanguageDict();
 
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04344" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104344" ) );
 
 	// load the font, etc
 	console->LoadGraphics();
@@ -2927,7 +2927,7 @@ void idCommonLocal::InitGame( void ) {
 	// init journalling, etc
 	eventLoop->Init();
 
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04345" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104345" ) );
 
 	// exec the startup scripts
 	cmdSystem->BufferCommandText( CMD_EXEC_APPEND, "exec editor.cfg\n" );
@@ -2957,12 +2957,12 @@ void idCommonLocal::InitGame( void ) {
 	// init the user command input code
 	usercmdGen->Init();
 
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04346" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104346" ) );
 
 	// start the sound system, but don't do any hardware operations yet
 	soundSystem->Init();
 
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04347" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104347" ) );
 
 	// init async network
 	idAsyncNetwork::Init();
@@ -2976,12 +2976,12 @@ void idCommonLocal::InitGame( void ) {
 		cvarSystem->SetCVarBool( "s_noSound", true );
 	} else {
 		// init OpenGL, which will open a window and connect sound and input hardware
-		PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04348" ) );
+		PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104348" ) );
 		InitRenderSystem();
 	}
 #endif
 
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04349" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104349" ) );
 
 	// initialize the user interfaces
 	uiManager->Init();
@@ -2989,12 +2989,12 @@ void idCommonLocal::InitGame( void ) {
 	// startup the script debugger
 	// DebuggerServerInit();
 
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04350" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104350" ) );
 
 	// load the game dll
 	LoadGameDLL();
 	
-	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_04351" ) );
+	PrintLoadingMessage( common->GetLanguageDict()->GetString( "#str_104351" ) );
 
 	// init the session
 	session->Init();
