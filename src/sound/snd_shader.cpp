@@ -195,15 +195,39 @@ bool idSoundShader::ParseShader( idLexer &src ) {
 		}
 		// mindistance
 		else if ( !token.Icmp( "mindistance" ) ) {
-			parms.minDistance = src.ParseFloat();
+			parms.minDistance = src.ParseFloat() / 100.0f; // jmarshall: scale to doom 3 distance
 		}
 		// maxdistance
 		else if ( !token.Icmp( "maxdistance" ) ) {
-			parms.maxDistance = src.ParseFloat();
+			parms.maxDistance = src.ParseFloat() / 100.0f; // jmarshall: scale to doom 3 distance
 		}
 // jmarshall - quake 4 sound shader
+		else if (!token.Icmp("frequencyshift")) {
+			float shiftVal = src.ParseFloat();
+			src.ExpectTokenString(",");
+			float shiftVal2 = src.ParseFloat();
+		}
 		else if (!token.Icmp("volumeDb")) {
-			src.ParseInt();
+			float db = src.ParseFloat();
+			parms.volume = idMath::dBToScale(db);
+		}
+		else if (!token.Icmp("useDoppler")) {
+			
+		}
+		else if (!token.Icmp("noRandomStart")) {
+
+		}
+		else if (!token.Icmp("voForPlayer")) {
+
+		}
+		else if (!token.Icmp("frequentlyUsed")) {
+
+		}
+		else if (!token.Icmp("causeRumble")) {
+
+		}
+		else if (!token.Icmp("center")) {
+
 		}
 // jmarshall end
 		// shakes screen
