@@ -394,17 +394,19 @@ void idGuiModel::DrawStretchPic( const idDrawVert *dverts, const glIndex_t *dind
 					break;
 				}
 			}
-			if ( j < 3 ) {
-				idPlane p;
-				p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = 1.0f; p.SetDist( min_x );
-				w.ClipInPlace( p );
-				p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = -1.0f; p.SetDist( -max_x );
-				w.ClipInPlace( p );
-				p.Normal().x = p.Normal().z = 0.0f; p.Normal().y = 1.0f; p.SetDist( min_y );
-				w.ClipInPlace( p );
-				p.Normal().x = p.Normal().z = 0.0f; p.Normal().y = -1.0f; p.SetDist( -max_y );
-				w.ClipInPlace( p );
-			}
+// jmarshall - screen clipping isn't working. This is a optimisation I'm not worried about on current gen hardware
+			//if ( j < 3 ) {
+			//	idPlane p;
+			//	p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = 1.0f; p.SetDist( min_x );
+			//	w.ClipInPlace( p );
+			//	p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = -1.0f; p.SetDist( -max_x );
+			//	w.ClipInPlace( p );
+			//	p.Normal().x = p.Normal().z = 0.0f; p.Normal().y = 1.0f; p.SetDist( min_y );
+			//	w.ClipInPlace( p );
+			//	p.Normal().x = p.Normal().z = 0.0f; p.Normal().y = -1.0f; p.SetDist( -max_y );
+			//	w.ClipInPlace( p );
+			//}
+// jmarshall end
 
 			int	numVerts = verts.Num();
 			verts.SetNum( numVerts + w.GetNumPoints(), false );
