@@ -1122,9 +1122,11 @@ extern idAnimManager		*animationLib;
 
 ID_INLINE void idGameLocal::WriteDecl( idBitMsg &msg, const idDecl *decl ) {
 	assert( decl );
+// jmarshall - changed to a warning.
 	if ( decl->IsImplicit() ) {
-		gameLocal.Error( "WriteDecl: %s decl %s ( index %d ) is implicit", declManager->GetDeclNameFromType( decl->GetType() ), decl->GetName(), decl->Index() );
+		gameLocal.Warning( "WriteDecl: %s decl %s ( index %d ) is implicit", declManager->GetDeclNameFromType( decl->GetType() ), decl->GetName(), decl->Index() );
 	}
+// jmarshall end
 	msg.WriteLong( decl->Index() );
 }
 
