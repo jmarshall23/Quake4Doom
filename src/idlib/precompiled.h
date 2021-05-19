@@ -97,6 +97,9 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 	#pragma warning( disable : 4389 )			// signed/unsigned mismatch
 	#pragma warning( disable : 4714 )			// function marked as __forceinline not inlined
 	#pragma warning( disable : 4800 )			// forcing value to bool 'true' or 'false' (performance warning)
+// jmarshall
+	#pragma warning( disable : 4458 )			//  hides class member
+// jmarshall end
 
 	class AlignmentChecker
 	{
@@ -147,7 +150,7 @@ public:
 
 #else
 
-#include "../tools/comafx/StdAfx.h"
+//#include "../tools/comafx/StdAfx.h"
 
 #endif
 

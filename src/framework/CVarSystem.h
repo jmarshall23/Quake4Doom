@@ -285,7 +285,9 @@ ID_INLINE void idCVar::Init( const char *name, const char *value, int flags, con
 	this->integerValue = 0;
 	this->floatValue = 0.0f;
 	this->internalVar = this;
-	if ( staticVars != (idCVar *)0xFFFFFFFF ) {
+// jmarshall - 64bit was 0xFFFFFFFFFF
+	if ( staticVars != (idCVar *)-1 ) {
+// jmarshall end
 		this->next = staticVars;
 		staticVars = this;
 	} else {
@@ -298,11 +300,15 @@ ID_INLINE void idCVar::RegisterStaticVars( void ) {
 // jnewquist: Tag scope and callees to track allocations using "new".
 	MEM_SCOPED_TAG(tag,MA_CVAR);
 // RAVEN END
-	if ( staticVars != (idCVar *)0xFFFFFFFF ) {
+// jmarshall - 64bit was 0xFFFFFFFFFF
+	if ( staticVars != (idCVar *)-1 ) {
+// jmarshall end
 		for ( idCVar *cvar = staticVars; cvar; cvar = cvar->next ) {
 			cvarSystem->Register( cvar );
 		}
-		staticVars = (idCVar *)0xFFFFFFFF;
+// jmarshall - 64bit was 0xFFFFFFFFFF
+		staticVars = (idCVar *)-1;
+// jmarshall end
 	}
 }
 

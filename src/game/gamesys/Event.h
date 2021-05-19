@@ -17,8 +17,14 @@ Event are used for scheduling tasks and for linking script commands.
 #define D_EVENT_ENTITY				'e'
 #define	D_EVENT_ENTITY_NULL			'E'			// event can handle NULL entity pointers
 #define D_EVENT_TRACE				't'
+// jmarshall - 64bit
+#define D_EVENT_INTEGER64bit		'y'
+// jmarshall end
 
 #define MAX_EVENTS					8192		// Upped from 4096
+
+// stack size of idVec3, aligned to native pointer size
+#define E_EVENT_SIZEOF_VEC			((sizeof(idVec3) + (sizeof(intptr_t) - 1)) & ~(sizeof(intptr_t) - 1))
 
 class idClass;
 class idTypeInfo;
@@ -78,7 +84,7 @@ public:
 	
 	static void					WriteDebugInfo( void );
 	static idEvent				*Alloc( const idEventDef *evdef, int numargs, va_list args );
-	static void					CopyArgs( const idEventDef *evdef, int numargs, va_list args, int data[ D_EVENT_MAXARGS ]  );
+	static void					CopyArgs( const idEventDef *evdef, int numargs, va_list args, intptr_t data[ D_EVENT_MAXARGS ]  );
 	
 	void						Free( void );
 	void						Schedule( idClass *object, const idTypeInfo *cls, int time );

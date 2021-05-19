@@ -65,15 +65,15 @@ idEventDef::idEventDef( const char *command, const char *formatspec, char return
 		switch( formatspec[ i ] ) {
 		case D_EVENT_FLOAT :
 			bits |= 1 << i;
-			argsize += sizeof( float );
+			argsize += sizeof(intptr_t);
 			break;
 
 		case D_EVENT_INTEGER :
-			argsize += sizeof( int );
+			argsize += sizeof(intptr_t);
 			break;
 
 		case D_EVENT_VECTOR :
-			argsize += sizeof( idVec3 );
+			argsize += E_EVENT_SIZEOF_VEC;
 			break;
 
 		case D_EVENT_STRING :
@@ -81,11 +81,11 @@ idEventDef::idEventDef( const char *command, const char *formatspec, char return
 			break;
 
 		case D_EVENT_ENTITY :
-			argsize += sizeof( idEntityPtr<idEntity> );
+			argsize += sizeof( intptr_t);
 			break;
 
 		case D_EVENT_ENTITY_NULL :
-			argsize += sizeof( idEntityPtr<idEntity> );
+			argsize += sizeof(intptr_t);
 			break;
 
 		case D_EVENT_TRACE :
@@ -267,17 +267,17 @@ idEvent *idEvent::Alloc( const idEventDef *evdef, int numargs, va_list args ) {
 		if ( format[ i ] != arg->type ) {
 // RAVEN BEGIN
 // abahr: type checking change as per Jim D.
-			if ( ( format[ i ] == D_EVENT_ENTITY_NULL ) && ( arg->type == D_EVENT_ENTITY ) ) {
-			// these types are identical, so allow them
-			} else if ( ( arg->type == D_EVENT_INTEGER ) && ( arg->value == 0 ) ) {
-				if ( ( format[ i ] == D_EVENT_ENTITY ) || ( format[ i ] == D_EVENT_ENTITY_NULL ) || ( format[ i ] == D_EVENT_TRACE ) ) {
-				 // when NULL is passed in for an entity or trace, it gets cast as an integer 0, so don't give an error when it happens
-				} else {
-					 gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
-				}
-			} else {
-				gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
-			}
+			//if ( ( format[ i ] == D_EVENT_ENTITY_NULL ) && ( arg->type == D_EVENT_ENTITY ) ) {
+			//// these types are identical, so allow them
+			//} else if ( ( arg->type == D_EVENT_INTEGER ) && ( arg->value == 0 ) ) {
+			//	if ( ( format[ i ] == D_EVENT_ENTITY ) || ( format[ i ] == D_EVENT_ENTITY_NULL ) || ( format[ i ] == D_EVENT_TRACE ) ) {
+			//	 // when NULL is passed in for an entity or trace, it gets cast as an integer 0, so don't give an error when it happens
+			//	} else {
+			//		 gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
+			//	}
+			//} else {
+			//	gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
+			//}
 // RAVEN END
 		}
 
@@ -348,7 +348,7 @@ idEvent *idEvent::Alloc( const idEventDef *evdef, int numargs, va_list args ) {
 idEvent::CopyArgs
 ================
 */
-void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, int data[ D_EVENT_MAXARGS ] ) {
+void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, intptr_t data[ D_EVENT_MAXARGS ] ) {
 	int			i;
 	const char	*format;
 	idEventArg	*arg;
@@ -363,17 +363,17 @@ void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, int 
 		if ( format[ i ] != arg->type ) {
 // RAVEN BEGIN
 // abahr: type checking change as per Jim D.
-			if ( ( format[ i ] == D_EVENT_ENTITY_NULL ) && ( arg->type == D_EVENT_ENTITY ) ) {
-			// these types are identical, so allow them
-			} else if ( ( arg->type == D_EVENT_INTEGER ) && ( arg->value == 0 ) ) {
-				if ( ( format[ i ] == D_EVENT_ENTITY ) || ( format[ i ] == D_EVENT_ENTITY_NULL ) ) {
-				// when NULL is passed in for an entity, it gets cast as an integer 0, so don't give an error when it happens
-				} else {
-					gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
-				}
-			} else {
-				gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
-			}
+			//if ( ( format[ i ] == D_EVENT_ENTITY_NULL ) && ( arg->type == D_EVENT_ENTITY ) ) {
+			//// these types are identical, so allow them
+			//} else if ( ( arg->type == D_EVENT_INTEGER ) && ( arg->value == 0 ) ) {
+			//	if ( ( format[ i ] == D_EVENT_ENTITY ) || ( format[ i ] == D_EVENT_ENTITY_NULL ) ) {
+			//	// when NULL is passed in for an entity, it gets cast as an integer 0, so don't give an error when it happens
+			//	} else {
+			//		gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
+			//	}
+			//} else {
+			//	gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
+			//}
 // RAVEN END
 		}
 
@@ -513,7 +513,7 @@ idEvent::ServiceEvents
 void idEvent::ServiceEvents( void ) {
 	idEvent		*event;
 	int			num;
-	int			args[ D_EVENT_MAXARGS ];
+	intptr_t	args[ D_EVENT_MAXARGS ];
 	int			offset;
 	int			i;
 	int			numargs;

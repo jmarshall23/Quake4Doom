@@ -231,25 +231,7 @@
     <ClInclude Include="idlib\math\Simd.h">
       <Filter>idLib\Math</Filter>
     </ClInclude>
-    <ClInclude Include="idlib\math\Simd_3DNow.h">
-      <Filter>idLib\Math</Filter>
-    </ClInclude>
     <ClInclude Include="idlib\math\Simd_Generic.h">
-      <Filter>idLib\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="idlib\math\Simd_InstructionMacros.h">
-      <Filter>idLib\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="idlib\math\Simd_MMX.h">
-      <Filter>idLib\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="idlib\math\Simd_SSE.h">
-      <Filter>idLib\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="idlib\math\Simd_SSE2.h">
-      <Filter>idLib\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="idlib\math\Simd_SSE3.h">
       <Filter>idLib\Math</Filter>
     </ClInclude>
     <ClInclude Include="idlib\math\Vector.h">
@@ -419,22 +401,7 @@
     <ClCompile Include="idlib\math\Simd.cpp">
       <Filter>idLib\Math</Filter>
     </ClCompile>
-    <ClCompile Include="idlib\math\Simd_3DNow.cpp">
-      <Filter>idLib\Math</Filter>
-    </ClCompile>
     <ClCompile Include="idlib\math\Simd_generic.cpp">
-      <Filter>idLib\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="idlib\math\Simd_MMX.cpp">
-      <Filter>idLib\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="idlib\math\Simd_SSE.cpp">
-      <Filter>idLib\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="idlib\math\Simd_SSE2.cpp">
-      <Filter>idLib\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="idlib\math\Simd_SSE3.cpp">
       <Filter>idLib\Math</Filter>
     </ClCompile>
     <ClCompile Include="idlib\math\Vector.cpp">

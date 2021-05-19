@@ -273,6 +273,8 @@ float readFloat( void ) {
 	return me.ffred;
 }
 
+#define QUAKE4_FONT_SIZE 20548
+
 /*
 ============
 RegisterFont
@@ -344,7 +346,7 @@ bool idRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 		idStr::Copynz( outFont->name, name, sizeof( outFont->name ) );
 
 		len = fileSystem->ReadFile( name, NULL, &ftime );
-		if ( len != sizeof( fontInfo_t ) ) {
+		if ( len != QUAKE4_FONT_SIZE) {
 			common->Warning( "RegisterFont: couldn't find font: '%s'", name );
 			return false;
 		}

@@ -3,7 +3,10 @@
 #define __SCRIPT_INTERPRETER_H__
 
 #define MAX_STACK_DEPTH 	64
-#define LOCALSTACK_SIZE 	6144
+
+// RB: doubled local stack size
+#define LOCALSTACK_SIZE 	(6144 * 2)
+// RB end
 
 typedef struct prstack_s {
 	int 				s;
@@ -36,7 +39,8 @@ private:
 //	abahr: making Push public to allow parms to be put on stack
 public:
 	void				PushString( const char *string );
-	void				Push( int value );
+	void				Push( intptr_t value );
+	void				PushVector(const idVec3& vector);
 private:
 // RAVEN END
 	const char			*FloatToString( float value );
@@ -118,12 +122,25 @@ ID_INLINE void idInterpreter::PopParms( int numParms ) {
 idInterpreter::Push
 ====================
 */
-ID_INLINE void idInterpreter::Push( int value ) {
-	if ( localstackUsed + sizeof( int ) > LOCALSTACK_SIZE ) {
+ID_INLINE void idInterpreter::Push( intptr_t value ) {
+	if ( localstackUsed + sizeof(intptr_t) > LOCALSTACK_SIZE ) {
 		Error( "Push: locals stack overflow\n" );
 	}
-	*( int * )&localstack[ localstackUsed ]	= value;
-	localstackUsed += sizeof( int );
+	*(intptr_t* )&localstack[ localstackUsed ]	= value;
+	localstackUsed += sizeof(intptr_t);
+}
+
+/*
+====================
+idInterpreter::PushVector
+====================
+*/
+ID_INLINE void idInterpreter::PushVector(const idVec3& vector) {
+	if (localstackUsed + E_EVENT_SIZEOF_VEC > LOCALSTACK_SIZE) {
+		Error("Push: locals stack overflow\n");
+	}
+	*(idVec3*)&localstack[localstackUsed] = vector;
+	localstackUsed += E_EVENT_SIZEOF_VEC;
 }
 
 /*

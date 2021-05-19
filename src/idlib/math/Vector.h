@@ -1334,47 +1334,6 @@ ID_INLINE idVec4 &idVec4::operator*=( const float a ) {
 	return *this;
 }
 
-// RAVEN BEGIN
-// jscott: Opt float array to byte array conversion
-#ifdef _WINDOWS
-ID_INLINE idVec4::operator int( void )
-{
-  	int			tmp, retval;
-  	float		constant = 255.0f;
-  
-  	_asm
-  	{
-  		push	edx
-  		mov		edx, this
-  		fld		dword ptr[edx + 0]
-  		fld		dword ptr[edx + 4]
-  		fld		dword ptr[edx + 8]
-  		fld		dword ptr[edx + 12]
-  
-  		fmul	[constant]
-  		fistp	tmp	   
-  		mov		ah, byte ptr [tmp]
-  
-  		fmul	[constant]
- 		fistp	tmp	   
-  		mov		al, byte ptr [tmp]
- 
-  		shl		eax, 16
- 		
-  		fmul	[constant]
-  		fistp	tmp
-  		mov		ah, byte ptr [tmp]
-  
-  		fmul	[constant]
-  		fistp	tmp
-  		mov		al, byte ptr [tmp]
-  
-  		mov		[retval], eax
-  		pop		edx
-  	}
-  	return( retval );
-}
-#else
 ID_INLINE idVec4::operator int( void )
 {
 	AlignmentChecker::UpdateCount(&x);
@@ -1396,8 +1355,6 @@ ID_INLINE idVec4::operator int( void )
 
   	return( retval );
 }
-#endif
-// RAVEN END
 
 ID_INLINE bool idVec4::Compare( const idVec4 &a ) const {
 	AlignmentChecker::UpdateCount(&x);
