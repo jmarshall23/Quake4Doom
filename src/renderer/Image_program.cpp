@@ -567,17 +567,14 @@ static bool R_ParseImageProgram_r( idLexer &src, byte **pic, int *width, int *he
 
 // jmarshall - quake 4 support
 	if (!token.Icmp("downsize")) {
-		if (!src.ExpectTokenString("(")) {
-			common->Printf("%s\n", src.GetBuffer());
-			src.Error("Downsize parse error\n");
-		}
+		MatchAndAppendToken(src, "(");
+		R_ParseImageProgram_r(src, pic, width, height, timestamps, depth);
+
+		MatchAndAppendToken(src, ",");
 		src.ReadToken(&token);
-		R_LoadImage(token.c_str(), pic, width, height, &timestamp, true);
-		if (src.PeekTokenString(",")) {
-			src.ExpectTokenString(",");
-			src.ReadToken(&token);
-		}		
-		src.ExpectTokenString(")");
+		AppendToken(token);
+
+		MatchAndAppendToken(src, ")");
 		return true;
 	}
 // jmarshall end
