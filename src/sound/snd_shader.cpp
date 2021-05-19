@@ -195,11 +195,11 @@ bool idSoundShader::ParseShader( idLexer &src ) {
 		}
 		// mindistance
 		else if ( !token.Icmp( "mindistance" ) ) {
-			parms.minDistance = src.ParseFloat() / 100.0f; // jmarshall: scale to doom 3 distance
+			parms.minDistance = src.ParseFloat();
 		}
 		// maxdistance
 		else if ( !token.Icmp( "maxdistance" ) ) {
-			parms.maxDistance = src.ParseFloat() / 100.0f; // jmarshall: scale to doom 3 distance
+			parms.maxDistance = src.ParseFloat();
 		}
 // jmarshall - quake 4 sound shader
 		else if (!token.Icmp("frequencyshift")) {

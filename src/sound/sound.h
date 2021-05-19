@@ -48,8 +48,11 @@ If you have questions concerning this license or the applicable additional terms
 
 // unfortunately, our minDistance / maxDistance is specified in meters, and
 // we have far too many of them to change at this time.
-const float DOOM_TO_METERS = 0.0254f;					// doom to meters
-const float METERS_TO_DOOM = (1.0f/DOOM_TO_METERS);	// meters to doom
+
+// jmarshall - quake 4 doesn't use these
+const float DOOM_TO_METERS = 1.0f;					// doom to meters
+const float METERS_TO_DOOM = 1.0f;	// meters to doom
+// jmarshall end
 
 class idSoundSample;
 
