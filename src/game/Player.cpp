@@ -8745,7 +8745,9 @@ void idPlayer::AdjustSpeed( void ) {
 	} else if ( noclip ) {
 		speed = pm_noclipspeed.GetFloat();
 		bobFrac = 0.0f;
- 	} else if ( !physicsObj.OnLadder() && ( usercmd.buttons & BUTTON_RUN ) && ( usercmd.forwardmove || usercmd.rightmove ) && ( usercmd.upmove >= 0 ) ) {
+// jmarshall - force run, eval.
+ 	} else if ( !physicsObj.OnLadder() /*&& ( usercmd.buttons & BUTTON_RUN )*/ && ( usercmd.forwardmove || usercmd.rightmove ) && ( usercmd.upmove >= 0 ) ) {
+// jmarshall end
 		bobFrac = 1.0f;
 		speed = pm_speed.GetFloat();
 	} else {
