@@ -240,6 +240,7 @@
     <Link>
       <AdditionalLibraryDirectories>openal\lib;sys\win32\dongle;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>../Quake4.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
