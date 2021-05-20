@@ -406,8 +406,10 @@ typedef struct interactionTris_s {
 
 
 	if ( entityNum == 0 ) {
-		procFile->WriteFloatString( "model { /* name = */ \"_area%i\" /* numSurfaces = */ %i\n\n", 
+// jmarshall - quake 4 proc format
+		procFile->WriteFloatString( "model { /* name = */ \"_area%i\" /* numSurfaces = */ %i /* sky */ 0\n\n", 
 			areaNum, numSurfaces );
+// jmarshall end
 	} else {
 		const char *name;
 
@@ -415,8 +417,10 @@ typedef struct interactionTris_s {
 		if ( !name[0] ) {
 			common->Error( "Entity %i has surfaces, but no name key", entityNum );
 		}
-		procFile->WriteFloatString( "model { /* name = */ \"%s\" /* numSurfaces = */ %i\n\n", 
+// jmarshall - quake 4 proc format
+		procFile->WriteFloatString( "model { /* name = */ \"%s\" /* numSurfaces = */ %i /* sky */ 0\n\n", 
 			name, numSurfaces );
+// jmarshall end
 	}
 
 	surfaceNum = 0;
@@ -649,8 +653,11 @@ void WriteOutputFile( void ) {
 	if ( !procFile ) {
 		common->Error( "Error opening %s", qpath.c_str() );
 	}
+// jmarshall - Quake 4 proc support
+	procFile->WriteFloatString( "%s \"%s\"\n\n", PROC_FILE_ID, PROC_FILEVERSION);
 
-	procFile->WriteFloatString( "%s\n\n", PROC_FILE_ID );
+	procFile->WriteFloatString("%d\n", 1105723392); // Fake CRC
+// jmarshall end
 
 	// write the entity models and information, writing entities first
 	for ( i=dmapGlobals.num_entities - 1 ; i >= 0 ; i-- ) {

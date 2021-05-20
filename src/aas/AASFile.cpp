@@ -503,6 +503,10 @@ bool idAASSettings::WriteToFile( idFile *fp ) const {
 	fp->WriteFloatString( "\tplayerFlood = %d\n", playerFlood );
 	fp->WriteFloatString( "\tallowSwimReachabilities = %d\n", allowSwimReachabilities );
 	fp->WriteFloatString( "\tallowFlyReachabilities = %d\n", allowFlyReachabilities );
+// jmarshall - AAS 1.08
+	fp->WriteFloatString("\tgenerateAllFaces = 0\n");
+	fp->WriteFloatString("\tgenerateTacticalFeatures = 0\n");
+// jmarshall end
 	fp->WriteFloatString( "\tfileExtension = \"%s\"\n", fileExtension.c_str() );
 	fp->WriteFloatString( "\tgravity = (%f %f %f)\n", gravity.x, gravity.y, gravity.z );
 	fp->WriteFloatString( "\tmaxStepHeight = %f\n", maxStepHeight );
@@ -724,7 +728,7 @@ bool idAASFileLocal::Write( const idStr &fileName, unsigned int mapFileCRC ) {
 		}
 // jmarshall: AAS 1.08 - numFeatures/firstFeature
 		aasFile->WriteFloatString( "\t%d ( %d %d %d %d %d %d %d %d %d %d ) %d {\n", i, areas[i].flags, areas[i].contents,
-						areas[i].firstFace, areas[i].numFaces, areas[i].cluster, areas[i].clusterAreaNum, areas[i].numFeatures, areas[i].firstFeature, num );
+						areas[i].firstFace, areas[i].numFaces, areas[i].cluster, areas[i].clusterAreaNum, /*areas[i].numFeatures*/ 0, /*areas[i].firstFeature*/ 0, num );
 // jmarshall end
 		for ( reach = areas[i].reach; reach; reach = reach->next ) {
 			Reachability_Write( aasFile, reach );

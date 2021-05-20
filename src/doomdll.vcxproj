@@ -416,6 +416,11 @@
     <ClInclude Include="sys\win32\rc\ScriptEditor_resource.h" />
     <ClInclude Include="sys\win32\rc\SoundEditor_resource.h" />
     <ClInclude Include="tools\compilers\dmap\dmap.h" />
+    <ClInclude Include="tools\compilers\runaas\AASBuild_local.h" />
+    <ClInclude Include="tools\compilers\runaas\AASCluster.h" />
+    <ClInclude Include="tools\compilers\runaas\AASReach.h" />
+    <ClInclude Include="tools\compilers\runaas\Brush.h" />
+    <ClInclude Include="tools\compilers\runaas\BrushBSP.h" />
     <ClInclude Include="ui\BindWindow.h" />
     <ClInclude Include="ui\ChoiceWindow.h" />
     <ClInclude Include="ui\DeviceContext.h" />
@@ -1217,6 +1222,15 @@
     <ClCompile Include="tools\compilers\dmap\tritools.cpp" />
     <ClCompile Include="tools\compilers\dmap\ubrush.cpp" />
     <ClCompile Include="tools\compilers\dmap\usurface.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASBuild.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASBuild_file.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASBuild_gravity.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASBuild_ledge.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASBuild_merge.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASCluster.cpp" />
+    <ClCompile Include="tools\compilers\runaas\AASReach.cpp" />
+    <ClCompile Include="tools\compilers\runaas\Brush.cpp" />
+    <ClCompile Include="tools\compilers\runaas\BrushBSP.cpp" />
     <ClCompile Include="ui\BindWindow.cpp" />
     <ClCompile Include="ui\ChoiceWindow.cpp" />
     <ClCompile Include="ui\DeviceContext.cpp" />
