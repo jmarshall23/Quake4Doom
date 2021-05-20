@@ -364,9 +364,6 @@ bool rvPhysics_Particle::Evaluate( int timeStepMSec, int endTimeMSec ) {
 	float			 upspeed;
 
 	timeStep = MS2SEC( timeStepMSec );
-// jmarshall - Particle Physics disabled - needs proper BSE implementation.
-	return false;
-// jmarshall end
 
 	// if bound to a master
 	if ( hasMaster ) {
