@@ -1208,19 +1208,23 @@ RegisterDeclSubFolder
 */
 // jmarshall
 void idDeclManagerLocal::RegisterDeclSubFolder(const char* folder, const char* extension, idList<idStr>& fileList) {
-	idFileList* dirList = fileSystem->ListFiles(folder, "/", true);
-	for (int i = 0; i < dirList->GetNumFiles(); i++)
-	{
-		idFileList* list = fileSystem->ListFiles(va("%s/%s", folder, dirList->GetFile(i)), extension, true);
+	// Find all 
+	{		
+		idFileList* list = fileSystem->ListFiles(folder, extension, true);
 
 		for (int d = 0; d < list->GetNumFiles(); d++)
 		{
-			fileList.Append(va("%s/%s", dirList->GetFile(i), list->GetFile(d)));
+			fileList.Append(va("%s/%s", folder, list->GetFile(d)));
 		}
 
-		RegisterDeclSubFolder(va("%s/%s", dirList->GetFile(i), dirList->GetFile(i)), extension, fileList);
-
 		fileSystem->FreeFileList(list);
+	}
+	
+	idFileList* dirList = fileSystem->ListFiles(folder, "/", true);
+	for (int i = 0; i < dirList->GetNumFiles(); i++)
+	{		
+		idStr dir = va("%s/%s", folder, dirList->GetFile(i));
+		RegisterDeclSubFolder(dir, extension, fileList);
 	}
 
 	fileSystem->FreeFileList(dirList);
@@ -1257,20 +1261,15 @@ void idDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *ext
 	}
 
 // jmarshall - decls subfolders	
-	idFileList* localList = fileSystem->ListFiles(declFolder->folder, declFolder->extension, true);
-
-	for (int i = 0; i < localList->GetNumFiles(); i++)
-	{
-		fileList.Append(localList->GetFile(i));;
-	}
-	fileSystem->FreeFileList(localList);
-	
 	RegisterDeclSubFolder(declFolder->folder, declFolder->extension, fileList);
 // jmarshall end
 
 	// load and parse decl files
 	for ( i = 0; i < fileList.Num(); i++ ) {
-		fileName = declFolder->folder + "/" + fileList[ i ];
+// jmarshall
+		//fileName = declFolder->folder + "/" + fileList[ i ];
+		fileName = fileList[i];
+// jmarshall end
 
 		// check whether this file has already been loaded
 		for ( j = 0; j < loadedFiles.Num(); j++ ) {
