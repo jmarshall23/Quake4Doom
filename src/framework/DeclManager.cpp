@@ -270,6 +270,9 @@ public:
 	idList<rvGuideTemplate>		guides;
 // jmarshall end
 private:
+// jmarshall
+	void						RegisterDeclSubFolder(const char* folder, const char* extension, idList<idStr>& fileList);
+// jmarshall end
 
 	idList<idDeclType *>		declTypes;
 	idList<idDeclFolder *>		declFolders;
@@ -1198,7 +1201,31 @@ void idDeclManagerLocal::RegisterDeclType( const char *typeName, declType_t type
 	}
 	declTypes[type] = declType;
 }
+/*
+===================
+RegisterDeclSubFolder
+===================
+*/
+// jmarshall
+void idDeclManagerLocal::RegisterDeclSubFolder(const char* folder, const char* extension, idList<idStr>& fileList) {
+	idFileList* dirList = fileSystem->ListFiles(folder, "/", true);
+	for (int i = 0; i < dirList->GetNumFiles(); i++)
+	{
+		idFileList* list = fileSystem->ListFiles(va("%s/%s", folder, dirList->GetFile(i)), extension, true);
 
+		for (int d = 0; d < list->GetNumFiles(); d++)
+		{
+			fileList.Append(va("%s/%s", dirList->GetFile(i), list->GetFile(d)));
+		}
+
+		RegisterDeclSubFolder(va("%s/%s", dirList->GetFile(i), dirList->GetFile(i)), extension, fileList);
+
+		fileSystem->FreeFileList(list);
+	}
+
+	fileSystem->FreeFileList(dirList);
+}
+// jmarshall end
 /*
 ===================
 idDeclManagerLocal::RegisterDeclFolder
@@ -1207,7 +1234,7 @@ idDeclManagerLocal::RegisterDeclFolder
 void idDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *extension, declType_t defaultType ) {
 	int i, j;
 	idStr fileName;
-	idDeclFolder *declFolder;
+	idDeclFolder* declFolder;
 // jmarshall - decls subfolders
 	idList<idStr> fileList;
 // jmarshall end
@@ -1238,22 +1265,7 @@ void idDeclManagerLocal::RegisterDeclFolder( const char *folder, const char *ext
 	}
 	fileSystem->FreeFileList(localList);
 	
-
-	idFileList* dirList = fileSystem->ListFiles(declFolder->folder, "/", true);
-	for (int i = 0; i < dirList->GetNumFiles(); i++)
-	{
-		idFileList* list = fileSystem->ListFiles(va("%s/%s", declFolder->folder.c_str(), dirList->GetFile(i)), declFolder->extension, true);
-		
-		for (int d = 0; d < list->GetNumFiles(); d++)
-		{
-			fileList.Append(va("%s/%s", dirList->GetFile(i), list->GetFile(d)));
-		}
-
-		fileSystem->FreeFileList(list);
-	}
-
-	fileSystem->FreeFileList(dirList);
-	
+	RegisterDeclSubFolder(declFolder->folder, declFolder->extension, fileList);
 // jmarshall end
 
 	// load and parse decl files
