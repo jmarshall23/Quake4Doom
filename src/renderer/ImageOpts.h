@@ -87,6 +87,8 @@ enum textureFormat_t {
 	FMT_X16,			// 16 bpp
 	FMT_Y16_X16,		// 32 bpp
 	FMT_RGB565,			// 16 bpp
+
+	FMT_DEPTH_STENCIL
 };
 
 int BitsForFormat( textureFormat_t format );
@@ -126,6 +128,13 @@ public:
 	int					numLevels;		// if 0, will be 1 for NEAREST / LINEAR filters, otherwise based on size
 	bool				gammaMips;		// if true, mips will be generated with gamma correction
 	bool				readback;		// 360 specific - cpu reads back from this texture, so allocate with cached memory
+// jmarshall - MSAA
+	int					numMSAASamples;
+// jmarshall end
+
+// jmarshall - persistant images
+	bool				isPersistant;
+// jmarshall end
 };
 
 /*
@@ -142,7 +151,13 @@ ID_INLINE idImageOpts::idImageOpts() {
 	textureType		= TT_2D;
 	gammaMips		= false;
 	readback		= false;
+// jmarshall - MSAA
+	numMSAASamples = 0;
+// jmarshall end
 
+// jmarshall - persistant images
+	isPersistant = false;
+// jmarshall end
 };
 
 /*

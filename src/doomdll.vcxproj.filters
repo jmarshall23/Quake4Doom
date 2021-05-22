@@ -618,6 +618,9 @@
     <ClInclude Include="external\glew\wglew.h">
       <Filter>External\glew</Filter>
     </ClInclude>
+    <ClInclude Include="renderer\RenderTexture.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cm\CollisionModel_contacts.cpp">
@@ -1324,6 +1327,9 @@
     </ClCompile>
     <ClCompile Include="external\glew\glew.c">
       <Filter>External\glew</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\OpenGL\gl_RenderTexture.cpp">
+      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

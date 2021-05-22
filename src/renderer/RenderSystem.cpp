@@ -961,3 +961,128 @@ bool idRenderSystemLocal::UploadImage( const char *imageName, const byte *data, 
 	//image->SetImageFilterAndRepeat();
 	return true;
 }
+
+
+/*
+===============
+idRenderSystemLocal::BindRenderTexture
+===============
+*/
+void idRenderSystemLocal::BindRenderTexture(idRenderTexture* renderTexture, idRenderTexture* feedbackRenderTexture) {
+	setRenderTargetCommand_t* cmd;
+
+	cmd = (setRenderTargetCommand_t*)R_GetCommandBuffer(sizeof(*cmd));
+	cmd->commandId = RC_SET_RENDERTEXTURE;
+
+	cmd->renderTexture = renderTexture;
+	cmd->feedbackRenderTexture = feedbackRenderTexture;
+}
+
+/*
+===============
+idRenderSystemLocal::ClearRenderTarget
+===============
+*/
+void idRenderSystemLocal::ClearRenderTarget(bool clearColor, bool clearDepth, float depthValue, float red, float green, float blue) {
+	renderClearBufferCommand_t* cmd;
+
+	cmd = (renderClearBufferCommand_t*)R_GetCommandBuffer(sizeof(*cmd));
+	cmd->commandId = RC_CLEAR_RENDERTARGET;
+
+	cmd->clearColor = clearColor;
+	cmd->clearDepth = clearDepth;
+
+	cmd->clearDepthValue = depthValue;
+	cmd->clearColorValue = idVec4(red, green, blue, 1.0);
+}
+
+/*
+===============
+idRenderSystemLocal::ResolveMSAA
+===============
+*/
+void idRenderSystemLocal::ResolveMSAA(idRenderTexture* msaaRenderTexture, idRenderTexture* destRenderTexture) {
+	resolveRenderTargetCommand_t* cmd;
+
+	cmd = (resolveRenderTargetCommand_t*)R_GetCommandBuffer(sizeof(*cmd));
+	cmd->commandId = RC_RESOLVE_MSAA;
+
+	cmd->msaaRenderTexture = msaaRenderTexture;
+	cmd->destRenderTexture = destRenderTexture;
+}
+
+/*
+===============
+idRenderSystemLocal::CreateImage
+===============
+*/
+idImage* idRenderSystemLocal::CreateImage(const char* name, idImageOpts* opts, textureFilter_t textureFilter) {
+	// Check to see if the image already exists.
+	idImage* image = globalImages->GetImage(name);
+	if (image != nullptr) {
+		common->FatalError("idRenderSystemLocal::CreateImage: Image already allocated!");
+		return nullptr;
+	}
+
+	return globalImages->ScratchImage(name, opts, textureFilter, TR_CLAMP, TD_DEFAULT);
+}
+
+/*
+===============
+idRenderSystemLocal::FindImage
+===============
+*/
+idImage* idRenderSystemLocal::FindImage(const char* name) {
+	return globalImages->ImageFromFile(name, TF_DEFAULT, TR_REPEAT, TD_DEFAULT);
+}
+
+/*
+===============
+idRenderSystemLocal::ResizeImage
+===============
+*/
+void idRenderSystemLocal::ResizeImage(idImage* image, int width, int height) {
+	image->Resize(width, height);
+}
+
+/*
+===============
+idRenderSystemLocal::GetImageSize
+===============
+*/
+void idRenderSystemLocal::GetImageSize(idImage* image, int& imageWidth, int& imageHeight) {
+	imageWidth = image->GetOpts().width;
+	imageHeight = image->GetOpts().height;
+}
+
+/*
+===============
+idRenderSystemLocal::ResizeRenderTexture
+===============
+*/
+void idRenderSystemLocal::ResizeRenderTexture(idRenderTexture* renderTexture, int width, int height) {
+	renderTexture->Resize(width, height);
+}
+
+/*
+===============
+idRenderSystemLocal::CreateRenderTexture
+===============
+*/
+idRenderTexture* idRenderSystemLocal::CreateRenderTexture(idImage* albedoImage, idImage* depthImage, idImage* albedoImage2, idImage* albedoImage3) {
+	idRenderTexture* renderTexture = new idRenderTexture(albedoImage, depthImage);
+
+	if (albedoImage2)
+	{
+		renderTexture->AddRenderImage(albedoImage2);
+	}
+
+	if (albedoImage3)
+	{
+		renderTexture->AddRenderImage(albedoImage3);
+	}
+
+	renderTexture->InitRenderTexture();
+
+	return renderTexture;
+}

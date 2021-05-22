@@ -500,14 +500,18 @@ void idPlayerView::SingleView( idUserInterface *hud, const renderView_t *view, i
 	}
 
 	if ( !( RF_GUI_ONLY & renderFlags ) ) {
+// jmarshall
 		// jscott: portal sky rendering with KRABS
-		idCamera *portalSky = gameLocal.GetPortalSky();
-		if( portalSky ) {
-			renderView_t portalSkyView = *view;
-			portalSky->GetViewParms( &portalSkyView );
-			gameRenderWorld->RenderScene( &portalSkyView );
-		}
-		gameRenderWorld->RenderScene( view );
+		//idCamera *portalSky = gameLocal.GetPortalSky();
+		//if( portalSky ) {
+		//	renderView_t portalSkyView = *view;
+		//	portalSky->GetViewParms( &portalSkyView );
+		//	gameRenderWorld->RenderScene( &portalSkyView );
+		//}
+		//gameRenderWorld->RenderScene( view );
+
+		gameLocal.RenderScene(view, gameRenderWorld, gameLocal.GetPortalSky());
+// jmarshall end
 	}
 
 	if ( RF_NO_GUI & renderFlags ) {

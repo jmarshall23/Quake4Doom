@@ -29,9 +29,9 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __TR_LOCAL_H__
 #define __TR_LOCAL_H__
 
-#include "ImageOpts.h"
 #include "BinaryImage.h"
 #include "Image.h"
+#include "RenderTexture.h"
 
 class idRenderWorldLocal;
 
@@ -475,6 +475,9 @@ typedef enum {
 	RC_DRAW_VIEW,
 	RC_SET_BUFFER,
 	RC_COPY_RENDER,
+	RC_SET_RENDERTEXTURE,
+	RC_RESOLVE_MSAA,
+	RC_CLEAR_RENDERTARGET,
 	RC_SWAP_BUFFERS		// can't just assume swap at end of list because
 						// of forced list submission before syncs
 } renderCommand_t;
@@ -501,6 +504,28 @@ typedef struct {
 	int		cubeFace;					// when copying to a cubeMap
 } copyRenderCommand_t;
 
+// jmarshall
+typedef struct {
+	renderCommand_t		commandId, * next;
+	idRenderTexture* renderTexture;
+	idRenderTexture* feedbackRenderTexture;
+} setRenderTargetCommand_t;
+
+typedef struct {
+	renderCommand_t		commandId, * next;
+	bool clearColor;
+	bool clearDepth;
+
+	float clearDepthValue;
+	idVec4 clearColorValue;
+} renderClearBufferCommand_t;
+
+typedef struct {
+	renderCommand_t		commandId, * next;
+	idRenderTexture* msaaRenderTexture;
+	idRenderTexture* destRenderTexture;
+} resolveRenderTargetCommand_t;
+// jmarshall end
 
 //=======================================================================
 
@@ -642,6 +667,8 @@ typedef struct {
 	const viewDef_t	*	viewDef;
 	backEndCounters_t	pc;
 
+	idRenderTexture		*renderTexture;
+
 	const viewEntity_t *currentSpace;		// for detecting when a matrix must change
 	idScreenRect		currentScissor;
 	// for scissor clipping, local inside renderView viewport
@@ -729,6 +756,16 @@ public:
 	virtual void			GetCardCaps( bool &oldCard, bool &nv10or20 );
 	virtual bool			UploadImage( const char *imageName, const byte *data, int width, int height );
 
+
+	virtual idImage*		CreateImage(const char* name, idImageOpts* opts, textureFilter_t textureFilter);
+	virtual idImage*		FindImage(const char* name);
+	virtual idRenderTexture* CreateRenderTexture(idImage* albedoImage, idImage* depthImage, idImage* albedoImage2 = nullptr, idImage* albedoImage3 = nullptr);
+	virtual void			ResizeImage(idImage* image, int width, int height);
+	virtual void			ResizeRenderTexture(idRenderTexture* renderTexture, int width, int height);
+	virtual void			BindRenderTexture(idRenderTexture* renderTexture, idRenderTexture* feedbackRenderTexture);
+	virtual void			ResolveMSAA(idRenderTexture* msaaRenderTexture, idRenderTexture* destRenderTexture);
+	virtual void			ClearRenderTarget(bool clearColor, bool clearDepth, float depthValue, float red, float green, float blue);
+	virtual void			GetImageSize(idImage* image, int& imageWidth, int& imageHeight);
 public:
 	// internal functions
 							idRenderSystemLocal( void );

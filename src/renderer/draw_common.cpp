@@ -1674,6 +1674,12 @@ void	RB_STD_DrawView( void ) {
 	drawSurfs = (drawSurf_t **)&backEnd.viewDef->drawSurfs[0];
 	numDrawSurfs = backEnd.viewDef->numDrawSurfs;
 
+	// If we have a backend rendertexture, assign it here.
+	if (backEnd.renderTexture)
+	{
+		backEnd.renderTexture->MakeCurrent();
+	}
+
 	// clear the z buffer, set the projection matrix, etc
 	RB_BeginDrawingView();
 
@@ -1706,4 +1712,7 @@ void	RB_STD_DrawView( void ) {
 
 	RB_RenderDebugTools( drawSurfs, numDrawSurfs );
 
+// jmarshall - stupid OpenGL
+	GL_State(GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO);
+// jmarshall end
 }

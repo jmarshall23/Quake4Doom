@@ -1,0 +1,7 @@
+postprocess/nopostprocess
+{
+	sort postProcess
+	{
+		map _forwardRenderResolvedAlbedo
+	}
+}

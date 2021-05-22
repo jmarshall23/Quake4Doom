@@ -227,6 +227,7 @@
     <ClCompile Include="game\Game_Log.cpp" />
     <ClCompile Include="game\Game_network.cpp" />
     <ClCompile Include="game\GameEdit.cpp" />
+    <ClCompile Include="game\Game_render.cpp" />
     <ClCompile Include="game\Healing_Station.cpp" />
     <ClCompile Include="game\Icon.cpp" />
     <ClCompile Include="game\IconManager.cpp" />

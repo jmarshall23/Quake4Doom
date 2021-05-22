@@ -4,6 +4,13 @@
 #ifndef __RENDERER_H__
 #define __RENDERER_H__
 
+// jmarshall
+class idImage;
+class idRenderTexture;
+
+#include "ImageOpts.h"
+// jmarshall end
+
 /*
 ===============================================================================
 
@@ -363,6 +370,35 @@ public:
 
 	//virtual void			DebugGraph( float cur, float min, float max, const idVec4 &color ) = 0;
 	//virtual void			ShowDebugGraph( void ) = 0;
+
+// jmarshall
+	// Returns a image based on the options in idImageOpts.
+	virtual idImage* CreateImage(const char* name, idImageOpts* opts, textureFilter_t textureFilter) = 0;
+
+	// Returns the specified image.
+	virtual idImage* FindImage(const char* name) = 0;
+
+	// Creates a render texture given a albedo and depth image.
+	virtual idRenderTexture* CreateRenderTexture(idImage* albedoImage, idImage* depthImage, idImage* albedoImage2 = nullptr, idImage* albedoImage3 = nullptr) = 0;
+
+	// Resizes a image to the specified width and height.
+	virtual void			ResizeImage(idImage* image, int width, int height) = 0;
+
+	// Resizes a render texture to the specified width and height.
+	virtual void			ResizeRenderTexture(idRenderTexture* renderTexture, int width, int height) = 0;
+
+	// Binds the specified render texture, set as nullptr to draw directly to the back buffer.
+	virtual void			BindRenderTexture(idRenderTexture* renderTexture, idRenderTexture* feedbackRenderTexture) = 0;
+
+	// Resolves a msaa render texture to the blit render texture.
+	virtual void			ResolveMSAA(idRenderTexture* msaaRenderTexture, idRenderTexture* destRenderTexture) = 0;
+
+	// Clears the current render target
+	virtual void			ClearRenderTarget(bool clearColor, bool clearDepth, float depthValue, float red, float green, float blue) = 0;
+
+	// Fills in the image dinem for the given image.
+	virtual void			GetImageSize(idImage* image, int& imageWidth, int& imageHeight) = 0;
+// jmarshall end
 };
 
 extern idRenderSystem *		renderSystem;

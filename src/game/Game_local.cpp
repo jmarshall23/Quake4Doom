@@ -547,6 +547,10 @@ void idGameLocal::Init( void ) {
 
 	gamestate = GAMESTATE_NOMAP;
 
+// jmarshall
+	InitGameRenderSystem();
+// jmarshall end
+
 	Printf( "...%d aas types\n", aasList.Num() );
 	Printf( "game initialized.\n" );
 	Printf( "---------------------------------------------\n" );

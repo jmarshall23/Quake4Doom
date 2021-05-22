@@ -540,6 +540,93 @@ const void	RB_CopyRender( const void *data ) {
 	}
 }
 
+// jmarshall
+/*
+=============
+RB_SetRenderTexture
+=============
+*/
+static void RB_SetRenderTexture(const void* data) {
+	const setRenderTargetCommand_t* cmd;
+
+	cmd = (setRenderTargetCommand_t*)data;
+
+	if (cmd->renderTexture) {
+		backEnd.renderTexture = cmd->renderTexture;
+	}
+	else {
+		backEnd.renderTexture = nullptr;
+		idRenderTexture::BindNull();
+	}
+}
+
+/*
+============
+RB_ResolveMSAA
+============
+*/
+static void RB_ResolveMSAA(const void* data) {
+	const resolveRenderTargetCommand_t* cmd;
+
+	cmd = (resolveRenderTargetCommand_t*)data;
+
+	int width = cmd->msaaRenderTexture->GetWidth();
+	int height = cmd->msaaRenderTexture->GetHeight();
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, cmd->msaaRenderTexture->GetDeviceHandle());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cmd->destRenderTexture->GetDeviceHandle());
+
+	// Resolve all of the render targets.
+	for (int i = 0; i < cmd->msaaRenderTexture->GetNumColorImages(); i++)
+	{
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	}
+
+	GL_CheckErrors();
+
+	// Resolve the Depth Buffer
+	glReadBuffer(GL_NONE);
+	glDrawBuffer(GL_NONE);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+	GL_CheckErrors();
+
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+/*
+============
+RB_ClearRenderTarget
+============
+*/
+static void RB_ClearRenderTarget(const void* data) {
+	const renderClearBufferCommand_t* cmd;
+
+	cmd = (renderClearBufferCommand_t*)data;
+
+	if (cmd->clearDepth) {
+		glStencilMask(0xff);
+		// some cards may have 7 bit stencil buffers, so don't assume this
+		// should be 128
+		glClearStencil(1 << (glConfig.stencilBits - 1));
+		glClearDepth(cmd->clearDepthValue);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	}
+
+	if (cmd->clearColor) {
+		glClearColor(cmd->clearColorValue[0], cmd->clearColorValue[1], cmd->clearColorValue[2], cmd->clearColorValue[3]);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	glClearDepth(1.0f);
+
+}
+// jmarshall end
+
 /*
 ====================
 RB_ExecuteBackEndCommands
@@ -578,6 +665,17 @@ void RB_ExecuteBackEndCommands( const emptyCommand_t *cmds ) {
 				c_draw2d++;
 			}
 			break;
+// jmarshall
+		case RC_SET_RENDERTEXTURE:
+			RB_SetRenderTexture(cmds);
+			break;
+		case RC_RESOLVE_MSAA:
+			RB_ResolveMSAA(cmds);
+			break;
+		case RC_CLEAR_RENDERTARGET:
+			RB_ClearRenderTarget(cmds);
+			break;
+// jmarshall end
 		case RC_SET_BUFFER:
 			RB_SetBuffer( cmds );
 			c_setBuffers++;

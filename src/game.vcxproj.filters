@@ -519,6 +519,9 @@
     <ClCompile Include="idlib\precompiled.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="game\Game_render.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\Actor.h">

@@ -313,6 +313,15 @@ private:
 class rvGravityArea;
 // RAVEN END
 
+// jmarshall
+struct rvmGameRender_t {
+	idRenderTexture* forwardRenderPassRT;
+	idRenderTexture* forwardRenderPassResolvedRT;
+	const idMaterial* noPostProcessMaterial;
+	const idMaterial* blackPostProcessMaterial;
+};
+// jmarshall end
+
 //============================================================================
 // ddynerman: moved MultiplayerGame.h down here, so it can use more stuff in Game_local (idEntityPtr)
 #include "MultiplayerGame.h"
@@ -997,6 +1006,10 @@ private:
 
 	idStrList				shakeSounds;
 
+// jmarshall
+	rvmGameRender_t			gameRender;
+// jmarshall end
+
 	byte					lagometer[ LAGO_IMG_HEIGHT ][ LAGO_IMG_WIDTH ][ 4 ];
 
 	idMsgQueue				unreliableMessages[ MAX_CLIENTS+1 ];	// MAX_CLIENTS slot for server demo recording
@@ -1100,7 +1113,12 @@ public:
 	pvsHandle_t				GetClientPVS( idPlayer *player, pvsType_t type );
 
 	int						GetCurrentDemoProtocol( void ) { return demo_protocol; }
-
+// jmarshall
+	void					RenderScene(const renderView_t* view, idRenderWorld* renderWorld, idCamera* portalSky);
+private:	
+	void					ResizeRenderTextures(int width, int height);
+	void					InitGameRenderSystem(void);
+// jmarshall end
 private:
 	char					clientGuids[ MAX_CLIENTS ][ CLIENT_GUID_LENGTH ];
 	idList<mpBanInfo_t>		banList;

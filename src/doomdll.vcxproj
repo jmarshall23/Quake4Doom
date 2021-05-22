@@ -341,6 +341,7 @@
     <ClInclude Include="renderer\qgl.h" />
     <ClInclude Include="renderer\qgl_linked.h" />
     <ClInclude Include="renderer\RenderSystem.h" />
+    <ClInclude Include="renderer\RenderTexture.h" />
     <ClInclude Include="renderer\RenderWorld.h" />
     <ClInclude Include="renderer\RenderWorld_local.h" />
     <ClInclude Include="renderer\simplex.h" />
@@ -544,6 +545,7 @@
     <ClCompile Include="renderer\ModelManager.cpp" />
     <ClCompile Include="renderer\ModelOverlay.cpp" />
     <ClCompile Include="renderer\OpenGL\gl_Image.cpp" />
+    <ClCompile Include="renderer\OpenGL\gl_RenderTexture.cpp" />
     <ClCompile Include="renderer\RenderEntity.cpp" />
     <ClCompile Include="renderer\RenderSystem.cpp" />
     <ClCompile Include="renderer\RenderSystem_init.cpp" />

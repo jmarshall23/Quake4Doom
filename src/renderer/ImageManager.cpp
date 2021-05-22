@@ -539,6 +539,11 @@ void idImageManager::PurgeAllImages() {
 
 	for ( i = 0; i < images.Num() ; i++ ) {
 		image = images[i];
+// jmarshall - persistant images.
+		if (image->GetOpts().isPersistant)
+			continue;
+// jmarshall end
+
 		image->PurgeImage();
 	}
 }

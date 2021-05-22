@@ -154,6 +154,7 @@ public:
 
 	static void			GetGeneratedName(idStr& _name, const textureUsage_t& _usage, const cubeFiles_t& _cube);
 
+	GLuint		GetDeviceHandle(void) { return texnum; }
 private:
 	friend class idImageManager;
 

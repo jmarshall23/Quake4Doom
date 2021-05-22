@@ -347,6 +347,11 @@ void idImage::AllocImage() {
 		dataFormat = GL_DEPTH_COMPONENT;
 		dataType = GL_UNSIGNED_BYTE;
 		break;
+	case FMT_DEPTH_STENCIL:
+		internalFormat = GL_DEPTH24_STENCIL8;
+		dataFormat = GL_DEPTH_STENCIL;
+		dataType = GL_UNSIGNED_INT_24_8;
+		break;
 	case FMT_X16:
 		internalFormat = GL_INTENSITY16;
 		dataFormat = GL_LUMINANCE;
@@ -381,7 +386,14 @@ void idImage::AllocImage() {
 	int target;
 	int uploadTarget;
 	if ( opts.textureType == TT_2D ) {
-		target = uploadTarget = GL_TEXTURE_2D;
+// jmarshall
+		if (opts.numMSAASamples == 0) {
+			target = uploadTarget = GL_TEXTURE_2D;
+		}
+		else {
+			target = uploadTarget = GL_TEXTURE_2D_MULTISAMPLE;
+		}
+// jmarshall end
 		numSides = 1;
 	} else if ( opts.textureType == TT_CUBIC ) {
 		target = GL_TEXTURE_CUBE_MAP_EXT;
