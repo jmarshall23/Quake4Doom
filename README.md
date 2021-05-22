@@ -1,6 +1,8 @@
 # Quake4Doom
 Quake 4 SDK integrated with Doom 3
 
+![alt text](https://i.ibb.co/V3Mw0Rv/unknown-1.png)
+![alt text](https://i.ibb.co/TTHTTkQ/image.png)
 
 This project is a code integration of the Quake 4 SDK against the Doom 3 GPL codebase. 
 This means this includes new engine side features that were in the Quake 4 engine,
