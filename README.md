@@ -1,5 +1,5 @@
 # Quake4Doom
-Quake 4 SDK integrated with Doom 3
+Quake 4 SDK integrated with Doom 3 GPL release
 
 ![alt text](https://i.ibb.co/V3Mw0Rv/unknown-1.png)
 ![alt text](https://i.ibb.co/TTHTTkQ/image.png)
