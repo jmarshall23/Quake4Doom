@@ -2,6 +2,22 @@
 #ifndef __DRAWVERT_H__
 #define __DRAWVERT_H__
 
+// The hardware converts a byte to a float by division with 255 and in the
+// vertex programs we convert the floating-point value in the range [0, 1]
+// to the range [-1, 1] by multiplying with 2 and subtracting 1.
+#define VERTEX_BYTE_TO_FLOAT( x )		( (x) * ( 2.0f / 255.0f ) - 1.0f )
+#define VERTEX_FLOAT_TO_BYTE( x )		idMath::Ftob( ( (x) + 1.0f ) * ( 255.0f / 2.0f ) + 0.5f )
+
+// The hardware converts a byte to a float by division with 255 and in the
+// fragment programs we convert the floating-point value in the range [0, 1]
+// to the range [-1, 1] by multiplying with 2 and subtracting 1.
+// This is the conventional OpenGL mapping which specifies an exact
+// representation for -1 and +1 but not 0. The DirectX 10 mapping is
+// in the comments which specifies a non-linear mapping with an exact
+// representation of -1, 0 and +1 but -1 is represented twice.
+#define NORMALMAP_BYTE_TO_FLOAT( x )	VERTEX_BYTE_TO_FLOAT( x )	//( (x) - 128.0f ) * ( 1.0f / 127.0f )
+#define NORMALMAP_FLOAT_TO_BYTE( x )	VERTEX_FLOAT_TO_BYTE( x )	//idMath::Ftob( 128.0f + 127.0f * (x) + 0.5f )
+
 /*
 ===============================================================================
 

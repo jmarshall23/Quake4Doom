@@ -261,6 +261,12 @@
     <ClInclude Include="idlib\algorithms\MultifieldSort.h">
       <Filter>idLib\Algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="idlib\Swap.h">
+      <Filter>idLib</Filter>
+    </ClInclude>
+    <ClInclude Include="idlib\containers\Sort.h">
+      <Filter>idLib\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="idlib\Base64.cpp">

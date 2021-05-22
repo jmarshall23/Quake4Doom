@@ -160,6 +160,7 @@
     <ClInclude Include="idlib\Base64.h" />
     <ClInclude Include="idlib\BitMsg.h" />
     <ClInclude Include="idlib\CmdArgs.h" />
+    <ClInclude Include="idlib\containers\Sort.h" />
     <ClInclude Include="idlib\Dict.h" />
     <ClInclude Include="idlib\Heap.h" />
     <ClInclude Include="idlib\LangDict.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="idlib\rvHeapArena.h" />
     <ClInclude Include="idlib\rvMemSys.h" />
     <ClInclude Include="idlib\Str.h" />
+    <ClInclude Include="idlib\Swap.h" />
     <ClInclude Include="idlib\TextCompiler.h" />
     <ClInclude Include="idlib\Timer.h" />
     <ClInclude Include="idlib\TimingCollection.h" />

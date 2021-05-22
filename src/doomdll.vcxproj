@@ -281,6 +281,8 @@
     <ClInclude Include="bse\BSE_SpawnDomains.h" />
     <ClInclude Include="cm\CollisionModel.h" />
     <ClInclude Include="cm\CollisionModel_local.h" />
+    <ClInclude Include="external\glew\glew.h" />
+    <ClInclude Include="external\glew\wglew.h" />
     <ClInclude Include="framework\BuildDefines.h" />
     <ClInclude Include="framework\BuildVersion.h" />
     <ClInclude Include="framework\CmdSystem.h" />
@@ -316,13 +318,17 @@
     <ClInclude Include="framework\async\NetworkSystem.h" />
     <ClInclude Include="framework\async\ServerScan.h" />
     <ClInclude Include="idlib\precompiled.h" />
+    <ClInclude Include="renderer\BinaryImage.h" />
+    <ClInclude Include="renderer\BinaryImageData.h" />
     <ClInclude Include="renderer\Cinematic.h" />
+    <ClInclude Include="renderer\Color\ColorSpace.h" />
+    <ClInclude Include="renderer\DXT\DXTCodec.h" />
     <ClInclude Include="renderer\glext.h" />
     <ClInclude Include="renderer\GuiModel.h" />
     <ClInclude Include="renderer\Image.h" />
+    <ClInclude Include="renderer\ImageOpts.h" />
     <ClInclude Include="renderer\Interaction.h" />
     <ClInclude Include="renderer\Material.h" />
-    <ClInclude Include="renderer\MegaTexture.h" />
     <ClInclude Include="renderer\Model.h" />
     <ClInclude Include="renderer\Model_ase.h" />
     <ClInclude Include="renderer\Model_local.h" />
@@ -460,6 +466,15 @@
     <ClCompile Include="cm\CollisionModel_rotate.cpp" />
     <ClCompile Include="cm\CollisionModel_trace.cpp" />
     <ClCompile Include="cm\CollisionModel_translate.cpp" />
+    <ClCompile Include="external\glew\glew.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with inlines|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="framework\CmdSystem.cpp" />
     <ClCompile Include="framework\Common.cpp" />
     <ClCompile Include="framework\Compressor.cpp" />
@@ -499,22 +514,22 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with inlines|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="renderer\BinaryImage.cpp" />
     <ClCompile Include="renderer\Cinematic.cpp" />
-    <ClCompile Include="renderer\draw_arb.cpp" />
+    <ClCompile Include="renderer\Color\ColorSpace.cpp" />
     <ClCompile Include="renderer\draw_arb2.cpp" />
     <ClCompile Include="renderer\draw_common.cpp" />
-    <ClCompile Include="renderer\draw_nv10.cpp" />
-    <ClCompile Include="renderer\draw_nv20.cpp" />
-    <ClCompile Include="renderer\draw_r200.cpp" />
+    <ClCompile Include="renderer\DXT\DXTDecoder.cpp" />
+    <ClCompile Include="renderer\DXT\DXTEncoder.cpp" />
     <ClCompile Include="renderer\GuiModel.cpp" />
+    <ClCompile Include="renderer\ImageManager.cpp" />
     <ClCompile Include="renderer\Image_files.cpp" />
-    <ClCompile Include="renderer\Image_init.cpp" />
+    <ClCompile Include="renderer\Image_intrinsic.cpp" />
     <ClCompile Include="renderer\Image_load.cpp" />
     <ClCompile Include="renderer\Image_process.cpp" />
     <ClCompile Include="renderer\Image_program.cpp" />
     <ClCompile Include="renderer\Interaction.cpp" />
     <ClCompile Include="renderer\Material.cpp" />
-    <ClCompile Include="renderer\MegaTexture.cpp" />
     <ClCompile Include="renderer\Model.cpp" />
     <ClCompile Include="renderer\Model_ase.cpp" />
     <ClCompile Include="renderer\Model_beam.cpp" />
@@ -528,6 +543,7 @@
     <ClCompile Include="renderer\ModelDecal.cpp" />
     <ClCompile Include="renderer\ModelManager.cpp" />
     <ClCompile Include="renderer\ModelOverlay.cpp" />
+    <ClCompile Include="renderer\OpenGL\gl_Image.cpp" />
     <ClCompile Include="renderer\RenderEntity.cpp" />
     <ClCompile Include="renderer\RenderSystem.cpp" />
     <ClCompile Include="renderer\RenderSystem_init.cpp" />

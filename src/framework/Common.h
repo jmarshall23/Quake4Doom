@@ -66,6 +66,8 @@ typedef enum {
 } saveType_t;
 // RAVEN END
 
+extern idCVar		com_productionMode;
+
 // converted to a class so the idStr gets constructed
 class MemInfo {
 public:

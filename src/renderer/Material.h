@@ -40,7 +40,6 @@ If you have questions concerning this license or the applicable additional terms
 class idImage;
 class idCinematic;
 class idUserInterface;
-class idMegaTexture;
 
 // moved from image.h for default parm
 typedef enum {
@@ -196,8 +195,6 @@ typedef struct {
 	int					fragmentProgram;
 	int					numFragmentProgramImages;
 	idImage* fragmentProgramImages[MAX_FRAGMENT_IMAGES];
-
-	idMegaTexture* megaTexture;		// handles all the binding and parameter setting 
 } newShaderStage_t;
 
 typedef struct {

@@ -43,34 +43,6 @@ only be called when the back end thread is idle.
 =====================
 */
 static void R_PerformanceCounters( void ) {
-	if ( r_showPrimitives.GetInteger() != 0 ) {
-		
-		float megaBytes = globalImages->SumOfUsedImages() / ( 1024*1024.0 );
-
-		if ( r_showPrimitives.GetInteger() > 1 ) {
-			common->Printf( "v:%i ds:%i t:%i/%i v:%i/%i st:%i sv:%i image:%5.1f MB\n",
-				tr.pc.c_numViews,
-				backEnd.pc.c_drawElements + backEnd.pc.c_shadowElements,
-				backEnd.pc.c_drawIndexes / 3,
-				( backEnd.pc.c_drawIndexes - backEnd.pc.c_drawRefIndexes ) / 3,
-				backEnd.pc.c_drawVertexes,
-				( backEnd.pc.c_drawVertexes - backEnd.pc.c_drawRefVertexes ),
-				backEnd.pc.c_shadowIndexes / 3,
-				backEnd.pc.c_shadowVertexes,
-				megaBytes
-				);
-		} else {
-			common->Printf( "views:%i draws:%i tris:%i (shdw:%i) (vbo:%i) image:%5.1f MB\n",
-				tr.pc.c_numViews,
-				backEnd.pc.c_drawElements + backEnd.pc.c_shadowElements,
-				( backEnd.pc.c_drawIndexes + backEnd.pc.c_shadowIndexes ) / 3,
-				backEnd.pc.c_shadowIndexes / 3,
-				backEnd.pc.c_vboIndexes / 3,
-				megaBytes
-				);
-		}
-	}
-
 	if ( r_showDynamic.GetBool() ) {
 		common->Printf( "callback:%i md5:%i dfrmVerts:%i dfrmTris:%i tangTris:%i guis:%i\n",
 			tr.pc.c_entityDefCallbacks,
@@ -272,7 +244,7 @@ See if some cvars that we watch have changed
 =============
 */
 static void R_CheckCvars( void ) {
-	globalImages->CheckCvars();
+	//globalImages->CheckCvars();
 
 	// gamma stuff
 	if ( r_gamma.IsModified() || r_brightness.IsModified() ) {
@@ -540,63 +512,13 @@ void idRenderSystemLocal::SetBackEndRenderer() {
 
 	bool oldVPstate = backEndRendererHasVertexPrograms;
 
-	backEndRenderer = BE_BAD;
-
-	if ( idStr::Icmp( r_renderer.GetString(), "arb" ) == 0 ) {
-		backEndRenderer = BE_ARB;
-	} else if ( idStr::Icmp( r_renderer.GetString(), "arb2" ) == 0 ) {
-		if ( glConfig.allowARB2Path ) {
-			backEndRenderer = BE_ARB2;
-		}
-	} else if ( idStr::Icmp( r_renderer.GetString(), "nv10" ) == 0 ) {
-		if ( glConfig.allowNV10Path ) {
-			backEndRenderer = BE_NV10;
-		}
-	} else if ( idStr::Icmp( r_renderer.GetString(), "nv20" ) == 0 ) {
-		if ( glConfig.allowNV20Path ) {
-			backEndRenderer = BE_NV20;
-		}
-	} else if ( idStr::Icmp( r_renderer.GetString(), "r200" ) == 0 ) {
-		if ( glConfig.allowR200Path ) {
-			backEndRenderer = BE_R200;
-		}
-	}
-
-	// fallback
-	if ( backEndRenderer == BE_BAD ) {
-		// choose the best
-		if ( glConfig.allowARB2Path ) {
-			backEndRenderer = BE_ARB2;
-		} else if ( glConfig.allowR200Path ) {
-			backEndRenderer = BE_R200;
-		} else if ( glConfig.allowNV20Path ) {
-			backEndRenderer = BE_NV20;
-		} else if ( glConfig.allowNV10Path ) {
-			backEndRenderer = BE_NV10;
-		} else {
-			// the others are considered experimental
-			backEndRenderer = BE_ARB;
-		}
-	}
+	// choose the best
+	backEndRenderer = BE_ARB2;
 
 	backEndRendererHasVertexPrograms = false;
 	backEndRendererMaxLight = 1.0;
 
 	switch( backEndRenderer ) {
-	case BE_ARB:
-		common->Printf( "using ARB renderSystem\n" );
-		break;
-	case BE_NV10:
-		common->Printf( "using NV10 renderSystem\n" );
-		break;
-	case BE_NV20:
-		common->Printf( "using NV20 renderSystem\n" );
-		backEndRendererHasVertexPrograms = true;
-		break;
-	case BE_R200:
-		common->Printf( "using R200 renderSystem\n" );
-		backEndRendererHasVertexPrograms = true;
-		break;
 	case BE_ARB2:
 		common->Printf( "using ARB2 renderSystem\n" );
 		backEndRendererHasVertexPrograms = true;
@@ -609,12 +531,12 @@ void idRenderSystemLocal::SetBackEndRenderer() {
 	// clear the vertex cache if we are changing between
 	// using vertex programs and not, because specular and
 	// shadows will be different data
-	if ( oldVPstate != backEndRendererHasVertexPrograms ) {
-		vertexCache.PurgeAll();
-		if ( primaryWorld ) {
-			primaryWorld->FreeInteractions();
-		}
-	}
+	//if ( oldVPstate != backEndRendererHasVertexPrograms ) {
+	//	vertexCache.PurgeAll();
+	//	if ( primaryWorld ) {
+	//		primaryWorld->FreeInteractions();
+	//	}
+	//}
 
 	r_renderer.ClearModified();
 }
@@ -928,7 +850,7 @@ void idRenderSystemLocal::CaptureRenderToImage( const char *imageName ) {
 
 	// look up the image before we create the render command, because it
 	// may need to sync to create the image
-	idImage	*image = globalImages->ImageFromFile(imageName, TF_DEFAULT, true, TR_REPEAT, TD_DEFAULT);
+	idImage	*image = globalImages->ImageFromFile(imageName, TF_DEFAULT, TR_REPEAT, TD_DEFAULT);
 
 	renderCrop_t *rc = &renderCrops[currentRenderCrop];
 
@@ -960,13 +882,13 @@ void idRenderSystemLocal::CaptureRenderToFile( const char *fileName, bool fixAlp
 	guiModel->Clear();
 	R_IssueRenderCommands();
 
-	qglReadBuffer( GL_BACK );
+	glReadBuffer( GL_BACK );
 
 	// include extra space for OpenGL padding to word boundaries
 	int	c = ( rc->width + 3 ) * rc->height;
 	byte *data = (byte *)R_StaticAlloc( c * 3 );
 	
-	qglReadPixels( rc->x, rc->y, rc->width, rc->height, GL_RGB, GL_UNSIGNED_BYTE, data ); 
+	glReadPixels( rc->x, rc->y, rc->width, rc->height, GL_RGB, GL_UNSIGNED_BYTE, data ); 
 
 	byte *data2 = (byte *)R_StaticAlloc( c * 4 );
 
@@ -1036,6 +958,6 @@ bool idRenderSystemLocal::UploadImage( const char *imageName, const byte *data, 
 		return false;
 	}
 	image->UploadScratch( data, width, height );
-	image->SetImageFilterAndRepeat();
+	//image->SetImageFilterAndRepeat();
 	return true;
 }

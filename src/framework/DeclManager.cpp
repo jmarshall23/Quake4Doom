@@ -752,7 +752,7 @@ int idDeclFile::LoadAndParse() {
 		finalPreprocessedBuffer = PreprocessGuides(buffer, length);
 	}
 
-	fileSystem->WriteFile(va("generated/%s", fileName.c_str()), finalPreprocessedBuffer.c_str(), finalPreprocessedBuffer.Length());
+	//fileSystem->WriteFile(va("generated/%s", fileName.c_str()), finalPreprocessedBuffer.c_str(), finalPreprocessedBuffer.Length());
 
 	Mem_Free(buffer);
 // jmarshall end

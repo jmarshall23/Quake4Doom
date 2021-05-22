@@ -123,6 +123,8 @@ public:
 	} bitValue_t;
 };
 
+#include <stdint.h>
+
 //-----------------------------------------------------
 
 #define ID_TIME_T time_t

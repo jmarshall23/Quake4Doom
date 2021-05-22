@@ -74,7 +74,7 @@ PFNWGLBINDTEXIMAGEARBPROC		wglBindTexImageARB;
 PFNWGLRELEASETEXIMAGEARBPROC	wglReleaseTexImageARB;
 PFNWGLSETPBUFFERATTRIBARBPROC	wglSetPbufferAttribARB;
 
-
+void* GLimp_ExtensionPointer(const char* name);
 
 /* ARB_pixel_format */
 #define WGL_NUMBER_PIXEL_FORMATS_ARB       0x2000
@@ -1050,7 +1050,7 @@ GLimp_DeactivateContext
 ===================
 */
 void GLimp_DeactivateContext( void ) {
-	qglFinish();
+	glFinish();
 	if ( !qwglMakeCurrent( win32.hDC, NULL ) ) {
 		win32.wglErrors++;
 	}
@@ -1227,10 +1227,10 @@ GLimp_ExtensionPointer
 Returns a function pointer for an OpenGL extension entry point
 ===================
 */
-GLExtension_t GLimp_ExtensionPointer( const char *name ) {
-	void	(*proc)(void);
+void *GLimp_ExtensionPointer( const char *name ) {
+	void* proc;
 
-	proc = (GLExtension_t)qwglGetProcAddress( name );
+	proc = (void *)qwglGetProcAddress( name );
 
 	if ( !proc ) {
 		common->Printf( "Couldn't find proc address for: %s\n", name );

@@ -287,8 +287,45 @@ public:
 
 							// ignore case and seperator char distinctions
 	virtual bool			FilenameCompare( const char *s1, const char *s2 ) const = 0;
+
+	virtual bool			InProductionMode() = 0;
 };
 
 extern idFileSystem *		fileSystem;
+
+/*
+================================================
+idFileLocal is a FileStream wrapper that automatically closes a file when the
+class variable goes out of scope. Note that the pointer passed in to the constructor can be for
+any type of File Stream that ultimately inherits from idFile, and that this is not actually a
+SmartPointer, as it does not keep a reference count.
+================================================
+*/
+class idFileLocal {
+public:
+	// Constructor that accepts and stores the file pointer.
+	idFileLocal(idFile* _file) : file(_file) {
+	}
+
+	// Destructor that will destroy (close) the file when this wrapper class goes out of scope.
+	~idFileLocal() {
+		if(file != NULL)
+			fileSystem->CloseFile(file);
+	}
+
+	// Cast to a file pointer.
+	operator idFile* () const {
+		return file;
+	}
+
+	// Member access operator for treating the wrapper as if it were the file, itself.
+	idFile* operator -> () const {
+		return file;
+	}
+
+protected:
+	idFile* file;	// The managed file pointer.
+};
+
 
 #endif /* !__FILESYSTEM_H__ */

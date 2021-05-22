@@ -296,6 +296,77 @@ void operator delete[]( void *p );
 
 
 /*
+================================================
+idTempArray is an array that is automatically free'd when it goes out of scope.
+There is no "cast" operator because these are very unsafe.
+
+The template parameter MUST BE POD!
+
+Compile time asserting POD-ness of the template parameter is complicated due
+to our vector classes that need a default constructor but are otherwise
+considered POD.
+================================================
+*/
+template < class T >
+class idTempArray {
+public:
+	idTempArray(idTempArray<T>& other);
+	idTempArray(unsigned int num);
+
+	~idTempArray();
+
+	T& operator [](unsigned int i) { assert(i < num); return buffer[i]; }
+	const T& operator [](unsigned int i) const { assert(i < num); return buffer[i]; }
+
+	T* Ptr() { return buffer; }
+	const T* Ptr() const { return buffer; }
+
+	size_t Size() const { return num * sizeof(T); }
+	unsigned int Num() const { return num; }
+
+	void Zero() { memset(Ptr(), 0, Size()); }
+
+private:
+	T* buffer;		// Ensure this buffer comes first, so this == &this->buffer
+	unsigned int	num;
+};
+
+/*
+========================
+idTempArray::idTempArray
+========================
+*/
+template < class T >
+ID_INLINE idTempArray<T>::idTempArray(idTempArray<T>& other) {
+	this->num = other.num;
+	this->buffer = other.buffer;
+	other.num = 0;
+	other.buffer = NULL;
+}
+
+/*
+========================
+idTempArray::idTempArray
+========================
+*/
+template < class T >
+ID_INLINE idTempArray<T>::idTempArray(unsigned int num) {
+	this->num = num;
+	buffer = (T*)Mem_Alloc(num * sizeof(T));
+}
+
+/*
+========================
+idTempArray::~idTempArray
+========================
+*/
+template < class T >
+ID_INLINE idTempArray<T>::~idTempArray() {
+	Mem_Free(buffer);
+}
+
+
+/*
 ===============================================================================
 
 	Block based allocator for fixed size objects.

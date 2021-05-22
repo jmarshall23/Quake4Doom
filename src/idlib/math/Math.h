@@ -1048,4 +1048,8 @@ public:
 
 // RAVEN END
 
+ID_INLINE byte CLAMP_BYTE(int x) {
+	return ((x) < 0 ? (0) : ((x) > 255 ? 255 : (byte)(x)));
+}
+
 #endif /* !__MATH_MATH_H__ */

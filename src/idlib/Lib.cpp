@@ -222,18 +222,34 @@ void UnpackColor( const dword color, idVec3 &unpackedColor ) {
 
 /*
 ===============
-idLib::Error
+idLib::FatalError
 ===============
 */
-void idLib::Error( const char *fmt, ... ) {
+void idLib::FatalError(const char* fmt, ...) {
 	va_list		argptr;
 	char		text[MAX_STRING_CHARS];
 
-	va_start( argptr, fmt );
-	idStr::vsnPrintf( text, sizeof( text ), fmt, argptr );
-	va_end( argptr );
+	va_start(argptr, fmt);
+	idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
+	va_end(argptr);
 
-	common->Error( "%s", text );
+	common->FatalError("%s", text);
+}
+
+/*
+===============
+idLib::Error
+===============
+*/
+void idLib::Error(const char* fmt, ...) {
+	va_list		argptr;
+	char		text[MAX_STRING_CHARS];
+
+	va_start(argptr, fmt);
+	idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
+	va_end(argptr);
+
+	common->Error("%s", text);
 }
 
 /*
@@ -241,15 +257,65 @@ void idLib::Error( const char *fmt, ... ) {
 idLib::Warning
 ===============
 */
-void idLib::Warning( const char *fmt, ... ) {
+void idLib::Warning(const char* fmt, ...) {
 	va_list		argptr;
 	char		text[MAX_STRING_CHARS];
 
-	va_start( argptr, fmt );
-	idStr::vsnPrintf( text, sizeof( text ), fmt, argptr );
-	va_end( argptr );
+	va_start(argptr, fmt);
+	idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
+	va_end(argptr);
 
-	common->Warning( "%s", text );
+	common->Warning("%s", text);
+}
+
+/*
+===============
+idLib::WarningIf
+===============
+*/
+void idLib::WarningIf(const bool test, const char* fmt, ...) {
+	if (!test) {
+		return;
+	}
+
+	va_list		argptr;
+	char		text[MAX_STRING_CHARS];
+
+	va_start(argptr, fmt);
+	idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
+	va_end(argptr);
+
+	common->Warning("%s", text);
+}
+
+/*
+===============
+idLib::Printf
+===============
+*/
+void idLib::Printf(const char* fmt, ...) {
+	va_list		argptr;
+	va_start(argptr, fmt);
+	if (common) {
+		common->VPrintf(fmt, argptr);
+	}
+	va_end(argptr);
+}
+
+/*
+===============
+idLib::PrintfIf
+===============
+*/
+void idLib::PrintfIf(const bool test, const char* fmt, ...) {
+	if (!test) {
+		return;
+	}
+
+	va_list		argptr;
+	va_start(argptr, fmt);
+	common->VPrintf(fmt, argptr);
+	va_end(argptr);
 }
 
 /*

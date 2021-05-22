@@ -1,32 +1,33 @@
 /*
 ===========================================================================
 
-Doom 3 GPL Source Code
-Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+Doom 3 BFG Edition GPL Source Code
+Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company. 
 
-This file is part of the Doom 3 GPL Source Code (?Doom 3 Source Code?).  
+This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").  
 
-Doom 3 Source Code is free software: you can redistribute it and/or modify
+Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Doom 3 Source Code is distributed in the hope that it will be useful,
+Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
+along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Doom 3 BFG Edition Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a copy in writing from id Software at the address below.
 
 If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
 */
-#include "precompiled.h"
 #pragma hdrstop
+#include "precompiled.h"
+
 
 #include "tr_local.h"
 
@@ -126,108 +127,6 @@ byte *R_Dropsample( const byte *in, int inwidth, int inheight,
 	}
 
 	return out;
-}
-
-
-/*
-===============
-R_SetBorderTexels
-
-===============
-*/
-void R_SetBorderTexels( byte *inBase, int width, int height, const byte border[4] ) {
-	int		i;
-	byte	*out;
-
-	out = inBase;
-	for (i=0 ; i<height ; i++, out+=width*4) {
-		out[0] = border[0];
-		out[1] = border[1];
-		out[2] = border[2];
-		out[3] = border[3];
-	}
-	out = inBase+(width-1)*4;
-	for (i=0 ; i<height ; i++, out+=width*4) {
-		out[0] = border[0];
-		out[1] = border[1];
-		out[2] = border[2];
-		out[3] = border[3];
-	}
-	out = inBase;
-	for (i=0 ; i<width ; i++, out+=4) {
-		out[0] = border[0];
-		out[1] = border[1];
-		out[2] = border[2];
-		out[3] = border[3];
-	}
-	out = inBase+width*4*(height-1);
-	for (i=0 ; i<width ; i++, out+=4) {
-		out[0] = border[0];
-		out[1] = border[1];
-		out[2] = border[2];
-		out[3] = border[3];
-	}
-}
-
-/*
-===============
-R_SetBorderTexels3D
-
-===============
-*/
-void R_SetBorderTexels3D( byte *inBase, int width, int height, int depth, const byte border[4] ) {
-	int		i, j;
-	byte	*out;
-	int		row, plane;
-
-	row = width * 4;
-	plane = row * depth;
-
-	for ( j = 1 ; j < depth - 1 ; j++ ) {
-		out = inBase + j * plane;
-		for (i=0 ; i<height ; i++, out+=row) {
-			out[0] = border[0];
-			out[1] = border[1];
-			out[2] = border[2];
-			out[3] = border[3];
-		}
-		out = inBase+(width-1)*4 + j * plane;
-		for (i=0 ; i<height ; i++, out+=row) {
-			out[0] = border[0];
-			out[1] = border[1];
-			out[2] = border[2];
-			out[3] = border[3];
-		}
-		out = inBase + j * plane;
-		for (i=0 ; i<width ; i++, out+=4) {
-			out[0] = border[0];
-			out[1] = border[1];
-			out[2] = border[2];
-			out[3] = border[3];
-		}
-		out = inBase+width*4*(height-1) + j * plane;
-		for (i=0 ; i<width ; i++, out+=4) {
-			out[0] = border[0];
-			out[1] = border[1];
-			out[2] = border[2];
-			out[3] = border[3];
-		}
-	}
-
-	out = inBase;
-	for ( i = 0 ; i < plane ; i += 4, out += 4 ) {
-		out[0] = border[0];
-		out[1] = border[1];
-		out[2] = border[2];
-		out[3] = border[3];
-	}
-	out = inBase+(depth-1)*plane;
-	for ( i = 0 ; i < plane ; i += 4, out += 4 ) {
-		out[0] = border[0];
-		out[1] = border[1];
-		out[2] = border[2];
-		out[3] = border[3];
-	}
 }
 
 /*
@@ -380,35 +279,42 @@ byte *R_MipMapWithAlphaSpecularity( const byte *in, int width, int height ) {
 	return out;
 }
 
+float mip_gammaTable[256] = {
+	0.000000f, 0.000005f, 0.000023f, 0.000057f, 0.000107f, 0.000175f, 0.000262f, 0.000367f, 0.000493f, 0.000638f, 0.000805f, 0.000992f, 0.001202f, 0.001433f, 0.001687f, 0.001963f,
+	0.002263f, 0.002586f, 0.002932f, 0.003303f, 0.003697f, 0.004116f, 0.004560f, 0.005028f, 0.005522f, 0.006041f, 0.006585f, 0.007155f, 0.007751f, 0.008373f, 0.009021f, 0.009696f,
+	0.010398f, 0.011126f, 0.011881f, 0.012664f, 0.013473f, 0.014311f, 0.015175f, 0.016068f, 0.016988f, 0.017936f, 0.018913f, 0.019918f, 0.020951f, 0.022013f, 0.023104f, 0.024223f,
+	0.025371f, 0.026549f, 0.027755f, 0.028991f, 0.030257f, 0.031551f, 0.032876f, 0.034230f, 0.035614f, 0.037029f, 0.038473f, 0.039947f, 0.041452f, 0.042987f, 0.044553f, 0.046149f,
+	0.047776f, 0.049433f, 0.051122f, 0.052842f, 0.054592f, 0.056374f, 0.058187f, 0.060032f, 0.061907f, 0.063815f, 0.065754f, 0.067725f, 0.069727f, 0.071761f, 0.073828f, 0.075926f,
+	0.078057f, 0.080219f, 0.082414f, 0.084642f, 0.086901f, 0.089194f, 0.091518f, 0.093876f, 0.096266f, 0.098689f, 0.101145f, 0.103634f, 0.106156f, 0.108711f, 0.111299f, 0.113921f,
+	0.116576f, 0.119264f, 0.121986f, 0.124741f, 0.127530f, 0.130352f, 0.133209f, 0.136099f, 0.139022f, 0.141980f, 0.144972f, 0.147998f, 0.151058f, 0.154152f, 0.157281f, 0.160444f,
+	0.163641f, 0.166872f, 0.170138f, 0.173439f, 0.176774f, 0.180144f, 0.183549f, 0.186989f, 0.190463f, 0.193972f, 0.197516f, 0.201096f, 0.204710f, 0.208360f, 0.212044f, 0.215764f,
+	0.219520f, 0.223310f, 0.227137f, 0.230998f, 0.234895f, 0.238828f, 0.242796f, 0.246800f, 0.250840f, 0.254916f, 0.259027f, 0.263175f, 0.267358f, 0.271577f, 0.275833f, 0.280124f,
+	0.284452f, 0.288816f, 0.293216f, 0.297653f, 0.302126f, 0.306635f, 0.311181f, 0.315763f, 0.320382f, 0.325037f, 0.329729f, 0.334458f, 0.339223f, 0.344026f, 0.348865f, 0.353741f,
+	0.358654f, 0.363604f, 0.368591f, 0.373615f, 0.378676f, 0.383775f, 0.388910f, 0.394083f, 0.399293f, 0.404541f, 0.409826f, 0.415148f, 0.420508f, 0.425905f, 0.431340f, 0.436813f,
+	0.442323f, 0.447871f, 0.453456f, 0.459080f, 0.464741f, 0.470440f, 0.476177f, 0.481952f, 0.487765f, 0.493616f, 0.499505f, 0.505432f, 0.511398f, 0.517401f, 0.523443f, 0.529523f,
+	0.535642f, 0.541798f, 0.547994f, 0.554227f, 0.560499f, 0.566810f, 0.573159f, 0.579547f, 0.585973f, 0.592438f, 0.598942f, 0.605484f, 0.612066f, 0.618686f, 0.625345f, 0.632043f,
+	0.638779f, 0.645555f, 0.652370f, 0.659224f, 0.666117f, 0.673049f, 0.680020f, 0.687031f, 0.694081f, 0.701169f, 0.708298f, 0.715465f, 0.722672f, 0.729919f, 0.737205f, 0.744530f,
+	0.751895f, 0.759300f, 0.766744f, 0.774227f, 0.781751f, 0.789314f, 0.796917f, 0.804559f, 0.812241f, 0.819964f, 0.827726f, 0.835528f, 0.843370f, 0.851252f, 0.859174f, 0.867136f,
+	0.875138f, 0.883180f, 0.891262f, 0.899384f, 0.907547f, 0.915750f, 0.923993f, 0.932277f, 0.940601f, 0.948965f, 0.957370f, 0.965815f, 0.974300f, 0.982826f, 0.991393f, 1.000000f
+};
+
 /*
 ================
-R_MipMap
+R_MipMapGamma
 
-Returns a new copy of the texture, quartered in size and filtered.
-
-If a texture is intended to be used in GL_CLAMP or GL_CLAMP_TO_EDGE mode with
-a completely transparent border, we must prevent any blurring into the outer
-ring of texels by filling it with the border from the previous level.  This
-will result in a slight shrinking of the texture as it mips, but better than
-smeared clamps...
+Returns a new copy of the texture, quartered in size with gamma correction.
 ================
 */
-byte *R_MipMap( const byte *in, int width, int height, bool preserveBorder ) {
+byte * R_MipMapWithGamma( const byte *in, int width, int height ) {
 	int		i, j;
 	const byte	*in_p;
 	byte	*out, *out_p;
 	int		row;
-	byte	border[4];
 	int		newWidth, newHeight;
 
 	if ( width < 1 || height < 1 || ( width + height == 2 ) ) {
-		common->FatalError( "R_MipMap called with size %i,%i", width, height );
+		return NULL;
 	}
-
-	border[0] = in[0];
-	border[1] = in[1];
-	border[2] = in[2];
-	border[3] = in[3];
 
 	row = width * 4;
 
@@ -430,20 +336,69 @@ byte *R_MipMap( const byte *in, int width, int height, bool preserveBorder ) {
 
 	if ( width == 0 || height == 0 ) {
 		width += height;	// get largest
-		if ( preserveBorder ) {
-			for (i=0 ; i<width ; i++, out_p+=4 ) {
-				out_p[0] = border[0];
-				out_p[1] = border[1];
-				out_p[2] = border[2];
-				out_p[3] = border[3];
-			}
-		} else {
-			for (i=0 ; i<width ; i++, out_p+=4, in_p+=8 ) {
-				out_p[0] = ( in_p[0] + in_p[4] )>>1;
-				out_p[1] = ( in_p[1] + in_p[5] )>>1;
-				out_p[2] = ( in_p[2] + in_p[6] )>>1;
-				out_p[3] = ( in_p[3] + in_p[7] )>>1;
-			}
+		for (i=0 ; i<width ; i++, out_p+=4, in_p+=8 ) {
+			out_p[0] = idMath::Ftob( 255.0f * idMath::Pow( 0.5f * ( mip_gammaTable[in_p[0]] + mip_gammaTable[in_p[4]] ), 1.0f / 2.2f ) );
+			out_p[1] = idMath::Ftob( 255.0f * idMath::Pow( 0.5f * ( mip_gammaTable[in_p[1]] + mip_gammaTable[in_p[5]] ), 1.0f / 2.2f ) );
+			out_p[2] = idMath::Ftob( 255.0f * idMath::Pow( 0.5f * ( mip_gammaTable[in_p[2]] + mip_gammaTable[in_p[6]] ), 1.0f / 2.2f ) );
+			out_p[3] = idMath::Ftob( 255.0f * idMath::Pow( 0.5f * ( mip_gammaTable[in_p[3]] + mip_gammaTable[in_p[7]] ), 1.0f / 2.2f ) );
+		}
+		return out;
+	}
+	for (i=0 ; i<height ; i++, in_p+=row) {
+		for (j=0 ; j<width ; j++, out_p+=4, in_p+=8) {
+			out_p[0] = idMath::Ftob( 255.0f * idMath::Pow( 0.25f * ( mip_gammaTable[in_p[0]] + mip_gammaTable[in_p[4]] + mip_gammaTable[in_p[row+0]] + mip_gammaTable[in_p[row+4]] ), 1.0f / 2.2f ) );
+			out_p[1] = idMath::Ftob( 255.0f * idMath::Pow( 0.25f * ( mip_gammaTable[in_p[1]] + mip_gammaTable[in_p[5]] + mip_gammaTable[in_p[row+1]] + mip_gammaTable[in_p[row+5]] ), 1.0f / 2.2f ) );
+			out_p[2] = idMath::Ftob( 255.0f * idMath::Pow( 0.25f * ( mip_gammaTable[in_p[2]] + mip_gammaTable[in_p[6]] + mip_gammaTable[in_p[row+2]] + mip_gammaTable[in_p[row+6]] ), 1.0f / 2.2f ) );
+			out_p[3] = idMath::Ftob( 255.0f * idMath::Pow( 0.25f * ( mip_gammaTable[in_p[3]] + mip_gammaTable[in_p[7]] + mip_gammaTable[in_p[row+3]] + mip_gammaTable[in_p[row+7]] ), 1.0f / 2.2f ) );
+		}
+	}
+
+	return out;
+}
+
+/*
+================
+R_MipMap
+
+Returns a new copy of the texture, quartered in size and filtered.
+================
+*/
+byte * R_MipMap( const byte *in, int width, int height ) {
+	int		i, j;
+	const byte	*in_p;
+	byte	*out, *out_p;
+	int		row;
+	int		newWidth, newHeight;
+
+	if ( width < 1 || height < 1 || ( width + height == 2 ) ) {
+		return NULL;
+	}
+
+	row = width * 4;
+
+	newWidth = width >> 1;
+	newHeight = height >> 1;
+	if ( !newWidth ) {
+		newWidth = 1;
+	}
+	if ( !newHeight ) {
+		newHeight = 1;
+	}
+	out = (byte *)R_StaticAlloc( newWidth * newHeight * 4 );
+	out_p = out;
+
+	in_p = in;
+
+	width >>= 1;
+	height >>= 1;
+
+	if ( width == 0 || height == 0 ) {
+		width += height;	// get largest
+		for (i=0 ; i<width ; i++, out_p+=4, in_p+=8 ) {
+			out_p[0] = ( in_p[0] + in_p[4] )>>1;
+			out_p[1] = ( in_p[1] + in_p[5] )>>1;
+			out_p[2] = ( in_p[2] + in_p[6] )>>1;
+			out_p[3] = ( in_p[3] + in_p[7] )>>1;
 		}
 		return out;
 	}
@@ -457,92 +412,8 @@ byte *R_MipMap( const byte *in, int width, int height, bool preserveBorder ) {
 		}
 	}
 
-	// copy the old border texel back around if desired
-	if ( preserveBorder ) {
-		R_SetBorderTexels( out, width, height, border );
-	}
-
 	return out;
 }
-
-/*
-================
-R_MipMap3D
-
-Returns a new copy of the texture, eigthed in size and filtered.
-
-If a texture is intended to be used in GL_CLAMP or GL_CLAMP_TO_EDGE mode with
-a completely transparent border, we must prevent any blurring into the outer
-ring of texels by filling it with the border from the previous level.  This
-will result in a slight shrinking of the texture as it mips, but better than
-smeared clamps...
-================
-*/
-byte *R_MipMap3D( const byte *in, int width, int height, int depth, bool preserveBorder ) {
-	int		i, j, k;
-	const byte	*in_p;
-	byte	*out, *out_p;
-	int		row, plane;
-	byte	border[4];
-	int		newWidth, newHeight, newDepth;
-
-	if ( depth == 1 ) {
-		return R_MipMap( in, width, height, preserveBorder );
-	}
-
-	// assume symetric for now
-	if ( width < 2 || height < 2 || depth < 2 ) {
-		common->FatalError( "R_MipMap3D called with size %i,%i,%i", width, height, depth );
-	}
-
-	border[0] = in[0];
-	border[1] = in[1];
-	border[2] = in[2];
-	border[3] = in[3];
-
-	row = width * 4;
-	plane = row * height;
-
-	newWidth = width >> 1;
-	newHeight = height >> 1;
-	newDepth = depth >> 1;
-
-	out = (byte *)R_StaticAlloc( newWidth * newHeight * newDepth * 4 );
-	out_p = out;
-
-	in_p = in;
-
-	width >>= 1;
-	height >>= 1;
-	depth >>= 1;
-
-	for (k=0 ; k<depth ; k++, in_p+=plane) {
-		for (i=0 ; i<height ; i++, in_p+=row) {
-			for (j=0 ; j<width ; j++, out_p+=4, in_p+=8) {
-				out_p[0] = (in_p[0] + in_p[4] + in_p[row+0] + in_p[row+4] +
-					in_p[plane+0] + in_p[plane+4] + in_p[plane+row+0] + in_p[plane+row+4]
-					)>>3;
-				out_p[1] = (in_p[1] + in_p[5] + in_p[row+1] + in_p[row+5] +
-					in_p[plane+1] + in_p[plane+5] + in_p[plane+row+1] + in_p[plane+row+5]
-					)>>3;
-				out_p[2] = (in_p[2] + in_p[6] + in_p[row+2] + in_p[row+6] +
-					in_p[plane+2] + in_p[plane+6] + in_p[plane+row+2] + in_p[plane+row+6]
-					)>>3;
-				out_p[3] = (in_p[3] + in_p[7] + in_p[row+3] + in_p[row+7] +
-					in_p[plane+3] + in_p[plane+6] + in_p[plane+row+3] + in_p[plane+row+6]
-					)>>3;
-			}
-		}
-	}
-
-	// copy the old border texel back around if desired
-	if ( preserveBorder ) {
-		R_SetBorderTexels3D( out, width, height, depth, border );
-	}
-
-	return out;
-}
-
 
 /*
 ==================

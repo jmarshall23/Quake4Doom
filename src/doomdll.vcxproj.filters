@@ -67,6 +67,21 @@
     <Filter Include="tools\compilers\runaas">
       <UniqueIdentifier>{790d16ec-9240-40b6-9c61-2ab9bbe6812c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\DXT">
+      <UniqueIdentifier>{e6f14e65-2c82-43b6-bf0d-b05bf16571ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Color">
+      <UniqueIdentifier>{794f7048-ed8a-4b35-82d7-abb86479edd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\OpenGL">
+      <UniqueIdentifier>{8f3197ee-2aa2-465f-a95c-b382d2b32ad0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{19514e55-e909-4b50-b87b-4cb71294ab64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\glew">
+      <UniqueIdentifier>{cfb669df-6063-4d72-9cdc-2bbcff2e0b57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cm\CollisionModel.h">
@@ -181,9 +196,6 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="renderer\Material.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="renderer\MegaTexture.h">
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="renderer\Model.h">
@@ -585,6 +597,27 @@
     <ClInclude Include="tools\compilers\runaas\BrushBSP.h">
       <Filter>tools\compilers\runaas</Filter>
     </ClInclude>
+    <ClInclude Include="renderer\DXT\DXTCodec.h">
+      <Filter>Renderer\DXT</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Color\ColorSpace.h">
+      <Filter>Renderer\Color</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\BinaryImage.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\BinaryImageData.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\ImageOpts.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="external\glew\glew.h">
+      <Filter>External\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="external\glew\wglew.h">
+      <Filter>External\glew</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cm\CollisionModel_contacts.cpp">
@@ -692,31 +725,16 @@
     <ClCompile Include="renderer\Cinematic.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\draw_arb.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="renderer\draw_arb2.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\draw_common.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\draw_nv10.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\draw_nv20.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\draw_r200.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="renderer\GuiModel.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\Image_files.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\Image_init.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\Image_load.cpp">
@@ -732,9 +750,6 @@
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\Material.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\MegaTexture.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\Model.cpp">
@@ -1285,6 +1300,30 @@
     </ClCompile>
     <ClCompile Include="tools\compilers\runaas\BrushBSP.cpp">
       <Filter>tools\compilers\runaas</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\DXT\DXTDecoder.cpp">
+      <Filter>Renderer\DXT</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\DXT\DXTEncoder.cpp">
+      <Filter>Renderer\DXT</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\Color\ColorSpace.cpp">
+      <Filter>Renderer\Color</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\BinaryImage.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\Image_intrinsic.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\ImageManager.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\OpenGL\gl_Image.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="external\glew\glew.c">
+      <Filter>External\glew</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

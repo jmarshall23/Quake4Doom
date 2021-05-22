@@ -118,6 +118,32 @@ public:
 	virtual void			WriteSyncId(void) { }
 	virtual void			ReadSyncId(const char* detail = "unspecified", const char* classname = NULL) { }
 // jmarshall end
+
+	template<class type> ID_INLINE size_t ReadBig(type& c) {
+		size_t r = Read(&c, sizeof(c));
+		idSwap::Big(c);
+		return r;
+	}
+
+	template<class type> ID_INLINE size_t ReadBigArray(type* c, int count) {
+		size_t r = Read(c, sizeof(c[0]) * count);
+		idSwap::BigArray(c, count);
+		return r;
+	}
+
+	template<class type> ID_INLINE size_t WriteBig(const type& c) {
+		type b = c;
+		idSwap::Big(b);
+		return Write(&b, sizeof(b));
+	}
+
+	template<class type> ID_INLINE size_t WriteBigArray(const type* c, int count) {
+		size_t r = 0;
+		for (int i = 0; i < count; i++) {
+			r += WriteBig(c[i]);
+		}
+		return r;
+	}
 };
 
 
