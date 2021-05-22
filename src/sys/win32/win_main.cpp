@@ -711,7 +711,7 @@ void Sys_DLL_Unload(INT_PTR dllHandle) {
 	if (!dllHandle) {
 		return;
 	}
-	if (FreeLibrary((HINSTANCE)dllHandle) == 0) {
+	if (FreeLibrary((HMODULE)dllHandle) == 0) {
 		int lastError = GetLastError();
 		LPVOID lpMsgBuf;
 		FormatMessage(
