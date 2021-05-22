@@ -10,3 +10,5 @@ The game is at visual partity with the original game, with the exception of the 
 
 Progression Blocker:
 There is a known bug were some doors don't open and have to be noclipped past. 
+
+Also the main menu works visually, but when you hit one button on the main menu it goes black, to start a game simply type devmap game/airdefense1 in the console. 
