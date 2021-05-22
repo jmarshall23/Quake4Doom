@@ -617,8 +617,8 @@ void RB_SetProgramEnvironment( void ) {
 	pot = globalImages->currentRenderImage->GetOpts().height;
 	parm[1] = (float)h / pot;
 
-	parm[2] = 0;
-	parm[3] = 1;
+	parm[2] = renderSystem->GetScreenWidth();
+	parm[3] = renderSystem->GetScreenHeight();
 	glProgramEnvParameter4fvARB( GL_VERTEX_PROGRAM_ARB, 0, parm );
 #endif
 
@@ -789,9 +789,9 @@ void RB_STD_T_RenderShaderPasses( const drawSurf_t *surf ) {
 			if ( tr.backEndRenderer != BE_ARB2 ) {
 				continue;
 			}
-			if ( r_skipNewAmbient.GetBool() ) {
-				continue;
-			}
+			//if ( r_skipNewAmbient.GetBool() ) {
+			//	continue;
+			//}
 			glColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( idDrawVert ), (void *)&ac->color );
 			glVertexAttribPointerARB( 9, 3, GL_FLOAT, false, sizeof( idDrawVert ), ac->tangents[0].ToFloatPtr() );
 			glVertexAttribPointerARB( 10, 3, GL_FLOAT, false, sizeof( idDrawVert ), ac->tangents[1].ToFloatPtr() );

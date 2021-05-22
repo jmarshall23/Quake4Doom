@@ -4,6 +4,8 @@
 #include "precompiled.h"
 #include "Game_local.h"
 
+idCVar g_renderCasUpscale("g_renderCasUpscale", "1", CVAR_BOOL, "jmarshall: toggles cas upscaling");
+
 /*
 =======================================
 
@@ -43,6 +45,27 @@ void idGameLocal::InitGameRenderSystem(void) {
 		gameRender.forwardRenderPassRT = renderSystem->CreateRenderTexture(albedoImage, depthImage, emissiveImage);
 	}
 
+	for(int i = 0; i < 2; i++)
+	{
+		idImageOpts opts;
+		opts.format = FMT_RGBA8;
+		opts.colorFormat = CFM_DEFAULT;
+		opts.numLevels = 1;
+		opts.textureType = TT_2D;
+		opts.isPersistant = true;
+		opts.width = renderSystem->GetScreenWidth();
+		opts.height = renderSystem->GetScreenHeight();
+		opts.numMSAASamples = 4; // renderSystem->GetNumMSAASamples();
+
+		idImage* albedoImage = renderSystem->CreateImage(va("_postProcessAlbedo%d", i), &opts, TF_LINEAR);
+
+		opts.numMSAASamples = 4; // renderSystem->GetNumMSAASamples();
+		opts.format = FMT_DEPTH_STENCIL;
+		idImage* depthImage = renderSystem->CreateImage(va("_postProcessDepth%d", i), &opts, TF_LINEAR);
+
+		gameRender.postProcessRT[i] = renderSystem->CreateRenderTexture(albedoImage, depthImage, NULL);
+	}
+
 	{
 		idImageOpts opts;
 		opts.format = FMT_RGBA8;
@@ -64,6 +87,8 @@ void idGameLocal::InitGameRenderSystem(void) {
 
 	gameRender.blackPostProcessMaterial = declManager->FindMaterial("postprocess/black", false);
 	gameRender.noPostProcessMaterial = declManager->FindMaterial("postprocess/nopostprocess", false);
+	gameRender.casPostProcessMaterial = declManager->FindMaterial("postprocess/casupscale", false);
+	gameRender.resolvePostProcessMaterial = declManager->FindMaterial("postprocess/resolvepostprocess", false);
 }
 
 /*
@@ -125,9 +150,20 @@ void idGameLocal::RenderScene(const renderView_t *view, idRenderWorld *renderWor
 	// Resolve our MSAA buffer.
 	renderSystem->ResolveMSAA(gameRender.forwardRenderPassRT, gameRender.forwardRenderPassResolvedRT);
 
-	// Render to the back buffer.	
-	renderSystem->DrawStretchPic(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 1.0f, 1.0f, 0.0f, gameRender.noPostProcessMaterial);
-	//renderSystem->DrawStretchPic(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 1.0f, 1.0f, 0.0f, gameRender.blackPostProcessMaterial);
+	// Render the resolved buffer to the screen.
+	renderSystem->BindRenderTexture(gameRender.postProcessRT[0], nullptr);
+		renderSystem->DrawStretchPic(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 1.0f, 1.0f, 0.0f, gameRender.resolvePostProcessMaterial);
+	renderSystem->BindRenderTexture(nullptr, nullptr);
+
+	// Now render CaS
+	if (g_renderCasUpscale.GetBool())
+	{
+		renderSystem->DrawStretchPic(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 1.0f, 1.0f, 0.0f, gameRender.casPostProcessMaterial);
+	}
+	else
+	{
+		renderSystem->DrawStretchPic(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 1.0f, 1.0f, 0.0f, gameRender.noPostProcessMaterial);
+	}
 
 	// Copy everything to _currentRender
 	renderSystem->CaptureRenderToImage("_currentRender");
