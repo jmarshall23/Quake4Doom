@@ -247,6 +247,7 @@ void idAsyncServer::ExecuteMapChange( void ) {
 	idStr		mapName;
 	findFile_t	ff;
 	bool		addonReload = false;
+	//char		bestGameType[ MAX_STRING_CHARS ];
 
 	assert( active );
 
@@ -254,9 +255,8 @@ void idAsyncServer::ExecuteMapChange( void ) {
 	fileSystem->ClearPureChecksums();
 
 	// make sure the map/gametype combo is good
-// jmarshall - best game type
 	//game->GetBestGameType( cvarSystem->GetCVarString("si_map"), cvarSystem->GetCVarString("si_gametype"), bestGameType );
-// jmarshall end
+	//cvarSystem->SetCVarString("si_gametype", bestGameType );
 
 	// initialize map settings
 	cmdSystem->BufferCommandText( CMD_EXEC_NOW, "rescanSI" );
@@ -318,7 +318,7 @@ void idAsyncServer::ExecuteMapChange( void ) {
 	memset( userCmds, 0, sizeof( userCmds ) );
 
 	if ( idAsyncNetwork::serverDedicated.GetInteger() == 0 ) {
-		InitLocalClient( 0 );
+		InitLocalClient( 0, false );
 	} else {
 		localClientNum = -1;
 	}
@@ -703,13 +703,22 @@ void idAsyncServer::InitClient( int clientNum, int clientId, int clientRate ) {
 idAsyncServer::InitLocalClient
 ==================
 */
-void idAsyncServer::InitLocalClient( int clientNum ) {
+void idAsyncServer::InitLocalClient( int clientNum, bool isBot ) {
 	netadr_t badAddress;
 
-	localClientNum = clientNum;
 	InitClient( clientNum, 0, 0 );
 	memset( &badAddress, 0, sizeof( badAddress ) );
-	badAddress.type = NA_BAD;
+// jmarshall
+	if (isBot)
+	{
+		badAddress.type = NA_BOT;
+	}
+	else
+	{
+		badAddress.type = NA_BAD;
+		localClientNum = clientNum;
+	}
+// jmarshall end
 	clients[clientNum].channel.Init( badAddress, serverId );
 	clients[clientNum].clientState = SCS_INGAME;
 	sessLocal.mapSpawnData.userInfo[clientNum] = *cvarSystem->MoveCVarsToDict( CVAR_USERINFO );
@@ -723,7 +732,7 @@ idAsyncServer::BeginLocalClient
 void idAsyncServer::BeginLocalClient( void ) {
 	game->SetLocalClient( localClientNum );
 	game->SetUserInfo( localClientNum, sessLocal.mapSpawnData.userInfo[localClientNum], false );
-	game->ServerClientBegin( localClientNum );
+	game->ServerClientBegin( localClientNum, false );
 }
 
 /*
@@ -798,6 +807,11 @@ void idAsyncServer::SendReliableMessage( int clientNum, const idBitMsg &msg ) {
 	if ( clientNum == localClientNum ) {
 		return;
 	}
+// jmarshall
+	if (clients[clientNum].channel.GetRemoteAddress().type == NA_BOT)
+		return;
+// jmarshall end
+
 	if ( !clients[ clientNum ].channel.SendReliableMessage( msg ) ) {
 		clients[ clientNum ].channel.ClearReliableMessages();
 		DropClient( clientNum, "#str_07136" );
@@ -821,6 +835,11 @@ void idAsyncServer::CheckClientTimeouts( void ) {
 		if ( i == localClientNum ) {
 			continue;
 		}
+
+// jmarshall
+		if (client.channel.GetRemoteAddress().type == NA_BOT)
+			continue;
+// jmarshall end
 
 		if ( client.lastPacketTime > serverTime ) {
 			client.lastPacketTime = serverTime;
@@ -1178,7 +1197,7 @@ bool idAsyncServer::SendSnapshotToClient( int clientNum ) {
 	msg.WriteShort( idMath::ClampShort( client.clientAheadTime ) );
 
 	// write the game snapshot
-	game->ServerWriteSnapshot( clientNum, client.snapshotSequence, msg, &clientInPVS[0], MAX_ASYNC_CLIENTS, 0 ); // jmarshall: eval
+	game->ServerWriteSnapshot( clientNum, client.snapshotSequence, msg, clientInPVS, MAX_ASYNC_CLIENTS, 0 );
 
 	// write the latest user commands from the other clients in the PVS to the snapshot
 	for ( last = NULL, i = 0; i < MAX_ASYNC_CLIENTS; i++ ) {
@@ -1283,7 +1302,7 @@ void idAsyncServer::ProcessUnreliableClientMessage( int clientNum, const idBitMs
 		SendEnterGameToClient( clientNum );
 
 		// get the client running in the game
-		game->ServerClientBegin( clientNum );
+		game->ServerClientBegin( clientNum, false );
 
 		// write any reliable messages to initialize the client game state
 		game->ServerWriteInitialReliableMessages( clientNum );
@@ -1777,7 +1796,7 @@ void idAsyncServer::ProcessConnectMessage( const netadr_t from, const idBitMsg &
 	// but meanwhile, the max players may have been reached
 	msg.ReadString( password, sizeof( password ) );
 	char reason[MAX_STRING_CHARS];
-	allowReply_t reply = game->ServerAllowClient(clientId, numClients, Sys_NetAdrToString( from ), guid, password, NULL, reason ); // jmarshall: added clientid
+	allowReply_t reply = game->ServerAllowClient(clientId, numClients, Sys_NetAdrToString( from ), guid, password, password, reason );
 	if ( reply != ALLOW_YES ) {
 		common->DPrintf( "game denied connection for %s\n", Sys_NetAdrToString( from ) );
 
@@ -2294,7 +2313,7 @@ void idAsyncServer::SendReliableGameMessageExcluding( int clientNum, const idBit
 	idBitMsg	outMsg;
 	byte		msgBuf[MAX_MESSAGE_SIZE];
 
-	assert( clientNum >= 0 && clientNum < MAX_ASYNC_CLIENTS );
+	//assert( clientNum >= 0 && clientNum < MAX_ASYNC_CLIENTS );
 
 	outMsg.Init( msgBuf, sizeof( msgBuf ) );
 	outMsg.WriteByte( SERVER_RELIABLE_MESSAGE_GAME );
@@ -2463,7 +2482,7 @@ void idAsyncServer::RunFrame( void ) {
 		DuplicateUsercmds( gameFrame, gameTime );
 
 		// advance game
-		gameReturn_t ret = game->RunFrame( userCmds[gameFrame & ( MAX_USERCMD_BACKUP - 1 ) ], 0, 0, 0 ); // jmarshall server frame.
+		gameReturn_t ret = game->RunFrame( userCmds[gameFrame & ( MAX_USERCMD_BACKUP - 1 ) ], 0, true, gameFrame );
 
 		idAsyncNetwork::ExecuteSessionCommand( ret.sessionCommand );
 
@@ -2823,3 +2842,82 @@ void idAsyncServer::ProcessDownloadRequestMessage( const netadr_t from, const id
 		serverPort.SendPacket( from, outMsg.GetData(), outMsg.GetSize() );
 	}
 }
+
+// jmarshall
+/*
+===============
+idAsyncServer::ServerSetBotUserCommand
+===============
+*/
+int idAsyncServer::ServerSetBotUserCommand(int clientNum, int frameNum, const usercmd_t& cmd) {
+	usercmd_t realcmd;
+
+	// Ensure this client is a bot.
+	if (clients[clientNum].channel.GetRemoteAddress().type != NA_BOT)
+		return -1;
+
+	realcmd = cmd;
+	realcmd.gameTime = gameFrame;
+	realcmd.duplicateCount = gameTime;
+
+	int index = gameFrame & (MAX_USERCMD_BACKUP - 1);
+	userCmds[index][clientNum] = realcmd;
+
+	return 1;
+}
+
+/*
+===============
+idAsyncServer::AllocOpenClientSlotForAI
+===============
+*/
+int idAsyncServer::AllocOpenClientSlotForAI(int maxPlayersOnServer) {
+	int numActivePlayers = 0;
+	int botClientId = -1;
+	idStr botName;
+	idDict spawnArgs;
+
+	// Check to see how many active players we have.
+	for (int i = 0; i < MAX_ASYNC_CLIENTS; i++)
+	{
+		if (clients[i].clientState >= SCS_PUREWAIT)
+		{
+			numActivePlayers++;
+		}
+	}
+
+	if (numActivePlayers >= maxPlayersOnServer) {
+		common->Warning("idAsyncServer::AllocateClientSlotForBot: No open slots for bot\n");
+		return -1;
+	}
+
+	// Find a free slot for the bot.
+	for (int i = 0; i < MAX_ASYNC_CLIENTS; i++)
+	{
+		if (clients[i].clientState == SCS_FREE)
+		{
+			botClientId = i;
+			break;
+		}
+	}
+
+	if (botClientId == -1)
+	{
+		common->Warning("idAsyncServer::AllocateClientSlotForBot: Invalid client number\n");
+		return -1;
+	}
+
+	game->GetRandomBotName(botClientId, botName);
+
+	idAsyncServer::InitLocalClient(botClientId, true);
+
+	// Set all the spawn args for the new bot.
+	spawnArgs.Set("ui_name", botName);
+
+	// Init the new client, and broadcast it to the rest of the players.
+	game->ServerClientBegin(botClientId, true);
+	idAsyncServer::SendUserInfoBroadcast(botClientId, spawnArgs, true);
+
+	return 1;
+}
+// jmarshall end

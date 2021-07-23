@@ -177,6 +177,11 @@ public:
 
 	void				PrintLocalServerInfo( void );
 
+// jmarshall
+	int					AllocOpenClientSlotForAI(int maxPlayersOnServer);
+	int 				ServerSetBotUserCommand(int clientNum, int frameNum, const usercmd_t& cmd);
+// jmarshall end
+
 private:
 	bool				active;						// true if server is active
 	int					realTime;					// absolute time
@@ -220,7 +225,9 @@ private:
 	void				DuplicateUsercmds( int frame, int time );
 	void				ClearClient( int clientNum );
 	void				InitClient( int clientNum, int clientId, int clientRate );
-	void				InitLocalClient( int clientNum );
+// jmarshall
+	void				InitLocalClient( int clientNum, bool isBot );
+// jmarshall end
 	void				BeginLocalClient( void );
 	void				LocalClientInput( void );
 	void				CheckClientTimeouts( void );

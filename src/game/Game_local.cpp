@@ -8391,6 +8391,15 @@ bool idGameLocal::IsTeamPowerups( void ) {
 	return ( gameType != GAME_ARENA_CTF );
 }
 
+/*
+===============
+idGameLocal::GetRandomBotName
+===============
+*/
+void idGameLocal::GetRandomBotName(int clientNum, idStr& name) {
+	name = "Quake4Bot";
+}
+
 // RAVEN BEGIN
 // mwhitlock: Dynamic memory consolidation
 #if defined(_RV_MEM_SYS_SUPPORT)

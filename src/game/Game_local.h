@@ -499,7 +499,7 @@ public:
 	virtual void			HandleMainMenuCommands( const char *menuCommand, idUserInterface *gui );
 	virtual allowReply_t	ServerAllowClient( int clientId, int numClients, const char *IP, const char *guid, const char *password, const char *privatePassword, char reason[MAX_STRING_CHARS] );
 	virtual void			ServerClientConnect( int clientNum, const char *guid );
-	virtual void			ServerClientBegin( int clientNum );
+	virtual void			ServerClientBegin( int clientNum, bool isBot);
 	virtual void			ServerClientDisconnect( int clientNum );
 	virtual void			ServerWriteInitialReliableMessages( int clientNum );
 	virtual allowReply_t	RepeaterAllowClient( int clientId, int numClients, const char *IP, const char *guid, bool repeater, const char *password, const char *privatePassword, char reason[MAX_STRING_CHARS] ) { idStr::Copynz( reason, "#str_107239" /* zinx - FIXME - not banned... */, sizeof(reason) ); return ALLOW_NO; };
@@ -507,6 +507,9 @@ public:
 	virtual void			RepeaterClientBegin( int clientNum ) {assert(false);};
 	virtual void			RepeaterClientDisconnect( int clientNum ) {assert(false);};
 	virtual void			RepeaterWriteInitialReliableMessages( int clientNum ) {assert(false);};
+
+	virtual void			GetRandomBotName(int clientNum, idStr& name);
+
 // RAVEN BEGIN
 // jnewquist: Use dword array to match pvs array so we don't have endianness problems.
 	virtual void			ServerWriteSnapshot( int clientNum, int sequence, idBitMsg &msg, dword *clientInPVS, int numPVSClients, int lastSnapshotFrame );

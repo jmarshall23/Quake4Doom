@@ -202,7 +202,9 @@ public:
 	virtual void				ServerClientConnect( int clientNum, const char *guid ) = 0;
 
 	// Spawns the player entity to be used by the client.
-	virtual void				ServerClientBegin( int clientNum ) = 0;
+	virtual void				ServerClientBegin( int clientNum, bool isBot ) = 0;
+
+	virtual void				GetRandomBotName(int clientNum, idStr& name) = 0;
 
 	// Disconnects a client and removes the player entity from the game.
 	virtual void				ServerClientDisconnect( int clientNum ) = 0;

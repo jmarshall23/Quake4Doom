@@ -398,7 +398,10 @@ typedef enum {
 	NA_BAD,					// an address lookup failed
 	NA_LOOPBACK,
 	NA_BROADCAST,
-	NA_IP
+	NA_IP,
+// jmarshall
+	NA_BOT
+// jmarshall end
 } netadrtype_t;
 
 typedef struct {

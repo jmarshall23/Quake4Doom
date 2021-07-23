@@ -190,7 +190,7 @@ void idGameLocal::ServerClientConnect( int clientNum, const char *guid ) {
 idGameLocal::ServerClientBegin
 ================
 */
-void idGameLocal::ServerClientBegin( int clientNum ) {
+void idGameLocal::ServerClientBegin( int clientNum, bool isBot ) {
 	idBitMsg	outMsg;
 	byte		msgBuf[MAX_GAME_MESSAGE_SIZE];
 

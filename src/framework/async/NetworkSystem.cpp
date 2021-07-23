@@ -30,6 +30,8 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 
 #include "NetworkSystem.h"
+#include "AsyncServer.h"
+#include "AsyncNetwork.h"
 
 idNetworkSystem		networkSystemLocal;
 idNetworkSystem *	networkSystem = &networkSystemLocal;
@@ -40,22 +42,22 @@ idNetworkSystem *	networkSystem = &networkSystemLocal;
 idNetworkSystem::ServerSendReliableMessage
 ==================
 */
-//void idNetworkSystem::ServerSendReliableMessage( int clientNum, const idBitMsg &msg ) {
-//	if ( idAsyncNetwork::server.IsActive() ) {
-//		idAsyncNetwork::server.SendReliableGameMessage( clientNum, msg );
-//	}
-//}
+void idNetworkSystem::ServerSendReliableMessage( int clientNum, const idBitMsg &msg ) {
+	if ( idAsyncNetwork::server.IsActive() ) {
+		idAsyncNetwork::server.SendReliableGameMessage( clientNum, msg );
+	}
+}
 
 /*
 ==================
 idNetworkSystem::ServerSendReliableMessageExcluding
 ==================
 */
-//void idNetworkSystem::ServerSendReliableMessageExcluding( int clientNum, const idBitMsg &msg ) {
-//	if ( idAsyncNetwork::server.IsActive() ) {
-//		idAsyncNetwork::server.SendReliableGameMessageExcluding( clientNum, msg );
-//	}
-//}
+void idNetworkSystem::ServerSendReliableMessageExcluding( int clientNum, const idBitMsg &msg ) {
+	if ( idAsyncNetwork::server.IsActive() ) {
+		idAsyncNetwork::server.SendReliableGameMessageExcluding( clientNum, msg );
+	}
+}
 
 /*
 ==================
@@ -74,12 +76,12 @@ int idNetworkSystem::ServerGetClientPing( int clientNum ) {
 idNetworkSystem::ServerGetClientPrediction
 ==================
 */
-//int idNetworkSystem::ServerGetClientPrediction( int clientNum ) {
-//	if ( idAsyncNetwork::server.IsActive() ) {
-//		return idAsyncNetwork::server.GetClientPrediction( clientNum );
-//	}
-//	return 0;
-//}
+int idNetworkSystem::ServerGetClientPrediction( int clientNum ) {
+	if ( idAsyncNetwork::server.IsActive() ) {
+		return idAsyncNetwork::server.GetClientPrediction( clientNum );
+	}
+	return 0;
+}
 
 /*
 ==================
@@ -212,4 +214,31 @@ float idNetworkSystem::ClientGetIncomingPacketLoss( void ) {
 		return idAsyncNetwork::client.GetIncomingPacketLoss();
 	}
 	return 0.0f;
+}
+
+/*
+==================
+idNetworkSystem::AllocateClientSlotForBot
+==================
+*/
+int idNetworkSystem::AllocateClientSlotForBot(int maxPlayersOnServer) {
+	return idAsyncNetwork::server.AllocOpenClientSlotForAI(maxPlayersOnServer);
+}
+
+/*
+==================
+idNetworkSystem::ServerSetBotUserCommand
+==================
+*/
+int idNetworkSystem::ServerSetBotUserCommand(int clientNum, int frameNum, const usercmd_t& cmd) {
+	return idAsyncNetwork::server.ServerSetBotUserCommand(clientNum, frameNum, cmd);
+}
+
+/*
+==================
+idNetworkSystem::ServerSetBotUserName
+==================
+*/
+int idNetworkSystem::ServerSetBotUserName(int clientNum, const char* playerName) {
+	return 0;
 }
