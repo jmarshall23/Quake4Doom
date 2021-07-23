@@ -247,7 +247,6 @@ void idAsyncServer::ExecuteMapChange( void ) {
 	idStr		mapName;
 	findFile_t	ff;
 	bool		addonReload = false;
-	char		bestGameType[ MAX_STRING_CHARS ];
 
 	assert( active );
 
@@ -258,7 +257,6 @@ void idAsyncServer::ExecuteMapChange( void ) {
 // jmarshall - best game type
 	//game->GetBestGameType( cvarSystem->GetCVarString("si_map"), cvarSystem->GetCVarString("si_gametype"), bestGameType );
 // jmarshall end
-	cvarSystem->SetCVarString("si_gametype", bestGameType );
 
 	// initialize map settings
 	cmdSystem->BufferCommandText( CMD_EXEC_NOW, "rescanSI" );

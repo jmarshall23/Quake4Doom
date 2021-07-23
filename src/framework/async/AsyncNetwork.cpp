@@ -301,7 +301,7 @@ void idAsyncNetwork::SpawnServer_f( const idCmdArgs &args ) {
 
 	// don't let a server spawn with singleplayer game type - it will crash
 	if ( idStr::Icmp( cvarSystem->GetCVarString( "si_gameType" ), "singleplayer" ) == 0 ) {
-		cvarSystem->SetCVarString( "si_gameType", "deathmatch" );
+		cvarSystem->SetCVarString( "si_gameType", "dm" );
 	}
 	com_asyncInput.SetBool( false );
 	// make sure the current system state is compatible with net_serverDedicated

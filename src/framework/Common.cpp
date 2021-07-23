@@ -2304,7 +2304,7 @@ void idCommonLocal::InitCommands( void ) {
 	cmdSystem->AddCommand( "execMachineSpec", Com_ExecMachineSpec_f, CMD_FL_SYSTEM, "execs the appropriate config files and sets cvars based on com_machineSpec" );
 
 	cmdSystem->AddCommand("dmap", Dmap_f, CMD_FL_TOOL, "compiles a map", idCmdSystem::ArgCompletion_MapName);
-	cmdSystem->AddCommand("runAAS", RunAAS_f, CMD_FL_TOOL, "compiles an AAS file for a map", idCmdSystem::ArgCompletion_MapName);
+	//cmdSystem->AddCommand("runAAS", RunAAS_f, CMD_FL_TOOL, "compiles an AAS file for a map", idCmdSystem::ArgCompletion_MapName);
 
 #ifdef ID_ALLOW_TOOLS
 	// compilers	

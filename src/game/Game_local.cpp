@@ -1274,7 +1274,6 @@ void idGameLocal::SetServerInfo( const idDict &_serverInfo ) {
 	}
 
 	serverInfo = _serverInfo;
-
 	if ( timeLimitChanged ) {
 		mpGame.ClearAnnouncerSounds( );
 		mpGame.ScheduleTimeAnnouncements( );
@@ -1909,10 +1908,10 @@ void idGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 	this->isListenServer = isServer && !cvarSystem->GetCVarBool( "net_serverDedicated" );
 // RAVEN END
 	this->isMultiplayer = isServer || isClient;
-
-	if ( this->isMultiplayer )
-		gameLocal.Error( "This mod is for singleplayer only" );
-
+// jmarshall
+	//if ( this->isMultiplayer )
+	//	gameLocal.Error( "This mod is for singleplayer only" );
+// jmarshall end
 	PACIFIER_UPDATE;
 
 //RAVEN BEGIN
@@ -7172,9 +7171,10 @@ idGameLocal::UpdateServerInfoFlags
 // RAVEN BEGIN
 // ddynerman: new gametype strings
 void idGameLocal::SetGameType( void ) {
+	idStr gameTypeName = serverInfo.GetString("si_gameType");
 	gameType = GAME_SP;
 
-	if ( idStr::Icmp( serverInfo.GetString( "si_gameType" ), "singleplayer" ) ) {
+	if ( gameTypeName != "singleplayer") {
 		mpGame.SetGameType();
 	}
 }

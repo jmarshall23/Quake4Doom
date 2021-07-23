@@ -55,9 +55,9 @@ idCVar si_dropWeaponsInBuyingModes(	"si_dropWeaponsInBuyingModes",	"0",		CVAR_GA
 // RITUAL END
 // RAVEN BEGIN
 // ddynerman: new gametype strings
-idCVar si_gameType(					"si_gameType",				si_gameTypeArgs[ 0 ],	CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "game type - singleplayer, DM, Tourney, Team DM, CTF, Arena CTF, or DeadZone", si_gameTypeArgs, idCmdSystem::ArgCompletion_String<si_gameTypeArgs> );
-idCVar si_map(						"si_map",					"mp/q4dm1",				CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "map to be played next on server", idCmdSystem::ArgCompletion_MapName );
-idCVar si_mapCycle(					"si_mapCycle",				"",						CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "map cycle list semicolon delimited" );
+idCVar si_gameType(					"si_gameType",				si_gameTypeArgs[ 0 ],	CVAR_GAME | CVAR_SERVERINFO, "game type - singleplayer, DM, Tourney, Team DM, CTF, Arena CTF, or DeadZone", si_gameTypeArgs, idCmdSystem::ArgCompletion_String<si_gameTypeArgs> );
+idCVar si_map(						"si_map",					"mp/q4dm1",				CVAR_GAME | CVAR_SERVERINFO, "map to be played next on server", idCmdSystem::ArgCompletion_MapName );
+idCVar si_mapCycle(					"si_mapCycle",				"",						CVAR_GAME | CVAR_SERVERINFO, "map cycle list semicolon delimited" );
 // bdube: raise player limit
 idCVar si_maxPlayers(				"si_maxPlayers",			"12",			CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE | CVAR_INTEGER, "max number of players allowed on the server", 1, 16 );
 // ddynerman: min players to start

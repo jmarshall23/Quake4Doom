@@ -36,7 +36,7 @@ idCVar gui_filter_idle( "gui_filter_idle", "0", CVAR_GUI | CVAR_INTEGER | CVAR_A
 idCVar gui_filter_game( "gui_filter_game", "0", CVAR_GUI | CVAR_INTEGER | CVAR_ARCHIVE, "Game filter" );
 
 const char* l_gameTypes[] = {
-	"Deathmatch",
+	"dm",
 	"Tourney",
 	"Team DM",
 	"Last Man",
