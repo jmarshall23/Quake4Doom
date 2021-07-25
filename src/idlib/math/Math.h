@@ -96,6 +96,18 @@ template<class T> ID_INLINE T	Cube( T x ) { return x * x * x; }
 class idVec2;
 class idVec3;
 
+/*
+================================================================================================
+
+	floating point sign bit tests
+
+================================================================================================
+*/
+
+#define IEEE_FLT_SIGNBITSET( a )	(reinterpret_cast<const unsigned int &>(a) >> IEEE_FLT_SIGN_BIT)
+#define IEEE_FLT_SIGNBITNOTSET( a )	((~reinterpret_cast<const unsigned int &>(a)) >> IEEE_FLT_SIGN_BIT)
+#define IEEE_FLT_ISNOTZERO( a )		(reinterpret_cast<const unsigned int &>(a) & ~(1u<<IEEE_FLT_SIGN_BIT))
+
 class idMath {
 public:
 

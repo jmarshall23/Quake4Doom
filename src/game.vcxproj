@@ -228,6 +228,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game\AFEntity.cpp" />
+    <ClCompile Include="game\ai\ObstacleAvoidance.cpp" />
     <ClCompile Include="game\BrittleFracture.cpp" />
     <ClCompile Include="game\Camera.cpp" />
     <ClCompile Include="game\client\ClientAFEntity.cpp" />
@@ -395,6 +396,7 @@
     <ClInclude Include="game\Actor.h" />
     <ClInclude Include="game\AF.h" />
     <ClInclude Include="game\AFEntity.h" />
+    <ClInclude Include="game\ai\ObstacleAvoidance.h" />
     <ClInclude Include="game\BrittleFracture.h" />
     <ClInclude Include="game\Camera.h" />
     <ClInclude Include="game\client\ClientAFEntity.h" />

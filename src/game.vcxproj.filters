@@ -522,6 +522,9 @@
     <ClCompile Include="game\Game_render.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="game\ai\ObstacleAvoidance.cpp">
+      <Filter>Game\AI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\Actor.h">
@@ -835,6 +838,9 @@
     </ClInclude>
     <ClInclude Include="game\mp\stats\StatWindow.h">
       <Filter>Game\MP\Stats</Filter>
+    </ClInclude>
+    <ClInclude Include="game\ai\ObstacleAvoidance.h">
+      <Filter>Game\AI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
