@@ -10,7 +10,7 @@
 rvmBot::state_SeekLTG
 =====================
 */
-stateResult_t rvmBot::state_SeekLTG(stateParms_t* parms)
+stateResult_t rvmBot::state_SeekLTG(const stateParms_t& parms)
 {
 	if( BotIsDead( &bs ) )
 	{

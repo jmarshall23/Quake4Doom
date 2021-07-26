@@ -10,7 +10,7 @@
 rvmBot::state_BattleFight
 =====================
 */
-stateResult_t rvmBot::state_BattleFight(stateParms_t* parms)
+stateResult_t rvmBot::state_BattleFight(const stateParms_t& parms)
 {
 	int areanum;
 	idVec3 target;

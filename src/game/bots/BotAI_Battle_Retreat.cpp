@@ -10,7 +10,7 @@
 rvmBot::state_Retreat
 =====================
 */
-stateResult_t rvmBot::state_Retreat(stateParms_t* parms)
+stateResult_t rvmBot::state_Retreat(const stateParms_t& parms)
 {
 	bot_goal_t goal;
 	idPlayer* entinfo;

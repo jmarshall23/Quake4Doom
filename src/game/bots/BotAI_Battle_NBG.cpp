@@ -10,7 +10,7 @@
 rvmBot::state_BattleNBG
 =====================
 */
-stateResult_t rvmBot::state_BattleNBG(stateParms_t* parms)
+stateResult_t rvmBot::state_BattleNBG(const stateParms_t& parms)
 {
 	int areanum;
 	bot_goal_t goal;

@@ -11,7 +11,7 @@
 rvmBot::state_Chase
 =====================
 */
-stateResult_t rvmBot::state_Chase(stateParms_t* parms)
+stateResult_t rvmBot::state_Chase(const stateParms_t& parms)
 {
 	bot_goal_t goal;
 	idVec3 target, dir;

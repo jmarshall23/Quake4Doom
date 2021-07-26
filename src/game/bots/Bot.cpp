@@ -15,6 +15,17 @@ idCVar bot_skill("bot_skill", "3", CVAR_INTEGER, "");
 CLASS_DECLARATION( idPlayer, rvmBot )
 END_CLASS
 
+CLASS_STATES_DECLARATION(rvmBot)
+	STATE("state_Chase", rvmBot::state_Chase)
+	STATE("state_BattleFight", rvmBot::state_BattleFight)
+	STATE("state_BattleNBG", rvmBot::state_BattleNBG)
+	STATE("state_Retreat", rvmBot::state_Retreat)
+	STATE("state_Respawn", rvmBot::state_Respawn)
+	STATE("state_SeekNBG", rvmBot::state_SeekNBG)
+	STATE("state_SeekLTG", rvmBot::state_SeekLTG)
+	STATE("state_Attacked", rvmBot::state_Attacked)
+END_CLASS_STATES
+
 /*
 ===================
 rvmBot::rvmBot

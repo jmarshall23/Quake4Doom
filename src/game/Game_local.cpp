@@ -8478,7 +8478,7 @@ idGameLocal::TravelTimeToGoal
 */
 int idGameLocal::TravelTimeToGoal( const idVec3& origin, const idVec3& goal )
 {
-	idAAS* aas = bot_aas;
+	idAAS* aas = GetBotAAS();
 
 	if( aas == NULL )
 	{

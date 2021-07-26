@@ -10,7 +10,7 @@
 rvmBot::state_SeekNBG
 =====================
 */
-stateResult_t rvmBot::state_SeekNBG(stateParms_t* parms)
+stateResult_t rvmBot::state_SeekNBG(const stateParms_t& parms)
 {
 	bot_goal_t goal;
 	idVec3 target, dir;

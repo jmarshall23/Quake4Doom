@@ -906,18 +906,21 @@ protected:
 	static int	WP_SHOTGUN;
 	static int	WP_PLASMAGUN;
 	static int	WP_ROCKET_LAUNCHER;
-private:
-	stateResult_t	state_Chase(stateParms_t* parms);
-	stateResult_t	state_BattleFight(stateParms_t* parms);
-	stateResult_t	state_BattleNBG(stateParms_t* parms);
-	stateResult_t	state_Retreat(stateParms_t* parms);
-	stateResult_t	state_Respawn(stateParms_t* parms);
-	stateResult_t	state_SeekNBG(stateParms_t* parms);
-	stateResult_t	state_SeekLTG(stateParms_t* parms);
-	stateResult_t	state_Attacked(stateParms_t* parms);
+public:
+	stateResult_t	state_Chase(const stateParms_t& parms);
+	stateResult_t	state_BattleFight(const stateParms_t& parms);
+	stateResult_t	state_BattleNBG(const stateParms_t& parms);
+	stateResult_t	state_Retreat(const stateParms_t& parms);
+	stateResult_t	state_Respawn(const stateParms_t& parms);
+	stateResult_t	state_SeekNBG(const stateParms_t& parms);
+	stateResult_t	state_SeekLTG(const stateParms_t& parms);
+	stateResult_t	state_Attacked(const stateParms_t& parms);
+
+	CLASS_STATES_PROTOTYPE(rvmBot);
 private:
 	idAAS*			aas;
 };
+
 
 extern idCVar bot_skill;
 

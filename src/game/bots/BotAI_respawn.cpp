@@ -10,16 +10,16 @@
 rvmBot::state_Respawn
 =====================
 */
-stateResult_t rvmBot::state_Respawn(stateParms_t* parms)
+stateResult_t rvmBot::state_Respawn(const stateParms_t& parms)
 {
-	if (parms->stage == 0)
+	if (parms.stage == 0)
 	{
 		bs.botinput.respawn = true;
-		parms->stage = 1;
+		((stateParms_t &)parms).stage = 1;
 		return SRESULT_WAIT;
 	}
 
-	if (parms->stage == 1)
+	if (parms.stage == 1)
 	{
 		if (spectating)
 		{

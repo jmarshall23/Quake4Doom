@@ -10,7 +10,7 @@
 rvmBot::state_Attacked
 ==================
 */
-stateResult_t rvmBot::state_Attacked(stateParms_t* parms) {
+stateResult_t rvmBot::state_Attacked(const stateParms_t& parms) {
 	// respawn if dead.
 	if (BotIsDead(&bs))
 	{
