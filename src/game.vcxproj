@@ -228,7 +228,25 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game\AFEntity.cpp" />
+    <ClCompile Include="game\ai\AASCallback_AvoidLocation.cpp" />
+    <ClCompile Include="game\ai\AASCallback_FindCoverArea.cpp" />
     <ClCompile Include="game\ai\ObstacleAvoidance.cpp" />
+    <ClCompile Include="game\bots\Bot.cpp" />
+    <ClCompile Include="game\bots\BotAI.cpp" />
+    <ClCompile Include="game\bots\BotAI_Battle_Attacked.cpp" />
+    <ClCompile Include="game\bots\BotAI_Battle_Chase.cpp" />
+    <ClCompile Include="game\bots\BotAI_Battle_Fight.cpp" />
+    <ClCompile Include="game\bots\BotAI_Battle_NBG.cpp" />
+    <ClCompile Include="game\bots\BotAI_Battle_Retreat.cpp" />
+    <ClCompile Include="game\bots\BotAI_respawn.cpp" />
+    <ClCompile Include="game\bots\BotAI_SeekLTG.cpp" />
+    <ClCompile Include="game\bots\BotAI_Seek_NBG.cpp" />
+    <ClCompile Include="game\bots\Bot_char.cpp" />
+    <ClCompile Include="game\bots\Bot_chat.cpp" />
+    <ClCompile Include="game\bots\Bot_goal.cpp" />
+    <ClCompile Include="game\bots\Bot_Input.cpp" />
+    <ClCompile Include="game\bots\Bot_weapons.cpp" />
+    <ClCompile Include="game\bots\Bot_weights.cpp" />
     <ClCompile Include="game\BrittleFracture.cpp" />
     <ClCompile Include="game\Camera.cpp" />
     <ClCompile Include="game\client\ClientAFEntity.cpp" />
@@ -396,7 +414,15 @@
     <ClInclude Include="game\Actor.h" />
     <ClInclude Include="game\AF.h" />
     <ClInclude Include="game\AFEntity.h" />
+    <ClInclude Include="game\ai\AASCallback_AvoidLocation.h" />
+    <ClInclude Include="game\ai\AASCallback_FindCoverArea.h" />
     <ClInclude Include="game\ai\ObstacleAvoidance.h" />
+    <ClInclude Include="game\bots\Bot.h" />
+    <ClInclude Include="game\bots\Bot_char.h" />
+    <ClInclude Include="game\bots\Bot_chat.h" />
+    <ClInclude Include="game\bots\Bot_goal.h" />
+    <ClInclude Include="game\bots\Bot_weapons.h" />
+    <ClInclude Include="game\bots\Bot_weights.h" />
     <ClInclude Include="game\BrittleFracture.h" />
     <ClInclude Include="game\Camera.h" />
     <ClInclude Include="game\client\ClientAFEntity.h" />

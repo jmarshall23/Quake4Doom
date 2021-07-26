@@ -239,6 +239,10 @@ public:
 	void					Init( void );
 	void					Shutdown( void );
 
+// jmarshall
+	int						PointContents(const idVec3 p);
+// jmarshall end
+
 	// clip versus the rest of the world
 // RAVEN BEGIN
 // nmckenzie: we have cases where both a guy and his target need to be ignored by a translation

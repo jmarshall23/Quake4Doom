@@ -37,6 +37,9 @@
     <Filter Include="Game\MP\Stats">
       <UniqueIdentifier>{b0331c0d-1cc1-41cd-ad58-29560053c0bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Bots">
+      <UniqueIdentifier>{da114a45-de0d-4203-90a4-ec3a40add988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game\Actor.cpp">
@@ -525,6 +528,60 @@
     <ClCompile Include="game\ai\ObstacleAvoidance.cpp">
       <Filter>Game\AI</Filter>
     </ClCompile>
+    <ClCompile Include="game\bots\Bot.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\Bot_char.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\Bot_chat.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\Bot_goal.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\Bot_Input.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\Bot_weapons.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\Bot_weights.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_Battle_Attacked.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_Battle_Chase.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_Battle_Fight.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_Battle_NBG.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_Battle_Retreat.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_respawn.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_Seek_NBG.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bots\BotAI_SeekLTG.cpp">
+      <Filter>Game\Bots</Filter>
+    </ClCompile>
+    <ClCompile Include="game\ai\AASCallback_FindCoverArea.cpp">
+      <Filter>Game\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="game\ai\AASCallback_AvoidLocation.cpp">
+      <Filter>Game\AI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\Actor.h">
@@ -840,6 +897,30 @@
       <Filter>Game\MP\Stats</Filter>
     </ClInclude>
     <ClInclude Include="game\ai\ObstacleAvoidance.h">
+      <Filter>Game\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bots\Bot.h">
+      <Filter>Game\Bots</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bots\Bot_char.h">
+      <Filter>Game\Bots</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bots\Bot_chat.h">
+      <Filter>Game\Bots</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bots\Bot_goal.h">
+      <Filter>Game\Bots</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bots\Bot_weapons.h">
+      <Filter>Game\Bots</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bots\Bot_weights.h">
+      <Filter>Game\Bots</Filter>
+    </ClInclude>
+    <ClInclude Include="game\ai\AASCallback_FindCoverArea.h">
+      <Filter>Game\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="game\ai\AASCallback_AvoidLocation.h">
       <Filter>Game\AI</Filter>
     </ClInclude>
   </ItemGroup>

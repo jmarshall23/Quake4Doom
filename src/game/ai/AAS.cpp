@@ -461,3 +461,18 @@ bool idAASCallback::TestPoint ( class idAAS *aas, const idVec3& pos, const float
 }
 
 // RAVEN END
+
+
+// jmarshall
+/*
+============
+idAASLocal::AdjustPositionAndGetArea
+============
+*/
+int idAASLocal::AdjustPositionAndGetArea(idVec3& origin)
+{
+	int area = PointReachableAreaNum(origin, DefaultSearchBounds(), AREA_REACHABLE_WALK);
+	PushPointIntoAreaNum(area, origin);
+	return area;
+}
+// jmarshall end

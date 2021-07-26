@@ -80,6 +80,9 @@ public:
 	int				SkipUntilString( const char *string );
 					// skip the rest of the current line
 	int				SkipRestOfLine( void );
+// jmarshall
+	int				Parse1DMatrixLegacy(int x, float* m);
+// jmarshall end
 					// skip the braced section
 	int				SkipBracedSection( bool parseFirstBrace = true );
 					// parse a braced section into a string

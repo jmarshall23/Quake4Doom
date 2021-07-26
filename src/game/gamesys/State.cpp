@@ -295,6 +295,10 @@ stateResult_t rvStateThread::Execute ( void ) {
 				return SRESULT_ERROR;				
 		}
 
+		if (lastResult == SRESULT_DONE) {
+			owner->StateThreadChanged();
+		}
+
 		// Dont remove the node if it was interrupted or cleared in the last process
 		if ( !fl.stateCleared && !fl.stateInterrupted ) {
 			if( lastResult >= SRESULT_SETDELAY ) {

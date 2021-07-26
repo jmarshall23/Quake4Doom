@@ -221,6 +221,29 @@ public:
 	static unsigned long		Ftol(float f);			// float to long conversion
 	static byte					Ftob( float f );			// float to byte conversion, the result is clamped to the range [0-255]
 
+// jmarshall
+	static float				AngleMod(float a);
+	static idVec3				ReflectVector(idVec3 vector, idVec3 normal);
+	static idVec4				CreateVector(float x, float y, float z, float w);
+	static idVec3				CreateVector(float x, float y, float z);
+	static idVec3				CrossProduct(const idVec3& a, const idVec3& b);
+	static float				DistanceSquared(idVec3 p1, idVec3 p2);
+	static float				Distance(idVec3 p1, idVec3 p2);
+
+	static int					Rand()
+	{
+		return rand();
+	}
+	static float				FRand()
+	{
+		return Rand() / (float)RAND_MAX;
+	}
+	static float				FRandRange(float min, float max)
+	{
+		return min + (max - min) * FRand();
+	}
+// jmarshall end
+
 	static signed char			ClampChar( int i );
 // RAVEN BEGIN
 	static byte					ClampByte( int i );
@@ -1022,6 +1045,17 @@ ID_INLINE int idMath::FloatHash( const float *array, const int numFloats ) {
 
 ID_INLINE unsigned long idMath::Ftol(float f) {
 	return (unsigned long)f;
+}
+
+/*
+========================
+idMath::Ftob
+========================
+*/
+ID_INLINE float idMath::AngleMod(float a)
+{
+	a = (360.0 / 65536) * ((int)(a * (65536 / 360.0)) & 65535);
+	return a;
 }
 
 // RAVEN BEGIN

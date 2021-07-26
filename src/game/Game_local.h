@@ -46,6 +46,9 @@ class idWorldspawn;
 class idTestModel;
 class idAAS;
 class idAI;
+// jmarshall
+class rvmBot;
+// jmarshall end
 // RAVEN BEGIN
 // bdube: not using id effects
 //class idSmokeParticles;
@@ -486,7 +489,7 @@ public:
 // RAVEN END
 	virtual void			MapShutdown( void );
 	virtual void			CacheDictionaryMedia( const idDict *dict );
-	virtual void			SpawnPlayer( int clientNum );
+	virtual void			SpawnPlayer( int clientNum, bool isBot, const char* botName);
 // RAVEN BEGIN
 	virtual gameReturn_t	RunFrame( const usercmd_t *clientCmds, int activeEditors, bool lastCatchupFrame, int serverGameFrame );
 	virtual	void			MenuFrame( void );
@@ -499,16 +502,47 @@ public:
 	virtual void			HandleMainMenuCommands( const char *menuCommand, idUserInterface *gui );
 	virtual allowReply_t	ServerAllowClient( int clientId, int numClients, const char *IP, const char *guid, const char *password, const char *privatePassword, char reason[MAX_STRING_CHARS] );
 	virtual void			ServerClientConnect( int clientNum, const char *guid );
-	virtual void			ServerClientBegin( int clientNum, bool isBot);
+	virtual void			ServerClientBegin( int clientNum, bool isBot, const char* botName);
 	virtual void			ServerClientDisconnect( int clientNum );
 	virtual void			ServerWriteInitialReliableMessages( int clientNum );
 	virtual allowReply_t	RepeaterAllowClient( int clientId, int numClients, const char *IP, const char *guid, bool repeater, const char *password, const char *privatePassword, char reason[MAX_STRING_CHARS] ) { idStr::Copynz( reason, "#str_107239" /* zinx - FIXME - not banned... */, sizeof(reason) ); return ALLOW_NO; };
 	virtual void			RepeaterClientConnect( int clientNum ) {assert(false);};
 	virtual void			RepeaterClientBegin( int clientNum ) {assert(false);};
 	virtual void			RepeaterClientDisconnect( int clientNum ) {assert(false);};
-	virtual void			RepeaterWriteInitialReliableMessages( int clientNum ) {assert(false);};
+	virtual void			RepeaterWriteInitialReliableMessages( int clientNum ) {assert(false);};	
 
+// jmarshall
 	virtual void			GetRandomBotName(int clientNum, idStr& name);
+	virtual int				TravelTimeToGoal(const idVec3& origin, const idVec3& goal);
+	virtual int				GetBotItemEntry(const char* name);
+
+	void					AddBot(const char* botName);
+
+	idAAS* GetBotAAS(void)
+	{
+		return bot_aas;
+	}
+
+	void					RegisterBot(rvmBot* bot)
+	{
+		registeredBots.AddUnique(bot);
+	}
+	void					UnRegisterBot(rvmBot* bot)
+	{
+		registeredBots.Remove(bot);
+	}
+
+	float					SysScriptTime(void) const
+	{
+		return MS2SEC(realClientTime);
+	}
+	float					SysScriptFrameTime(void) const
+	{
+		return MS2SEC(time - previousTime);
+	}
+
+	void	Trace(trace_t& results, const idVec3& start, const idVec3& end, int contentMask, int passEntity);
+// jmarshall end
 
 // RAVEN BEGIN
 // jnewquist: Use dword array to match pvs array so we don't have endianness problems.
@@ -925,13 +959,12 @@ public:
 	void					ServerSetMinSpawnIndex( void );
 	void					ServerSetEntityIndexWatermark( int instanceID );
 
-private:
 // RAVEN BEGIN
 // ddynerman: multiple instance for MP
 	idList<idClip*>			clip;					// collision detection
 	idList<rvInstance*>		instances;
 // RAVEN END
-
+private:
 	// keep watermarks on the high entity index
 	// server transmits this to clients so they use the right entity layout
 	idList<int>				instancesEntityIndexWatermarks;
@@ -1131,6 +1164,14 @@ private:
 	bool					banListLoaded;
 	bool					banListChanged;
 // RAVEN END
+
+// jmarshall
+	const idDeclEntityDef* botItemTable;;
+
+	idList<rvmBot*> registeredBots;
+
+	idAAS* bot_aas;
+// jmarshall end
 };
 
 //============================================================================
@@ -1434,5 +1475,7 @@ ID_INLINE idEntityPtr<type>::operator type * ( void ) const {
 // RAVEN END
 
 #include "../idlib/containers/ListGame.h"
+
+#include "bots/bot.h"
 
 #endif	/* !__GAME_LOCAL_H__ */

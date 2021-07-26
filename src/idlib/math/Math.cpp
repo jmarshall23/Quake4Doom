@@ -271,3 +271,69 @@ float idMath::ScaleToDb( float scale ) {
 }
 
 // RAVEN END
+
+
+// jmarshall
+/*
+===================
+idMath::Distance
+===================
+*/
+float idMath::Distance(idVec3 p1, idVec3 p2)
+{
+	idVec3 v = p2 - p1;
+	return v.Length();
+}
+
+/*
+===================
+idMath::DistanceSquared
+===================
+*/
+float idMath::DistanceSquared(idVec3 p1, idVec3 p2)
+{
+	idVec3 v = p2 - p1;
+	return v.LengthSqr();
+}
+
+/*
+========================
+idMath::CrossProduct
+========================
+*/
+idVec3 idMath::CrossProduct(const idVec3& a, const idVec3& b)
+{
+	return a.Cross(b);
+}
+
+/*
+========================
+idMath::CreateVector
+========================
+*/
+idVec3 idMath::CreateVector(float x, float y, float z)
+{
+	return idVec3(x, y, z);
+}
+
+/*
+========================
+idMath::CreateVector
+========================
+*/
+idVec4 idMath::CreateVector(float x, float y, float z, float w)
+{
+	return idVec4(x, y, z, w);
+}
+
+/*
+========================
+idMath::ReflectVector
+========================
+*/
+idVec3 idMath::ReflectVector(idVec3 vector, idVec3 normal)
+{
+	float n = 2 * DotProduct(vector, normal);
+	return vector - normal * n;
+}
+// jmarshall end

@@ -215,6 +215,16 @@ public:
 	void					BecomeInactive( int flags );
 	void					UpdatePVSAreas( const idVec3 &pos );
 
+// jmarshall
+	idVec3					GetOrigin(void);
+	float					GetFloat(const char* key);
+	const char*				GetKey(const char* key);
+	int						GetInt(const char* key);
+	bool					GetBool(const char* key);
+
+	virtual void			InflictedDamageEvent(idEntity* target) { }
+// jmarshall end
+
 // RAVEN BEGIN
 // abahr:
 	bool					IsActive( int flags ) const { return (flags & thinkFlags) > 0; }

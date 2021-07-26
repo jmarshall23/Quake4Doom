@@ -6793,3 +6793,60 @@ void idAnimatedEntity::Event_CollapseJoints ( const char* jointnames, const char
 }
 // RAVEN END
 
+
+/*
+==============
+idEntity::GetKey
+==============
+*/
+// jmarshall
+const char* idEntity::GetKey(const char* key)
+{
+	const char* value;
+
+	spawnArgs.GetString(key, "", &value);
+
+	return value;
+}
+
+/*
+==============
+idEntity::GetFloat
+==============
+*/
+
+float idEntity::GetFloat(const char* key)
+{
+	return spawnArgs.GetFloat(key, "0");
+}
+
+/*
+==============
+idEntity::GetInt
+==============
+*/
+int idEntity::GetInt(const char* key)
+{
+	return spawnArgs.GetInt(key, "0");
+}
+
+/*
+==============
+idEntity::GetBool
+==============
+*/
+bool idEntity::GetBool(const char* key)
+{
+	return spawnArgs.GetBool(key, "0");
+}
+
+/*
+================
+idEntity::GetOrigin
+================
+*/
+idVec3 idEntity::GetOrigin(void)
+{
+	return GetLocalCoordinates(GetPhysics()->GetOrigin());
+}
+// jmarshall end

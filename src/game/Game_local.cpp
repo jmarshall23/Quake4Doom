@@ -551,6 +551,14 @@ void idGameLocal::Init( void ) {
 	InitGameRenderSystem();
 // jmarshall end
 
+// jmarshall
+	// init all the bot systems.
+	botCharacterStatsManager.Init();
+	botFuzzyWeightManager.Init();
+	botWeaponInfoManager.Init();
+	botGoalManager.BotSetupGoalAI();
+// jmarshall end
+
 	Printf( "...%d aas types\n", aasList.Num() );
 	Printf( "game initialized.\n" );
 	Printf( "---------------------------------------------\n" );
@@ -1978,6 +1986,14 @@ void idGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 	animationLib->FlushUnusedAnims();
 // RAVEN END
 
+// jmarshall
+	if (gameLocal.IsMultiplayer() && gameLocal.isServer)
+	{
+		botGoalManager.InitLevelItems();
+	}
+// jmarshall end
+
+
 	gamestate = GAMESTATE_ACTIVE;
 
 	Printf( "---------------------------------------------\n" );
@@ -2910,7 +2926,9 @@ void idGameLocal::InitScriptForMap( void ) {
 idGameLocal::SpawnPlayer
 ============
 */
-void idGameLocal::SpawnPlayer( int clientNum ) {
+// jmarshall - bot support
+void idGameLocal::SpawnPlayer(int clientNum, bool isBot, const char* botName) {
+// jmarshall end
 
 	TIME_THIS_SCOPE( __FUNCLINE__);
 
@@ -2928,7 +2946,31 @@ void idGameLocal::SpawnPlayer( int clientNum ) {
 	args.Set( "name", va( "player%d", clientNum + 1 ) );
 // RAVEN BEGIN
 // bdube: changed marine class
-	args.Set( "classname", idPlayer::GetSpawnClassname() );
+// jmarshall: bot support
+	if (gameLocal.IsMultiplayer())
+	{
+// jmarshall
+		if (isBot)
+		{
+			args.Set("classname", va("%s_bot", idPlayer::GetSpawnClassname()));
+			args.Set("botname", botName);
+		}
+		else
+		{
+			args.Set("classname", idPlayer::GetSpawnClassname());
+		}
+// jmarshall end
+	}
+	else
+	{
+// jmarshall - bot support
+		if (isBot)
+		{
+			gameLocal.Error("Bots not supported in singleplayer games!\n");
+		}
+// jmarshall end
+		args.Set("classname", idPlayer::GetSpawnClassname());
+	}
 // RAVEN END
 	
 	// This takes a really long time.
@@ -8398,6 +8440,100 @@ idGameLocal::GetRandomBotName
 */
 void idGameLocal::GetRandomBotName(int clientNum, idStr& name) {
 	name = "Quake4Bot";
+}
+
+/*
+===============
+idGameLocal::Trace
+===============
+*/
+void idGameLocal::Trace(trace_t& results, const idVec3& start, const idVec3& end, int contentMask, int passEntity)
+{
+	idMat3 axis;
+	axis.Identity();
+
+	if (passEntity == -1)
+	{
+		clip[0]->Translation(results, start, end, NULL, axis, CONTENTS_SOLID, NULL);
+	}
+	else
+	{
+		clip[0]->Translation(results, start, end, NULL, axis, CONTENTS_SOLID, entities[passEntity]);
+	}
+}
+
+
+/*
+================
+idGameLocal::TravelTimeToGoal
+================
+*/
+int idGameLocal::TravelTimeToGoal( const idVec3& origin, const idVec3& goal )
+{
+	idAAS* aas = bot_aas;
+
+	if( aas == NULL )
+	{
+		gameLocal.Error( "idGameLocal::TraveTimeToGoal: No AAS loaded...\n" );
+		return NULL;
+	}
+	//int originArea = aas->PointAreaNum(origin);
+	//idVec3 _goal = goal;
+	//int goalArea = aas->AdjustPositionAndGetArea(_goal);
+	//return aas->TravelTimeToGoalArea(originArea, origin, goalArea, TFL_WALK);
+
+	idVec3 org = origin;
+	int curAreaNum = aas->AdjustPositionAndGetArea( org );
+	int goalArea = aas->PointAreaNum( goal );
+	int travelTime;
+	idReachability* reach;
+	if( !aas->RouteToGoalArea( curAreaNum, org, goalArea, TFL_WALK | TFL_AIR, travelTime, &reach ) )
+	{
+		return NULL;
+	}
+
+	//int goalArea = aas->PointAreaNum(goal);
+	//aas->ShowWalkPath(origin, goalArea, goal);
+
+	return travelTime;
+}
+
+/*
+===============
+idGameLocal::GetBotItemEntry
+===============
+*/
+int idGameLocal::GetBotItemEntry( const char* name )
+{
+	const idKeyValue* keyvalue = botItemTable->dict.FindKey( name );
+	if( !keyvalue )
+	{
+		gameLocal.Warning( "GetBotItemModelIndex: Doesn't have key %s\n", name );
+		return 9;
+	}
+
+	return botItemTable->dict.GetInt( name );
+}
+
+/*
+======================
+idGameLocal::AddBot
+======================
+*/
+void idGameLocal::AddBot(const char *botName) {
+	int clientNum;
+
+	if (aasList.Num() == 0) {
+		common->Warning("idGameLocal::AddBot: No AAS file loaded for map\n");
+		return;
+	}
+
+	clientNum = networkSystem->AllocateClientSlotForBot(botName,  8);
+	if (clientNum == -1) {
+		return;
+	}
+
+	//	idPlayer* newPlayer = gameLocal.GetClient(clientNum);
 }
 
 // RAVEN BEGIN

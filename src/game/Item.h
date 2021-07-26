@@ -44,6 +44,13 @@ public:
 	virtual bool			Collide( const trace_t &collision, const idVec3 &velocity );
 // RAVEN END
 	
+// jmarshall
+	int						GetModelIndex() const
+	{
+		return modelindex;
+	}
+// jmarshall end
+
 	enum {
 		EVENT_PICKUP = idEntity::EVENT_MAXEVENTS,
 		EVENT_RESPAWNFX,
@@ -122,6 +129,10 @@ private: // FIXME: Temp hack while Eric gets back to me about why GameState.cpp 
 // abahr
 	void					Event_SetGravity();
 // RAVEN END
+
+// jmarshall
+	int						modelindex;
+// jmarshall end
 };
 
 /*

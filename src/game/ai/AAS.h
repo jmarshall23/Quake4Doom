@@ -158,6 +158,14 @@ public:
 	virtual void				ShowAreas( const idVec3 &origin, bool ShowProblemAreas = false ) const = 0;
 	virtual bool				IsValid( void ) const = 0;
 // RAVEN END
+
+// jmarshall
+	virtual int					AdjustPositionAndGetArea(idVec3& origin) = 0;
+	virtual void				ShowArea(const idVec3& origin) const = 0;
+
+	virtual idAASFile*			GetAASFile(void) = 0;
+	virtual const idBounds& DefaultSearchBounds(void) const = 0;
+// jmarshall end
 };
 
 #endif /* !__AAS_H__ */

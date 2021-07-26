@@ -1186,6 +1186,24 @@ void idActor::SetupBody( void ) {
 
 /*
 =====================
+idActor::PointVisible
+=====================
+*/
+bool idActor::PointVisible(const idVec3& point) const
+{
+	trace_t results;
+	idVec3 start, end;
+
+	start = GetEyePosition();
+	end = point;
+	end[2] += 1.0f;
+
+	gameLocal.clip[0]->TracePoint(results, start, end, MASK_OPAQUE, this);
+	return (results.fraction >= 1.0f);
+}
+
+/*
+=====================
 idActor::CheckBlink
 =====================
 */

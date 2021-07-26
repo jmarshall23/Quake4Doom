@@ -164,7 +164,7 @@ public:
 	virtual void				CacheDictionaryMedia( const idDict *dict ) = 0;
 
 	// Spawns the player entity to be used by the client.
-	virtual void				SpawnPlayer( int clientNum ) = 0;
+	virtual void				SpawnPlayer( int clientNum, bool isBot, const char* botName) = 0;
 
 // RAVEN BEGIN
 	// Runs a game frame, may return a session command for level changing, etc
@@ -202,7 +202,7 @@ public:
 	virtual void				ServerClientConnect( int clientNum, const char *guid ) = 0;
 
 	// Spawns the player entity to be used by the client.
-	virtual void				ServerClientBegin( int clientNum, bool isBot ) = 0;
+	virtual void				ServerClientBegin( int clientNum, bool isBot, const char *botName ) = 0;
 
 	virtual void				GetRandomBotName(int clientNum, idStr& name) = 0;
 

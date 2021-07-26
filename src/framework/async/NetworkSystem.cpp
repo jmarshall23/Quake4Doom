@@ -221,8 +221,8 @@ float idNetworkSystem::ClientGetIncomingPacketLoss( void ) {
 idNetworkSystem::AllocateClientSlotForBot
 ==================
 */
-int idNetworkSystem::AllocateClientSlotForBot(int maxPlayersOnServer) {
-	return idAsyncNetwork::server.AllocOpenClientSlotForAI(maxPlayersOnServer);
+int idNetworkSystem::AllocateClientSlotForBot(const char* botName, int maxPlayersOnServer) {
+	return idAsyncNetwork::server.AllocOpenClientSlotForAI(botName, maxPlayersOnServer);
 }
 
 /*

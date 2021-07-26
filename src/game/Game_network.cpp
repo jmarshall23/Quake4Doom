@@ -190,12 +190,12 @@ void idGameLocal::ServerClientConnect( int clientNum, const char *guid ) {
 idGameLocal::ServerClientBegin
 ================
 */
-void idGameLocal::ServerClientBegin( int clientNum, bool isBot ) {
+void idGameLocal::ServerClientBegin( int clientNum, bool isBot, const char* botName) {
 	idBitMsg	outMsg;
 	byte		msgBuf[MAX_GAME_MESSAGE_SIZE];
 
 	// spawn the player
-	SpawnPlayer( clientNum );
+	SpawnPlayer( clientNum, isBot, botName);
 	if ( clientNum == localClientNum ) {
 		mpGame.EnterGame( clientNum );
 	}
@@ -1781,7 +1781,7 @@ void idGameLocal::ClientProcessReliableMessage( int clientNum, const idBitMsg &m
 			int client = msg.ReadByte();
 			int spawnId = msg.ReadLong();
 			if ( !entities[ client ] ) {
-				SpawnPlayer( client );
+				SpawnPlayer( client, false, NULL);
 				entities[ client ]->FreeModelDef();
 			}
 			// fix up the spawnId to match what the server says
@@ -3325,7 +3325,7 @@ void idGameLocal::ReadNetworkInfo( int gameTime, idFile* file, int clientNum ) {
 		int icl, spawnId;
 		file->ReadInt( icl );
 		file->ReadInt( spawnId );
-		SpawnPlayer( icl );
+		SpawnPlayer( icl, false, NULL);
 		spawnIds[ icl ] = spawnId;
 		numClients = icl + 1;
 	}

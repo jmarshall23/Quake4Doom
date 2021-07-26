@@ -465,5 +465,21 @@ ID_INLINE int idLexer::GetFlags( void ) {
 	return idLexer::flags;
 }
 
+// jmarshall
+class rvmScopedLexerBaseFolder
+{
+public:
+	rvmScopedLexerBaseFolder(const char* baseFolder)
+	{
+		idLexer::SetBaseFolder(baseFolder);
+	}
+
+	~rvmScopedLexerBaseFolder()
+	{
+		idLexer::SetBaseFolder("");
+	}
+};
+// jmarshall end
+
 #endif /* !__LEXER_H__ */
 

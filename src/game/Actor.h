@@ -145,6 +145,8 @@ public:
 
 	virtual void			CheckBlink( void );
 
+	bool					PointVisible(const idVec3& point) const;
+
 	virtual bool			GetPhysicsToVisualTransform( idVec3 &origin, idMat3 &axis );
 	virtual bool			GetPhysicsToSoundTransform( idVec3 &origin, idMat3 &axis );
 

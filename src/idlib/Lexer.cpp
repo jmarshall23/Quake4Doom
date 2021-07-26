@@ -3965,3 +3965,13 @@ void Lexer::ParseNumericStructArray( int numStructElements, int tokenSubTypeStru
 
 char idLexer::baseFolder[256];
 // RAVEN END
+
+/*
+================
+idLexer::SetBaseFolder
+================
+*/
+void idLexer::SetBaseFolder(const char* path)
+{
+	idStr::Copynz(baseFolder, path, sizeof(baseFolder));
+}

@@ -91,7 +91,7 @@ public:
 	virtual					~idNetworkSystem( void ) {}
 
 // jmarshall
-	virtual int				AllocateClientSlotForBot(int maxPlayersOnServer);
+	virtual int				AllocateClientSlotForBot(const char *botName, int maxPlayersOnServer);
 	virtual int				ServerSetBotUserCommand(int clientNum, int frameNum, const usercmd_t& cmd);
 	virtual int				ServerSetBotUserName(int clientNum, const char* playerName);
 // jmarshall end

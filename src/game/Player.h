@@ -450,7 +450,7 @@ public:
 	void					SetupWeaponEntity( void );
 	bool					SelectSpawnPoint( idVec3 &origin, idAngles &angles );
 	void					SpawnFromSpawnSpot( void );
-	void					SpawnToPoint( const idVec3	&spawn_origin, const idAngles &spawn_angles );
+	virtual void			SpawnToPoint( const idVec3	&spawn_origin, const idAngles &spawn_angles );
 	void					SetClipModel( bool forceSpectatorBBox = false );	// spectator mode uses a different bbox size
 
 	void					SavePersistantInfo( void );
@@ -464,7 +464,10 @@ public:
 	bool					BalanceTeam( void );
 // RAVEN END
 	void					CacheWeapons( void );
-
+// jmarshall
+	bool					IsShooting(void);
+	float					GetViewHeight(void);
+// jmarshall end
  	bool					HandleESC( void );
    	void					EnterCinematic( void );
    	void					ExitCinematic( void );
@@ -544,6 +547,11 @@ public:
 	void					DiscoverSecretArea			( const char *description);
 	
 	void					StartBossBattle				( idEntity* ent );
+
+// jmarshall
+	const char*				GetNetName(void);
+	virtual bool			IsBot(void) { return false; }
+// jmarshall end
 
 	// Powerups
 	bool					GivePowerUp					( int powerup, int time, bool team = false );

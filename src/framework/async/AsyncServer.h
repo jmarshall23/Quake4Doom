@@ -178,7 +178,7 @@ public:
 	void				PrintLocalServerInfo( void );
 
 // jmarshall
-	int					AllocOpenClientSlotForAI(int maxPlayersOnServer);
+	int					AllocOpenClientSlotForAI(const char* botName, int maxPlayersOnServer);
 	int 				ServerSetBotUserCommand(int clientNum, int frameNum, const usercmd_t& cmd);
 // jmarshall end
 

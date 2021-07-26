@@ -1656,7 +1656,7 @@ void idSessionLocal::ExecuteMapChange( bool noFadeWipe ) {
 	if ( !idAsyncNetwork::IsActive() && !loadingSaveGame ) {
 		// spawn players
 		for ( i = 0; i < numClients; i++ ) {
-			game->SpawnPlayer( i );
+			game->SpawnPlayer( i, false, NULL );
 		}
 	}
 

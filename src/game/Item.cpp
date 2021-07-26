@@ -425,6 +425,10 @@ void idItem::Spawn( void ) {
 	RV_PUSH_HEAP_MEM(this);
 // RAVEN END
 
+// jmarshall
+	modelindex = gameLocal.GetBotItemEntry(spawnArgs.GetString("modelindex"));
+// jmarshall end
+
 	physicsObj.SetClipModel( new idClipModel( GetPhysics()->GetClipModel() ), 1.0f );
 
 // RAVEN BEGIN

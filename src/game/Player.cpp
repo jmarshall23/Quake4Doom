@@ -10197,6 +10197,14 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 
  	// inform the attacker that they hit someone
  	attacker->DamageFeedback( this, inflictor, damage );
+// jmarshall
+	if (gameLocal.IsMultiplayer() && gameLocal.isServer) {
+		if (attacker->IsType(rvmBot::GetClassType()))
+		{
+			attacker->InflictedDamageEvent(this);
+		}
+	}
+// jmarshall end
 	
 //RAVEN BEGIN
 //asalmon: Xenon needs stats in singleplayer
@@ -14084,3 +14092,49 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+
+// jmarshall
+const char* idPlayer::GetNetName(void) {
+	if (!gameLocal.IsMultiplayer()) {
+		gameLocal.Error("Can't get net name in singleplayer!");
+		return NULL;
+	}
+
+	return gameLocal.userInfo[entityNumber].GetString("ui_name");
+}
+
+/*
+===============
+idPlayer::IsShooting
+==============
+*/
+bool idPlayer::IsShooting(void)
+{
+	return pfl.attackHeld;
+}
+
+/*
+===============
+idPlayer::GetViewHeight
+==============
+*/
+float idPlayer::GetViewHeight(void) {
+	float newEyeOffset = 0.0f;
+	if (spectating) {
+		newEyeOffset = 0.0f;
+	}
+	else if (health <= 0) {
+		newEyeOffset = pm_deadviewheight.GetFloat();
+	}
+	else if (physicsObj.IsCrouching()) {
+		newEyeOffset = pm_crouchviewheight.GetFloat();
+	}
+	else if (IsInVehicle()) {
+		newEyeOffset = 0.0f;
+	}
+	else {
+		newEyeOffset = pm_normalviewheight.GetFloat();
+	}
+	return newEyeOffset;
+}
+// jmarshall end

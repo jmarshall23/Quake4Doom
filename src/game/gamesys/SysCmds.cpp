@@ -3037,6 +3037,29 @@ void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 }
 #endif
 
+// jmarshall
+void Cmd_AddBot_f(const idCmdArgs& args)
+{
+	if (args.Argc() < 2)
+	{
+		common->Warning("USAGE: addbot <botfile> e.g. addbot major or addbot dark - see botfiles/bots for more details\n");
+		return;
+	}
+	gameLocal.AddBot(args.Argv(1));
+}
+
+void Cmd_FillBots_f(const idCmdArgs& args)
+{
+	gameLocal.AddBot("dark");
+	gameLocal.AddBot("major");
+	gameLocal.AddBot("gargoyle");
+	gameLocal.AddBot("skelebot");
+	gameLocal.AddBot("sly");
+	gameLocal.AddBot("neko");
+	gameLocal.AddBot("sarge");
+}
+// jmarshall end
+
 /*
 =================
 idGameLocal::InitConsoleCommands
@@ -3052,6 +3075,12 @@ void idGameLocal::InitConsoleCommands( void ) {
 //	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
 //	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
 // RAVEN END
+
+// jmarshall
+	cmdSystem->AddCommand("addbot", Cmd_AddBot_f, CMD_FL_GAME, "adds a multiplayer bot");
+	cmdSystem->AddCommand("fillbots", Cmd_FillBots_f, CMD_FL_GAME, "fill bots");
+// jmarshall end
+
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
 	cmdSystem->AddCommand( "listThreads",			idThread::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );

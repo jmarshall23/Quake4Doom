@@ -85,7 +85,7 @@ public:																	\
 // RAVEN BEGIN
 // jnewquist: Use accessor for static class type 
 #define CLASS_PROTOTYPE( nameofclass )									\
-private:																\
+public:																\
 	static	idTypeInfo						*Type;						\
 public:																	\
 	static	void							RegisterClass( void );		\
@@ -320,6 +320,23 @@ public:
 // jnewquist: Use accessor for static class type 
 	bool						IsType( const idTypeInfo *c ) const { return IsType(*c); }
 // RAVEN END
+
+// jmarshall
+	template< typename T >
+	T* Cast(void)
+	{
+		return this ? (IsType(T::Type) ? static_cast<T*>(this) : NULL) : NULL;
+	}
+
+	template< typename T >
+	const T* Cast(void) const
+	{
+		return this ? (IsType(T::Type) ? static_cast<const T*>(this) : NULL) : NULL;
+	}
+
+	virtual void			StateThreadChanged(void) { };
+// jmarshall end
+
 	const char *				GetClassname( void ) const;
 	const char *				GetSuperclass( void ) const;
 	void						FindUninitializedMemory( void );

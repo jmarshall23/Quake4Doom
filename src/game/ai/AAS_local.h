@@ -110,6 +110,11 @@ public:
 	virtual void				ShowAreas( const idVec3 &origin, bool ShowProblemAreas = false ) const;
 // RAVEN END
 
+// jmarshall
+	virtual int					AdjustPositionAndGetArea(idVec3& origin);
+	virtual idAASFile*			GetAASFile(void) { return file; }
+	virtual const idBounds& DefaultSearchBounds(void) const;
+// jmarshall end
 
 private:
 	idAASFile *					file;
@@ -164,14 +169,17 @@ private:	// pathing
 	idVec3						SubSampleFlyPath( int areaNum, const idVec3 &origin, const idVec3 &start, const idVec3 &end, int travelFlags, int &endAreaNum ) const;
 
 private:	// debug
-	const idBounds &			DefaultSearchBounds( void ) const;
 	void						DrawCone( const idVec3 &origin, const idVec3 &dir, float radius, const idVec4 &color ) const;
 	void						DrawAreaBounds( int areaNum ) const;
 	void						DrawArea( int areaNum ) const;
 	void						DrawFace( int faceNum, bool side ) const;
 	void						DrawEdge( int edgeNum, bool arrow ) const;
 	void						DrawReachability( const idReachability *reach ) const;
-	void						ShowArea( const idVec3 &origin ) const;
+// jmarshall - exposed function.
+public:
+	virtual void				ShowArea( const idVec3 &origin ) const;
+private:
+// jmarshall end
 	void						ShowWallEdges( const idVec3 &origin ) const;
 	void						ShowHideArea( const idVec3 &origin, int targerAreaNum ) const;
 	bool						PullPlayer( const idVec3 &origin, int toAreaNum ) const;

@@ -202,6 +202,11 @@ public:
 	bool				IsNumeric( void ) const;
 	bool				HasLower( void ) const;
 	bool				HasUpper( void ) const;
+
+// jmarshall
+	void				StripDoubleQuotes(void);
+// jmarshall end
+
 // RAVEN BEGIN
 // bdube: escapes
 	int					IsEscape( int* type = NULL ) const;
