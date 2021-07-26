@@ -520,7 +520,10 @@ public:
 
 	idAAS* GetBotAAS(void)
 	{
-		return bot_aas;
+		if (NumAAS() == 0)
+			return nullptr;
+
+		return GetAAS(0);
 	}
 
 	void					RegisterBot(rvmBot* bot)
