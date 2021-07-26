@@ -552,6 +552,14 @@ void idGameLocal::Init( void ) {
 // jmarshall end
 
 // jmarshall
+	// 	   
+	// load in the bot itemtable.
+	botItemTable = FindEntityDef("bot_itemtable", false);
+	if (botItemTable == NULL)
+	{
+		common->FatalError("Failed to find bot_itemtable decl!\n");
+	}
+
 	// init all the bot systems.
 	botCharacterStatsManager.Init();
 	botFuzzyWeightManager.Init();

@@ -9,7 +9,7 @@ idCVar bot_pathdebug( "bot_pathdebug", "0", CVAR_BOOL | CVAR_CHEAT, "force the b
 idCVar bot_goaldist( "bot_goaldist", "20", CVAR_INTEGER | CVAR_CHEAT, "" );
 idCVar bot_debugnav( "bot_debugnav", "0", CVAR_BOOL | CVAR_CHEAT, "draws navmesh paths for the bot" );
 idCVar bot_showstate( "bot_showstate", "0", CVAR_BOOL | CVAR_CHEAT, "draws the bot state above the bot" );
-idCVar bot_debug( "bot_debug", "0", CVAR_BOOL, "shows debug info for the bot" );
+idCVar bot_debug( "bot_debug", "1", CVAR_BOOL, "shows debug info for the bot" );
 idCVar bot_skill("bot_skill", "3", CVAR_INTEGER, "");
 
 CLASS_DECLARATION( idPlayer, rvmBot )
@@ -72,12 +72,12 @@ void rvmBot::BotUpdateInventory( void )
 	bs.inventory[INVENTORY_PLASMAGUN]		= HasWeapon( weapon_plasmagun );
 	bs.inventory[INVENTORY_BFG10K]			= 0;
 	bs.inventory[INVENTORY_GRAPPLINGHOOK]	= 0;
-	bs.inventory[INVENTORY_SHELLS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_shells" )];
-	bs.inventory[INVENTORY_BULLETS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_clip" )];
+	bs.inventory[INVENTORY_SHELLS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_shotgun" )];
+	bs.inventory[INVENTORY_BULLETS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_machinegun" )];
 	bs.inventory[INVENTORY_GRENADES]		= 0;
-	bs.inventory[INVENTORY_CELLS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_cells" )];
+	bs.inventory[INVENTORY_CELLS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_lightninggun" )];
 	bs.inventory[INVENTORY_LIGHTNINGAMMO]	= 0;
-	bs.inventory[INVENTORY_ROCKETS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_rockets" )];
+	bs.inventory[INVENTORY_ROCKETS]			= inventory.ammo[rvWeapon::GetAmmoIndexForName( "ammo_rocketlauncher" )];
 	bs.inventory[INVENTORY_SLUGS]			= 0;
 	bs.inventory[INVENTORY_BFGAMMO]			= 0;
 	bs.inventory[INVENTORY_HEALTH]			= health;
@@ -395,19 +395,19 @@ void rvmBot::Think( void )
 	{
 		ServerThink();
 
-		//if( bot_debug.GetBool() )
-		//{
-		//	idVec4 color;
-		//	color = idVec4(1, 1, 1, 1);
-		//	if (bs.enemy >= 0)
-		//		color = idVec4(1, 0, 0, 1);
-		//
-		//	idBounds bounds = idBounds( idVec3( -10, -10, -10 ), idVec3( 10, 10, 10 ) );
-		//	gameRenderWorld->DebugBounds( color, bounds, GetOrigin() );
-		//
-		//	idMat3 axis = viewAngles.ToMat3();
-		//	gameRenderWorld->DrawTextA(stateThread.GetState()->state.c_str(), GetOrigin(), 1.0f, color, axis);
-		//}
+		if( bot_debug.GetBool() )
+		{
+			idVec4 color;
+			color = idVec4(1, 1, 1, 1);
+			if (bs.enemy >= 0)
+				color = idVec4(1, 0, 0, 1);
+		
+			idBounds bounds = idBounds( idVec3( -10, -10, -10 ), idVec3( 10, 10, 10 ) );
+			gameRenderWorld->DebugBounds( color, bounds, GetOrigin() );
+		
+			//idMat3 axis = viewAngles.ToMat3();
+			//gameRenderWorld->DrawTextA(stateThread.GetState()->state.c_str(), GetOrigin(), 1.0f, color, axis);
+		}
 	}
 
 	deltaViewAngles.Zero();
