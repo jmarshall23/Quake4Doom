@@ -1153,7 +1153,8 @@ void rvmBot::BotGetRandomPointNearPosition( idVec3 point, idVec3& randomPoint, f
 	int numFaces = area.numFaces;
 	int faceId = rvRandom::irand(firstFace, numFaces);
 
-	const aasFace_t& face = file->GetFace(faceId);
+	const aasIndex_t index = abs(file->GetFaceIndex(faceId));
+	const aasFace_t& face = file->GetFace(index);
 
 	int firstEdge = face.firstEdge;
 	int i = rvRandom::irand(0, face.numEdges);
