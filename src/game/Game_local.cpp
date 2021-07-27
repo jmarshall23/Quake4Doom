@@ -5617,6 +5617,39 @@ bool idGameLocal::IsWeaponsStayOn( void ) {
 	return serverInfo.GetBool( "si_weaponStay" );
 }
 
+/*
+===================
+idGameLocal::AlertBots
+===================
+*/
+// jmarshall
+void idGameLocal::AlertBots(idPlayer* player, idVec3 alert_position)
+{
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		rvmBot* bot = NULL;
+
+		if (entities[i] == NULL)
+		{
+			continue;
+		}
+
+		bot = entities[i]->Cast<rvmBot>();
+		if (bot == NULL)
+		{
+			continue;
+		}
+
+		trace_t tr;
+		Trace(tr, alert_position, bot->GetRenderEntity()->origin, CONTENTS_SOLID, 0);
+
+		if (tr.fraction == 1.0f)
+		{
+			bot->SetEnemy(player, player->GetOrigin());
+		}
+	}
+}
+// jmarshall end
 
 /*
 ============
@@ -5627,6 +5660,19 @@ void idGameLocal::AlertAI( idEntity *ent ) {
 // RAVEN BEGIN
 // bdube: merged
 	if ( ent ) {
+// jmarshall
+		// Alert any bots near were we just exploded.
+		if (gameLocal.IsMultiplayer() && gameLocal.isServer)
+		{
+			idPlayer* player = ent->Cast<idPlayer>();
+			if (player)
+			{
+				AlertBots(player, ent->GetOrigin());
+			}
+
+		}
+// jmarshall end
+
 // RAVEN BEGIN
 // jnewquist: Use accessor for static class type 
 		if ( ent->IsType( idActor::GetClassType() ) ) {

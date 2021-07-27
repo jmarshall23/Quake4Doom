@@ -1169,6 +1169,8 @@ private:
 // RAVEN END
 
 // jmarshall
+	void					AlertBots(idPlayer* player, idVec3 alert_position);
+
 	const idDeclEntityDef* botItemTable;;
 
 	idList<rvmBot*> registeredBots;
