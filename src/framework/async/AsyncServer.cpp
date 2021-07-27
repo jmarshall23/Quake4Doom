@@ -2503,6 +2503,11 @@ void idAsyncServer::RunFrame( void ) {
 			continue;
 		}
 
+// jmarshall - Don't send update packets to bots.
+		if (client.channel.GetRemoteAddress().type == NA_BOT)
+			continue;
+// jmarshall end
+
 		// modify maximum rate if necesary
 		if ( idAsyncNetwork::serverMaxClientRate.IsModified() ) {
 			client.channel.SetMaxOutgoingRate( Min( client.clientRate, idAsyncNetwork::serverMaxClientRate.GetInteger() ) );
