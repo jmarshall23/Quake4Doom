@@ -2798,7 +2798,9 @@ void idPlayer::SpawnToPoint( const idVec3 &spawn_origin, const idAngles &spawn_a
 
 	// Force players to use bounding boxes when in multiplayer
 	if ( gameLocal.isMultiplayer ) {
-		use_combat_bbox = true;
+// jmarshall - breaks multiplayer.
+//		use_combat_bbox = true;
+// jmarshall end
 
 		// Make sure the combat model is unlinked
 		if ( combatModel ) {
