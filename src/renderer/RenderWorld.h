@@ -608,7 +608,7 @@ public:
 	//-------------- Debug Visualization  -----------------
 
 	// Line drawing for debug visualization
-	virtual void			DebugClear(int time) { };		// a time of 0 will clear all lines and text
+	virtual void			DebugClear(int time) = 0;		// a time of 0 will clear all lines and text
 	virtual void			DebugLine(const idVec4& color, const idVec3& start, const idVec3& end, const int lifetime = 0, const bool depthTest = false) { }
 	virtual void			DebugArrow( const idVec4 &color, const idVec3 &start, const idVec3 &end, int size, const int lifetime = 0 ) = 0;
 	virtual void			DebugWinding( const idVec4 &color, const idWinding &w, const idVec3 &origin, const idMat3 &axis, const int lifetime = 0, const bool depthTest = false ) = 0;

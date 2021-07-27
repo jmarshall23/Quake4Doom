@@ -3529,6 +3529,10 @@ idGameLocal::RunFrame
 
 	assert( !isClient );
 
+	if (gameRenderWorld) {
+		gameRenderWorld->DebugClear(0);
+	}
+
 	player = GetLocalPlayer();
 
 	if ( !isMultiplayer && g_stopTime.GetBool() ) {

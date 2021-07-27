@@ -10199,9 +10199,9 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
  	attacker->DamageFeedback( this, inflictor, damage );
 // jmarshall
 	if (gameLocal.IsMultiplayer() && gameLocal.isServer) {
-		if (attacker->IsType(rvmBot::GetClassType()))
+		if (attacker->IsType(rvmBot::GetClassType()) || attacker->IsType(idPlayer::GetClassType()))
 		{
-			attacker->InflictedDamageEvent(this);
+			InflictedDamageEvent(attacker);
 		}
 	}
 // jmarshall end
