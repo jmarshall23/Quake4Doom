@@ -249,8 +249,6 @@ void rvmBot::ServerThink( void )
 	bs.thinktime = Bot_Time();
 	bs.botinput.actionflags = 0;
 
-	BotInputFrame();
-
 	BotUpdateInventory();
 
 	if( bot_pathdebug.IsModified() )
@@ -266,6 +264,8 @@ void rvmBot::ServerThink( void )
 	}
 
 	stateThread.Execute();
+
+	BotInputFrame();
 
 	// If we are moving along a set of waypoints, let's move along.
 	aasPath_t path;
