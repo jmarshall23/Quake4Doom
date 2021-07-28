@@ -137,12 +137,12 @@ public:
 	virtual void			ReadRenderLight(idDemoFile* readDemo, renderLight_t& light) { };
 
 	// jscott: handling of effects
-	virtual qhandle_t		AddEffectDef(const renderEffect_t* reffect, int time) { return 1; }
-	virtual bool			UpdateEffectDef(qhandle_t effectHandle, const renderEffect_t* reffect, int time) { return true; }
-	virtual void			StopEffectDef(qhandle_t effectHandle)  { }
-	virtual const class rvRenderEffectLocal* GetEffectDef(qhandle_t effectHandle) const { return NULL;  }
-	virtual void			FreeEffectDef(qhandle_t effectHandle) { }
-	virtual bool			EffectDefHasSound(const renderEffect_s* reffect) { return false; }
+	virtual qhandle_t		AddEffectDef(const renderEffect_t* reffect, int time);
+	virtual bool			UpdateEffectDef(qhandle_t effectHandle, const renderEffect_t* reffect, int time);
+	virtual void			StopEffectDef(qhandle_t effectHandle);
+	virtual const class rvRenderEffectLocal* GetEffectDef(qhandle_t effectHandle) const;
+	virtual void			FreeEffectDef(qhandle_t effectHandle);
+	virtual bool			EffectDefHasSound(const renderEffect_s* reffect);
 
 	// jscott: for optimised pushes
 	virtual void			PushMarkedDefs(void) { }
@@ -174,6 +174,9 @@ public:
 
 	idList<idRenderEntityLocal*>	entityDefs;
 	idList<idRenderLightLocal*>		lightDefs;
+// jmarshall: BSE
+	idList<rvRenderEffectLocal*>	effectsDef;
+// jmarshll end
 
 	idBlockAlloc<areaReference_t, 1024, 0> areaReferenceAllocator;
 	idBlockAlloc<idInteraction, 256, 0>	interactionAllocator;

@@ -1238,6 +1238,8 @@ void R_ModulateLights_f( const idCmdArgs &args );
 void R_SetLightProject( idPlane lightProject[4], const idVec3 origin, const idVec3 targetPoint,
 	   const idVec3 rightVector, const idVec3 upVector, const idVec3 start, const idVec3 stop );
 
+void R_AddEffectSurfaces(void);
+
 void R_AddLightSurfaces( void );
 void R_AddModelSurfaces( void );
 void R_RemoveUnecessaryViewLights( void );

@@ -174,6 +174,73 @@ void idRenderWorldLocal::ResizeInteractionTable() {
 
 /*
 ===================
+AddEffectDef
+===================
+*/
+qhandle_t idRenderWorldLocal::AddEffectDef(const renderEffect_t* reffect, int time) { 
+	int effectHandle = effectsDef.FindNull();
+	if (effectHandle == -1) {
+		effectHandle = effectsDef.Append(NULL);
+	}
+
+	if (effectsDef[effectHandle] == NULL) {
+		effectsDef[effectHandle] = new rvRenderEffectLocal();
+	}
+
+	effectsDef[effectHandle]->parms = *reffect;
+	effectsDef[effectHandle]->gameTime = time;
+
+	bse->PlayEffect(effectsDef[effectHandle], tr.frameShaderTime);
+
+	return effectHandle;
+}
+
+/*
+===================
+UpdateEffectDef
+===================
+*/
+bool idRenderWorldLocal::UpdateEffectDef(qhandle_t effectHandle, const renderEffect_t* reffect, int time) {
+	// create new slots if needed
+	if (effectHandle < 0 || effectHandle > LUDICROUS_INDEX) {
+		common->Error("idRenderWorld::UpdateEffectDef: index = %i", effectHandle);
+	}
+	//while (effectHandle >= effectsDef.Num()) {
+	//	effectsDef.Append(NULL);
+	//}
+
+	effectsDef[effectHandle]->parms = *reffect;
+	effectsDef[effectHandle]->gameTime = time;
+
+	return true; 
+}
+
+void idRenderWorldLocal::FreeEffectDef(qhandle_t effectHandle) {
+	bse->FreeEffect(effectsDef[effectHandle]);
+
+	if (effectsDef[effectHandle] != NULL)
+		delete effectsDef[effectHandle];
+	
+	effectsDef[effectHandle] = NULL;
+}
+
+void idRenderWorldLocal::StopEffectDef(qhandle_t effectHandle) { 
+	if (effectsDef[effectHandle] == NULL)
+		return;
+
+	bse->StopEffect(effectsDef[effectHandle]);
+}
+
+const class rvRenderEffectLocal* idRenderWorldLocal::GetEffectDef(qhandle_t effectHandle) const { 
+	return effectsDef[effectHandle]; 
+}
+
+bool idRenderWorldLocal::EffectDefHasSound(const renderEffect_s* reffect) { 
+	return false; 
+}
+
+/*
+===================
 AddEntityDef
 ===================
 */

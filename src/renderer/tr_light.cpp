@@ -1450,6 +1450,22 @@ idScreenRect R_CalcEntityScissorRectangle( viewEntity_t *vEntity ) {
 }
 
 /*
+===============
+R_AddEffectSurfaces
+===============
+*/
+void R_AddEffectSurfaces(void) {
+	idRenderWorldLocal* world = tr.viewDef->renderWorld;
+
+	for (int i = 0; i < world->effectsDef.Num(); i++) {
+		if (world->effectsDef[i] == NULL)
+			continue;
+
+		bse->ServiceEffect(world->effectsDef[i], tr.frameShaderTime);
+	}
+}
+
+/*
 ===================
 R_AddModelSurfaces
 
