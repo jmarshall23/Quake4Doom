@@ -389,6 +389,8 @@ bool rvSegmentTemplate::Parse(rvDeclEffect* effect, int segmentType, idParser* l
 		lexer->UnreadToken(&token);
 	}
 
+	mSegType = segmentType;
+
 	if (lexer->ExpectTokenString("{") && lexer->ReadToken(&token))
 	{
 		while (token != "}")
