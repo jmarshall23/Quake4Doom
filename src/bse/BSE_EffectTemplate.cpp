@@ -162,8 +162,6 @@ void rvDeclEffect::Finish() {
 }
 
 bool rvDeclEffect::Parse(const char* text, const int textLength) {
-	return true;
-#if 0
 	idParser src;
 	idToken	token, token2;
 	rvSegmentTemplate segment;
@@ -231,11 +229,12 @@ bool rvDeclEffect::Parse(const char* text, const int textLength) {
 			{
 				src.Error("^4BSE:^1 Invalid segment type '%s' (file: %s, line: %d)\n", token, GetFileName(), src.GetLineNum());
 			}
+
+			src.ReadToken(&token);
 		}
 	}
 
 	Finish();
 
 	return true;
-#endif
 }

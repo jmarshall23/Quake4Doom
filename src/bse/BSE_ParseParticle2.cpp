@@ -771,7 +771,7 @@ bool rvParticleTemplate::CheckCommonParms(idParser* src, rvParticleParms& parms)
 			{
 				parms.mFlags |= 1u;
 			}
-			if (!src->ReadToken((idToken*)((char*)&token + 4)))
+			if (!src->ReadToken(&token))
 				goto LABEL_18;
 		}
 		v5 = -1;
@@ -933,8 +933,9 @@ bool rvParticleTemplate::ParseSpawnDomains(rvDeclEffect* effect, idParser* src) 
 	idToken token;
 
 	src->ExpectTokenString("{");
-	src->ReadToken(&token);
 	while (true) {
+		src->ReadToken(&token);
+
 		if (token == "}")
 			break;
 
@@ -990,8 +991,9 @@ bool rvParticleTemplate::ParseDeathDomains(rvDeclEffect* effect, idParser* src) 
 	idToken token;
 
 	src->ExpectTokenString("{");
-	src->ReadToken(&token);
 	while (true) {
+		src->ReadToken(&token);
+
 		if (token == "}")
 			break;
 
@@ -1058,9 +1060,10 @@ bool rvParticleTemplate::ParseDeathDomains(rvDeclEffect* effect, idParser* src) 
 bool rvParticleTemplate::Parse(rvDeclEffect* effect, idParser* src) {
 	idToken token;
 
-	src->ExpectTokenString("{");
-	src->ReadToken(&token);
+	src->ExpectTokenString("{");	
 	while (true) {
+		src->ReadToken(&token);
+
 		if (token == "}")
 			break;
 
@@ -1167,7 +1170,6 @@ bool rvParticleTemplate::Parse(rvDeclEffect* effect, idParser* src) {
 			src->ExpectTokenString(",");
 
 			float srcc = src->ParseFloat();
-			srcc = src->ParseFloat();
 			float v9 = 0.0020000001;
 			if (srcc < 0.0020000001 || (v9 = srcc, srcc <= 300.0))
 			{

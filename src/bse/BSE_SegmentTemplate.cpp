@@ -534,6 +534,8 @@ bool rvSegmentTemplate::Parse(rvDeclEffect* effect, int segmentType, idParser* l
 			{
 				common->Warning("^4BSE:^1 Invalid segment parameter '%s' (file: %s, line: %d", token.c_str(), lexer->GetFileName(), lexer->GetLineNum());
 			}
+
+			lexer->ReadToken(&token);
 		}
 	}
 }
