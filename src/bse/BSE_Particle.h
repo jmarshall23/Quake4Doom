@@ -110,6 +110,10 @@ public:
 				int			GetTiled( void ) const { return( ( mFlags & PTFLAG_TILED ) ); }
 				int			GetPersist( void ) const { return( ( mFlags & PTFLAG_PERSIST ) ); }
 
+				int			GetFlags(void) {
+					return mFlags;
+				}
+
 				void			SetStationary( bool stopped ) { SetFlag( stopped, PTFLAG_STATIONARY ); }
 				void			SetLocked( bool locked ) { SetFlag( locked, PTFLAG_LOCKED ); }
 				void			SetHasOffset( bool hasOffset ) { SetFlag( hasOffset, PTFLAG_HAS_OFFSET ); }
@@ -631,6 +635,7 @@ public:
 				bool				operator!= ( const rvParticleTemplate& a ) const { return( !Compare( a ) ); }
 				rvParticleTemplate& operator=(const rvParticleTemplate& __that);
 
+				int					GetFlags(void) { return mFlags; }
 				void				SetFlag( bool on, int flag ) { on ? mFlags |= flag : mFlags &= ~flag; }
 				bool				GetFlag( int flag ) const { return ( mFlags & flag ) != 0; }
 				bool				GetParsed( void ) const { return( !!( mFlags & PTFLAG_PARSED ) ); }
@@ -732,7 +737,7 @@ public:
 				void				Duplicate( rvParticleTemplate const &copy );
 private:
 			bool					Compare( const rvParticleTemplate& a ) const;
-			void					FixupParms( rvParticleParms &parms );
+			void					FixupParms( rvParticleParms *parms );
 			void					AllocTrail( void );
 			void					AllocElectricityInfo( void );
 

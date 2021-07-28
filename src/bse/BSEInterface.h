@@ -55,6 +55,10 @@ public:
 
 	virtual void				UpdateRateTimes( void ) = 0;
 	virtual bool				CanPlayRateLimited( effectCategory_t category ) = 0;
+
+	virtual int							AddTraceModel(idTraceModel* model) = 0;
+	virtual idTraceModel*				GetTraceModel(int index) = 0;
+	virtual void						FreeTraceModel(int index) = 0;
 };
 
 extern	rvBSEManager			*bse;

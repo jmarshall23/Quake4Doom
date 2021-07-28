@@ -586,4 +586,17 @@ public:
 
 	virtual void				UpdateRateTimes(void) ;
 	virtual bool				CanPlayRateLimited(effectCategory_t category);
+
+	virtual int							AddTraceModel(idTraceModel* model);
+	virtual idTraceModel*				GetTraceModel(int index);
+	virtual void						FreeTraceModel(int index);
+private:
+	static		idBlockAlloc<rvBSE, 256, 0>	effects;
+	static		idVec3						mCubeNormals[6];
+	static		idMat3						mModelToBSE;
+	static		idList<idTraceModel*>		mTraceModels;
+	static		const char* mSegmentNames[SEG_COUNT];
+	static		int							mPerfCounters[NUM_PERF_COUNTERS];
+	static		float						mEffectRates[EC_MAX];
+	float								pauseTime;	// -1 means pause at the next time update
 };

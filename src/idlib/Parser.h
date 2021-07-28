@@ -102,7 +102,7 @@ public:
 					// read a floating point number
 	float			ParseFloat( void );
 					// parse matrices with floats
-	int				Parse1DMatrix( int x, float *m );
+	int				Parse1DMatrix( int x, float *m, bool ravenMatrix = false );
 	int				Parse2DMatrix( int y, int x, float *m );
 	int				Parse3DMatrix( int z, int y, int x, float *m );
 					// get the white space before the last read token

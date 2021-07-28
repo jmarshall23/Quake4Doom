@@ -1286,6 +1286,21 @@
     <ClCompile Include="renderer\OpenGL\gl_RenderTexture.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="bse\BSE_SegmentTemplate.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_ParseParticle2.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Envelopes.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Effect.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Segment.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="openal\idal.py">

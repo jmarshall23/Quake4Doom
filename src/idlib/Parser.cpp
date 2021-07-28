@@ -2781,19 +2781,29 @@ float idParser::ParseFloat( void ) {
 idParser::Parse1DMatrix
 ================
 */
-int idParser::Parse1DMatrix( int x, float *m ) {
+int idParser::Parse1DMatrix( int x, float *m, bool ravenMatrix) {
 	int i;
 
-	if ( !idParser::ExpectTokenString( "(" ) ) {
-		return false;
+	if (!ravenMatrix)
+	{
+		if (!idParser::ExpectTokenString("(")) {
+			return false;
+		}
 	}
 
 	for ( i = 0; i < x; i++ ) {
 		m[i] = idParser::ParseFloat();
+
+		if (ravenMatrix && i < x - 1) {
+			idParser::ExpectTokenString(",");
+		}
 	}
 
-	if ( !idParser::ExpectTokenString( ")" ) ) {
-		return false;
+	if (!ravenMatrix)
+	{
+		if (!idParser::ExpectTokenString(")")) {
+			return false;
+		}
 	}
 	return true;
 }

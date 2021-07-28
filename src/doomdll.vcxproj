@@ -451,8 +451,13 @@
     <ClCompile Include="aas\AASFileManager.cpp" />
     <ClCompile Include="aas\AASFile_optimize.cpp" />
     <ClCompile Include="aas\AASFile_sample.cpp" />
+    <ClCompile Include="bse\BSE_Effect.cpp" />
     <ClCompile Include="bse\BSE_EffectTemplate.cpp" />
+    <ClCompile Include="bse\BSE_Envelopes.cpp" />
     <ClCompile Include="bse\BSE_Manager.cpp" />
+    <ClCompile Include="bse\BSE_ParseParticle2.cpp" />
+    <ClCompile Include="bse\BSE_Segment.cpp" />
+    <ClCompile Include="bse\BSE_SegmentTemplate.cpp" />
     <ClCompile Include="cm\CollisionModel.cpp" />
     <ClCompile Include="cm\CollisionModel_contacts.cpp" />
     <ClCompile Include="cm\CollisionModel_contents.cpp" />

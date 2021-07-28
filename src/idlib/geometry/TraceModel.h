@@ -128,12 +128,11 @@ public:
 						// calculate mass properties assuming an uniform density
 	void				GetMassProperties( const float density, float &mass, idVec3 &centerOfMass, idMat3 &inertiaTensor ) const;
 
-private:
 	void				InitBox( void );
 	void				InitOctahedron( void );
 	void				InitDodecahedron( void );
 	void				InitBone( void );
-
+private:
 	void				ProjectionIntegrals( int polyNum, int a, int b, struct projectionIntegrals_t &integrals ) const;
 	void				PolygonIntegrals( int polyNum, int a, int b, int c, struct polygonIntegrals_t &integrals ) const;
 	void				VolumeIntegrals( struct volumeIntegrals_t &integrals ) const;
