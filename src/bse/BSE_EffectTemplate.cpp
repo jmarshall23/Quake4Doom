@@ -178,42 +178,72 @@ bool rvDeclEffect::Parse(const char* text, const int textLength) {
 			if (token == "tunnel")
 			{
 				segment.Parse(this, SEG_TUNNEL, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "shake")
 			{
 				segment.Parse(this, SEG_SHAKE, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "delay")
 			{
 				segment.Parse(this, SEG_DELAY, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "light")
 			{
 				segment.Parse(this, SEG_LIGHT, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "decal")
 			{
 				segment.Parse(this, SEG_DECAL, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "sound")
 			{
 				segment.Parse(this, SEG_SOUND, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "trail")
 			{
 				segment.Parse(this, SEG_TRAIL, &src);
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "spawner")
 			{
 				segment.Parse(this, SEG_SPAWNER, &src);
+
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "emitter")
 			{
 				segment.Parse(this, SEG_EMITTER, &src);
+
+				if (segment.Finish(this)) {
+					mSegmentTemplates.Append(segment);
+				}
 			}
 			else if (token == "effect")
 			{
 				segment.Parse(this, SEG_EFFECT, &src);
+
 				if (segment.Finish(this)) {
 					mSegmentTemplates.Append(segment);
 				}

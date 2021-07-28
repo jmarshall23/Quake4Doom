@@ -159,6 +159,30 @@ void rvSegmentTemplate::Duplicate(const rvSegmentTemplate& copy)
 
 void rvSegmentTemplate::Init(rvDeclEffect* decl)
 {
+	mSoundShader = NULL;
+	mFlags = 0;
+	mSegType = 0;
+	mLocalStartTime.Zero();				// Start time of segment wrt effect
+	mLocalDuration.Zero();					// Min and max duration
+	mAttenuation.Zero();					// How effect fades off to the distance
+	mParticleCap = 0;
+	mScale = 0;
+	mDetail = 0;
+
+	// Emitter parms	
+	mCount.Zero();							// The count of particles from a spawner
+	mDensity.Zero();						// Sets count or rate based on volume, area or length
+	mTrailSegmentIndex = 0;
+
+	mNumEffects = 0;
+	for (int i = 0; i < BSE_NUM_SPAWNABLE; i++)
+		mEffects[i] = NULL;
+
+	mSoundShader = NULL;
+	mSoundVolume.Zero();					// Starting volume of sound in decibels
+	mFreqShift.Zero();						// Frequency shift of sound
+
+	mDecalAxis = 0;
 	mDeclEffect = decl;
 	mFlags = 1;
 	mSegType = 0;
