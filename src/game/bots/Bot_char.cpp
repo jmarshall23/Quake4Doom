@@ -1,7 +1,7 @@
 // Bot_char.cpp
 //
 
-#include "precompiled.h"
+
 #include "../Game_local.h"
 
 idBotCharacterStatsManager botCharacterStatsManager;

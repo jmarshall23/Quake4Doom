@@ -1,5 +1,5 @@
-#include "precompiled.h"
-#pragma hdrstop
+
+
 #include "LexerFactory.h"
 
 LexerFactory::~LexerFactory()

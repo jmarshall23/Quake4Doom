@@ -203,6 +203,8 @@ public:
 	bool				HasLower( void ) const;
 	bool				HasUpper( void ) const;
 
+	void				SetStaticBuffer(char* buffer, const int bufferLength);
+
 // jmarshall
 	void				StripDoubleQuotes(void);
 // jmarshall end
@@ -424,6 +426,22 @@ ID_INLINE idStr::idStr( const idStr &text ) {
 	EnsureAlloced( l + 1 );
 	strcpy( data, text.data );
 	len = l;
+}
+
+
+/*
+========================
+idStr::SetStaticBuffer
+========================
+*/
+ID_INLINE void idStr::SetStaticBuffer(char* buffer, const int bufferLength)
+{
+	// this should only be called on a freshly constructed idStr
+	assert(data == baseBuffer);
+	data = buffer;
+	len = 0;
+	//SetAlloced(bufferLength);
+	//SetStatic(true);
 }
 
 ID_INLINE idStr::idStr( const idStr &text, int start, int end ) {

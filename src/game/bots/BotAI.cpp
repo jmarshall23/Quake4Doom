@@ -1,8 +1,8 @@
 // BotAI.cpp
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 #include "../Game_local.h"
 #include "../ai/AASCallback_FindCoverArea.h"
 

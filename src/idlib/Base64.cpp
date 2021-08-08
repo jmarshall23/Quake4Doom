@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 /*
 Copyright (c) 1996 Lars Wirzenius.  All rights reserved.

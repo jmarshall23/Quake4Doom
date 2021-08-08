@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 idStrPool		idDict::globalKeys;
 idStrPool		idDict::globalValues;

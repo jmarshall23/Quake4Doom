@@ -1,8 +1,8 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 
 #include "AAS_local.h"
 #include "../Game_local.h"		// for print and error

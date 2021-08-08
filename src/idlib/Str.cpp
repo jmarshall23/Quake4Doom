@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 // TTimo - don't do anything funky if you're on a real OS ;-)
 #if defined(_WINDOWS) || defined(_XENON)

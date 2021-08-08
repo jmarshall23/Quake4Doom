@@ -15,6 +15,9 @@
 */
 
 #include "mp/Buying.h"
+#include "mp/Tourney.h"
+
+class riBuyingManager;
 class idPlayer;
 class rvCTF_AssaultPoint;
 class rvItemCTFFlag;

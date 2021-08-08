@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 
 idSphere sphere_zero( vec3_zero, 0.0f );

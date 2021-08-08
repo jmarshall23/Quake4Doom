@@ -26,8 +26,8 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "Session_local.h"
 
@@ -1663,7 +1663,7 @@ void idSessionLocal::ExecuteMapChange( bool noFadeWipe ) {
 	// actually purge/load the media
 	if ( !reloadingSameMap ) {
 		renderSystem->EndLevelLoad();
-		soundSystem->EndLevelLoad( mapString.c_str() );
+		soundSystem->EndLevelLoad();
 		declManager->EndLevelLoad();
 		SetBytesNeededForMapLoad( mapString.c_str(), fileSystem->GetReadCount() );
 	}
@@ -2525,11 +2525,8 @@ void idSessionLocal::UpdateScreen( bool outOfSequence ) {
 idSessionLocal::Frame
 ===============
 */
-void idSessionLocal::Frame() {
-
-	if ( com_asyncSound.GetInteger() == 0 ) {
-		soundSystem->AsyncUpdate( Sys_Milliseconds() );
-	}
+void idSessionLocal::Frame() {	
+	soundSystem->Render();
 
 	// Editors that completely take over the game
 	if ( com_editorActive && ( com_editors & ( EDITOR_RADIANT | EDITOR_GUI ) ) ) {

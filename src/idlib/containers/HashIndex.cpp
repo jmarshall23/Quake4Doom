@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 int idHashIndex::INVALID_INDEX[1] = { -1 };
 

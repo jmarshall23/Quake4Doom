@@ -1,7 +1,7 @@
 // Game_render.cpp
 //
 
-#include "precompiled.h"
+
 #include "Game_local.h"
 
 idCVar g_renderCasUpscale("g_renderCasUpscale", "1", CVAR_BOOL, "jmarshall: toggles cas upscaling");

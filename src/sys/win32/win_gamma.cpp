@@ -32,6 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "win_local.h"
 #include "../../renderer/tr_local.h"
 
+#if 0
 static unsigned short s_oldHardwareGamma[3][256];
 
 /*
@@ -91,3 +92,4 @@ void WG_RestoreGamma( void )
 	ReleaseDC( GetDesktopWindow(), hDC );
 }
 
+#endif

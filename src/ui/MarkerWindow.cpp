@@ -26,8 +26,8 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 // included for image uploading for player stat graph
 #include "../renderer/Image.h"

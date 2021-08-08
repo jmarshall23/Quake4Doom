@@ -3,7 +3,7 @@
 
 #include "idlib/precompiled.h"
 #include "renderer/tr_local.h"
-#pragma hdrstop
+
 
 dnl =====================================================
 dnl utils

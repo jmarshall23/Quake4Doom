@@ -2,7 +2,7 @@
 #include "renderer/tr_local.h"
 #include "sys/linux/local.h"
 #include "glimp_local.h"
-#pragma hdrstop
+
 
 #include <unistd.h>
 #define ID_LOG_TO_STDOUT 0

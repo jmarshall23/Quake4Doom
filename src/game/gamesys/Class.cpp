@@ -5,8 +5,8 @@ instancing of objects.
 
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "../Game_local.h"
 
@@ -1013,7 +1013,7 @@ http://developer.apple.com/documentation/DeveloperTools/Conceptual/MachORuntime/
 		break;
 
 // generated file - see CREATE_EVENT_CODE
-#include "Callbacks.cpp"
+#include "../Callbacks.cpp"
 
 	default:
 		gameLocal.Warning( "Invalid formatspec on event '%s'", ev->GetName() );

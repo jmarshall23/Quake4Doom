@@ -27,7 +27,7 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "../idlib/precompiled.h"
-#pragma hdrstop
+
 
 void	RadiantInit( void ) { common->Printf( "The level editor Radiant only runs on Win32\n" ); }
 void	RadiantShutdown( void ) {}

@@ -1,7 +1,7 @@
 // RenderTexture.cpp
 //
 
-#include "precompiled.h"
+
 
 #include "../tr_local.h"
 

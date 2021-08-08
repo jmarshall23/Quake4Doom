@@ -1,7 +1,7 @@
 // BSE_EffectTemplate.cpp
 //
 
-#include "precompiled.h"
+
 
 #include "BSE_Envelope.h"
 #include "BSE_Particle.h"
@@ -162,6 +162,9 @@ void rvDeclEffect::Finish() {
 }
 
 bool rvDeclEffect::Parse(const char* text, const int textLength) {
+#if 1
+	return true;
+#else
 	idParser src;
 	idToken	token, token2;
 	rvSegmentTemplate segment;
@@ -267,4 +270,5 @@ bool rvDeclEffect::Parse(const char* text, const int textLength) {
 	Finish();
 
 	return true;
+#endif
 }

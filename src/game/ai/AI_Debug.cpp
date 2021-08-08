@@ -6,8 +6,8 @@ AI_Debug.cpp
 ================
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "../Game_local.h"
 #include "AI_Manager.h"

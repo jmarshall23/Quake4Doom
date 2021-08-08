@@ -4,8 +4,7 @@
 // Copyright 2002-2004 Raven Software
 //----------------------------------------------------------------
 
-#ifndef __TOURNEY_H__
-#define __TOURNEY_H__
+#pragma once
 
 #include "../Game_local.h"
 
@@ -152,5 +151,3 @@ private:
 	idUserInterface*	tourneyGUI;
 	idUserInterface*	tourneyScoreboard;
 };
-
-#endif

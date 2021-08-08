@@ -343,4 +343,6 @@ bool IsSignedType(const _type_ t) {
 #include "Swap.h"
 #include "containers/Sort.h"
 
+#include "StrStatic.h"
+
 #endif	/* !__LIB_H__ */

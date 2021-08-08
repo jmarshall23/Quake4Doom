@@ -26,8 +26,8 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 //#include "../renderer/Image.h"
 
@@ -2527,15 +2527,16 @@ void idCommonLocal::SingleAsyncTic( void ) {
 	if ( usercmdGen && com_asyncInput.GetBool() ) {
 		usercmdGen->UsercmdInterrupt();
 	}
-
-	switch ( com_asyncSound.GetInteger() ) {
-		case 1:
-			soundSystem->AsyncUpdate( stat->milliseconds );
-			break;
-		case 3:
-			soundSystem->AsyncUpdateWrite( stat->milliseconds );
-			break;
-	}
+// jmarshall
+	//switch ( com_asyncSound.GetInteger() ) {
+	//	case 1:
+	//		soundSystem->AsyncUpdate( stat->milliseconds );
+	//		break;
+	//	case 3:
+	//		soundSystem->AsyncUpdateWrite( stat->milliseconds );
+	//		break;
+	//}
+// jmarshall end
 
 	// we update com_ticNumber after all the background tasks
 	// have completed their work for this tic
@@ -3026,7 +3027,7 @@ void idCommonLocal::ShutdownGame( bool reloading ) {
 	//if ( sw ) {
 	//	sw->StopAllSounds();
 	//}
-	soundSystem->ClearBuffer();
+	//soundSystem->ClearBuffer();
 
 	// shutdown the script debugger
 	// DebuggerServerShutdown();

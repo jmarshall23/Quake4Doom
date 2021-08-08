@@ -1,8 +1,8 @@
 // BotAI_Battle_Attacked.cpp
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 #include "../Game_local.h"
 
 /*

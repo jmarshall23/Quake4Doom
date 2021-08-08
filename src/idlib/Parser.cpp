@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 //#define DEBUG_EVAL
 #define MAX_DEFINEPARMS				128

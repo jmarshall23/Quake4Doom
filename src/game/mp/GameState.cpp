@@ -4,9 +4,7 @@
 // Copyright 2002-2005 Raven Software
 //----------------------------------------------------------------
 
-#include "precompiled.h"
-#pragma hdrstop
-
+#include "../game_local.h"
 #include "GameState.h"
 
 /*

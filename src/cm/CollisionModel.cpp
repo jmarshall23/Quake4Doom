@@ -1,8 +1,8 @@
 // CollisionModel.cpp
 //
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "CollisionModel_local.h"
 

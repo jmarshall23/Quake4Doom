@@ -1,8 +1,8 @@
 // BSE_Segment.cpp
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 
 #include "BSE_Envelope.h"
 #include "BSE_Particle.h"

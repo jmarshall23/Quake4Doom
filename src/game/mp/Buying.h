@@ -12,10 +12,6 @@
 #ifndef __BUYING_H__
 #define __BUYING_H__
 
-#include "../Game_local.h"
-#include "../MultiplayerGame.h"
-
-
 class riBuyingManager
 {
 private:

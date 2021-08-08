@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #ifdef LEXER_READ_AHEAD
 

@@ -5,8 +5,8 @@ Worldspawn class.  Each map has one worldspawn which handles global spawnargs.
 
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "Game_local.h"
 

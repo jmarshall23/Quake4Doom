@@ -1,7 +1,7 @@
 // BSE_ParseParticle2.cpp
 //
 
-#include "precompiled.h"
+
 
 #include "BSE_Envelope.h"
 #include "BSE_Particle.h"

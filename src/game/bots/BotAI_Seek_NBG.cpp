@@ -1,8 +1,8 @@
 // BotAI_Seek_NBG.cpp
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 #include "../Game_local.h"
 
 /*

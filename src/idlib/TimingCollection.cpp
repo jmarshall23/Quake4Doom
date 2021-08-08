@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #if !defined(__TIMINGCOLLECTION_H_)
 	#include "TimingCollection.h"

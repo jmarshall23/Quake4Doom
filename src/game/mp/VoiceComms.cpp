@@ -1,5 +1,5 @@
-#include "precompiled.h"
-#pragma hdrstop
+
+
 #include "../Game_local.h"
 
 // This equates to about 1 second

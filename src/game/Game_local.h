@@ -330,6 +330,8 @@ struct rvmGameRender_t {
 
 //============================================================================
 // ddynerman: moved MultiplayerGame.h down here, so it can use more stuff in Game_local (idEntityPtr)
+#include "mp/Buying.h"
+#include "mp/Tourney.h"
 #include "MultiplayerGame.h"
 
 //============================================================================

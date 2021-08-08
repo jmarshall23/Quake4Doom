@@ -26,8 +26,8 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "Session_local.h"
 
@@ -894,27 +894,27 @@ void idSessionLocal::HandleMainMenuCommands( const char *menuCommand ) {
 			}
 			if ( !vcmd.Icmp( "eax" ) ) {
 				if ( cvarSystem->GetCVarBool( "s_useEAXReverb" ) ) {
-					int eax = soundSystem->IsEAXAvailable();
-					switch ( eax ) {
-					case 2:
-						// OpenAL subsystem load failed
-						MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_07238" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
-						break;
-					case 1:
-						// when you restart
-						MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_04137" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
-						break;
-					case -1:
-						cvarSystem->SetCVarBool( "s_useEAXReverb", false );
-						// disabled
-						MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_07233" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
-						break;
-					case 0:
-						cvarSystem->SetCVarBool( "s_useEAXReverb", false );
-						// not available
-						MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_07232" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
-						break;
-					}
+					//int eax = soundSystem->IsEAXAvailable();
+					//switch ( eax ) {
+					//case 2:
+					//	// OpenAL subsystem load failed
+					//	MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_07238" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
+					//	break;
+					//case 1:
+					//	// when you restart
+					//	MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_04137" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
+					//	break;
+					//case -1:
+					//	cvarSystem->SetCVarBool( "s_useEAXReverb", false );
+					//	// disabled
+					//	MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_07233" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
+					//	break;
+					//case 0:
+					//	cvarSystem->SetCVarBool( "s_useEAXReverb", false );
+					//	// not available
+					//	MessageBox( MSG_OK, common->GetLanguageDict()->GetString( "#str_07232" ), common->GetLanguageDict()->GetString( "#str_07231" ), true );
+					//	break;
+					//}
 				} else {
 					// also turn off OpenAL so we fully go back to legacy mixer
 					cvarSystem->SetCVarBool( "s_useOpenAL", false );

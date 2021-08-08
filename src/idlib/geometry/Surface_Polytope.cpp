@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #define POLYTOPE_VERTEX_EPSILON		0.1f
 

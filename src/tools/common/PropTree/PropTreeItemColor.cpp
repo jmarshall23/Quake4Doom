@@ -17,8 +17,8 @@
 //	useful.
 
 //#include "stdafx.h"
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "PropTree.h"
 #include "../../../sys/win32/rc/proptree_Resource.h"

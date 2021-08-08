@@ -1,8 +1,8 @@
 // Copyright (C) 2007 Id Software, Inc.
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 
 #include "../Game_local.h"
 #include "ObstacleAvoidance.h"

@@ -1,6 +1,3 @@
-#include "precompiled.h"
-#pragma hdrstop
-
 #include "Game_local.h"
 #include "Effect.h"
 #include "client/ClientEffect.h"

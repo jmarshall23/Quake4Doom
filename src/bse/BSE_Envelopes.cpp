@@ -1,8 +1,8 @@
 // BSP_Envelopes.cpp
 //
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 
 #include "BSE_Envelope.h"
 

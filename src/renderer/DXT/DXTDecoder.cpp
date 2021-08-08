@@ -31,8 +31,8 @@ Contains the DxtDecoder implementation.
 ================================================================================================
 */
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 #include "DXTCodec.h"
 
 /*

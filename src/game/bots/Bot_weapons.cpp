@@ -1,8 +1,8 @@
 // Bot_weapons.cpp
 //
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "../Game_local.h"
 

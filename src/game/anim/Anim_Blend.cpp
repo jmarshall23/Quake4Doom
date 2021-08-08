@@ -3,8 +3,8 @@
 //
 // MERGE_DATE 09/30/2004
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "../Game_local.h"
 #include "../../game/Projectile.h"

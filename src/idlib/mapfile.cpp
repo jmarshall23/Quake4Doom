@@ -1,6 +1,6 @@
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #ifdef _XENON
 #define PACIFIER_UPDATE session->PacifierUpdate()

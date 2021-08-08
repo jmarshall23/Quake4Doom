@@ -9,11 +9,8 @@
 // body of code (for merge simplification, etc).
 //----------------------------------------------------------------
 
-#include "precompiled.h"
-#pragma hdrstop
 
-#include "Buying.h"
-
+#include "../Game_local.h"
 
 riBuyingManager::riBuyingManager() :
 	_buyingGameBalanceConstants( NULL ),

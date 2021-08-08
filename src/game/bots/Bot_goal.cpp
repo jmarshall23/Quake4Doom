@@ -1,7 +1,7 @@
 // Bot_goal.cpp
 //
 
-#include "precompiled.h"
+
 #include "../Game_local.h"
 
 idCVar bot_droppedweight( "bot_droppedweight", "1000", CVAR_CHEAT | CVAR_INTEGER, "" );

@@ -31,8 +31,8 @@ Contains the DxtEncoder implementation.
 ================================================================================================
 */
 
-#pragma hdrstop
-#include "precompiled.h"
+
+
 #include "DXTCodec.h"
 
 #define INSET_COLOR_SHIFT		4		// inset the bounding box with ( range >> shift )

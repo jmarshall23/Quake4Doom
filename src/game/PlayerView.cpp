@@ -3,8 +3,8 @@
 //
 // MERGE_DATE 07/07/2004
 
-#include "precompiled.h"
-#pragma hdrstop
+
+
 
 #include "Game_local.h"
 

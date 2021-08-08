@@ -4,11 +4,7 @@
 // Copyright 2002-2004 Raven Software
 //----------------------------------------------------------------
 
-#include "precompiled.h"
-#pragma hdrstop
-
-#include "Tourney.h"
-
+#include "../Game_local.h"
 
 /*
 ===============================================================================

@@ -1,7 +1,7 @@
 // BSE_Manager.cpp
 //
 
-#include "precompiled.h"
+
 #include "BSE_Envelope.h"
 #include "BSE_Particle.h"
 #include "BSE.h"
