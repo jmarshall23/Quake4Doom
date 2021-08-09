@@ -127,12 +127,12 @@ void idSoundSample_OpenAL::WriteAllSamples( const idStr& sampleName )
 {
 	idSoundSample_OpenAL* samplePC = new idSoundSample_OpenAL();
 	{
-		idStrStatic< MAX_OSPATH > inName = sampleName;
+		idStr inName = sampleName;
 		inName.Append( ".msadpcm" );
-		idStrStatic< MAX_OSPATH > inName2 = sampleName;
+		idStr inName2 = sampleName;
 		inName2.Append( ".wav" );
 
-		idStrStatic< MAX_OSPATH > outName = "generated/";
+		idStr outName = "generated/";
 		outName.Append( sampleName );
 		outName.Append( ".idwav" );
 
@@ -211,32 +211,19 @@ void idSoundSample_OpenAL::LoadResource()
 
 	for( int i = 0; i < 2; i++ )
 	{
-		idStrStatic< MAX_OSPATH > sampleName = GetName();
+		idStr sampleName = GetName();
 		if( ( i == 0 ) && !sampleName.Replace( "/vo/", va( "/vo/%s/", sys_lang.GetString() ) ) )
 		{
 			i++;
 		}
-		idStrStatic< MAX_OSPATH > generatedName = "generated/";
+		idStr generatedName = "generated/";
 		generatedName.Append( sampleName );
 
 		{
-			if( s_useCompression.GetBool() )
-			{
-				sampleName.Append( ".msadpcm" );
-			}
-			else
-			{
-				sampleName.Append( ".wav" );
-			}
-			generatedName.Append( ".idwav" );
+			sampleName.SetFileExtension(".wav");
+			generatedName.SetFileExtension( ".idwav" );
 		}
 		loaded = LoadGeneratedSample( generatedName ) || LoadWav( sampleName );
-
-		if( !loaded && s_useCompression.GetBool() )
-		{
-			sampleName.SetFileExtension( "wav" );
-			loaded = LoadWav( sampleName );
-		}
 
 		if( loaded )
 		{
@@ -374,7 +361,7 @@ bool idSoundSample_OpenAL::LoadWav( const idStr& filename )
 		return false;
 	}
 
-	idStrStatic< MAX_OSPATH > sampleName = filename;
+	idStr sampleName = filename;
 	sampleName.SetFileExtension( "amp" );
 	LoadAmplitude( sampleName );
 

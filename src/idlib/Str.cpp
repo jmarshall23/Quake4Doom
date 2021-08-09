@@ -10,7 +10,7 @@
 // mwhitlock: Dynamic memory consolidation - may want to consier making a totally separate string allocator
 #if ( !defined(ID_REDIRECT_NEWDELETE) && !defined(RV_UNIFIED_ALLOCATOR) ) || defined(_RV_MEM_SYS_SUPPORT)
 // RAVEN END
-	#define USE_STRING_DATA_ALLOCATOR
+	//#define USE_STRING_DATA_ALLOCATOR
 #endif
 
 #endif

@@ -142,7 +142,7 @@ idSoundShader::Parse
   this is called by the declManager
 ===============
 */
-bool idSoundShader::Parse( const char* text, const int textLength, bool allowBinaryVersion )
+bool idSoundShader::Parse( const char* text, const int textLength )
 {
 	if( soundSystemLocal.currentSoundWorld )
 	{
@@ -205,17 +205,47 @@ bool idSoundShader::ParseShader( idLexer& src )
 		{
 			src.ReadTokenOnLine( &token );
 		}
-		// mindistance
-		else if( !token.Icmp( "mindistance" ) )
-		{
-			parms.minDistance = src.ParseFloat();
+		else if (!token.Icmp("mindistance")) {
+			parms.minDistance = src.ParseFloat() / 100.0f; // jmarshall: scale to doom 3 distance
 		}
 		// maxdistance
-		else if( !token.Icmp( "maxdistance" ) )
-		{
-			parms.maxDistance = src.ParseFloat();
+		else if (!token.Icmp("maxdistance")) {
+			parms.maxDistance = src.ParseFloat() / 100.0f; // jmarshall: scale to doom 3 distance
 		}
-		// shakes screen
+// jmarshall - quake 4 sound shader
+		else if (!token.Icmp("frequencyshift")) {
+			float shiftVal = src.ParseFloat();
+			src.ExpectTokenString(",");
+			float shiftVal2 = src.ParseFloat();
+		}
+		else if (!token.Icmp("volumeDb")) {
+			float db = src.ParseFloat();
+			parms.volume = idMath::dBToScale(db);
+		}
+		else if (!token.Icmp("useDoppler")) {
+
+		}
+		else if (!token.Icmp("noRandomStart")) {
+
+		}
+		else if (!token.Icmp("voForPlayer")) {
+
+		}
+		else if (!token.Icmp("frequentlyUsed")) {
+
+		}
+		else if (!token.Icmp("causeRumble")) {
+
+		}
+		else if (!token.Icmp("center")) {
+
+		}
+// jmarshall end
+		else if (!token.Icmp("shakeData"))
+		{
+			src.ExpectAnyToken(&token);
+			src.ExpectAnyToken(&token);
+		}
 		else if( !token.Icmp( "shakes" ) )
 		{
 			src.ExpectAnyToken( &token );
@@ -370,8 +400,11 @@ bool idSoundShader::ParseShader( idLexer& src )
 		{
 			leadin = true;
 		}
-		else if( token.Find( ".wav", false ) != -1 || token.Find( ".ogg", false ) != -1 )
+		else 
 		{
+// jmarshall
+			token.SetFileExtension(".wav");
+// jmarshall end
 			if( token.IcmpPrefixPath( "sound/vo/" ) == 0 || token.IcmpPrefixPath( "sound/guis/" ) == 0 )
 			{
 				parms.soundShaderFlags |= SSF_VO;
@@ -386,11 +419,11 @@ bool idSoundShader::ParseShader( idLexer& src )
 				entries.Append( soundSystemLocal.LoadSample( token.c_str() ) );
 			}
 		}
-		else
-		{
-			src.Warning( "unknown token '%s'", token.c_str() );
-			return false;
-		}
+		//else
+		//{
+		//	src.Warning( "unknown token '%s'", token.c_str() );
+		//	return false;
+		//}
 	}
 
 	return true;

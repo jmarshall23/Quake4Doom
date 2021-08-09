@@ -114,7 +114,7 @@ public:
 	virtual size_t			Size() const;
 	virtual bool			SetDefaultText();
 	virtual const char* 	DefaultDefinition() const;
-	virtual bool			Parse( const char* text, const int textLength, bool allowBinaryVersion );
+	virtual bool			Parse( const char* text, const int textLength ) override;
 	virtual void			FreeData();
 	virtual void			List() const;
 

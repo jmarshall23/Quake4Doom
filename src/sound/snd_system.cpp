@@ -450,7 +450,7 @@ idSoundSystemLocal::LoadSample
 */
 idSoundSample* idSoundSystemLocal::LoadSample( const char* name )
 {
-	idStrStatic< MAX_OSPATH > canonical = name;
+	idStr canonical = name;
 	canonical.ToLower();
 	canonical.BackSlashesToSlashes();
 	canonical.StripFileExtension();
@@ -466,16 +466,16 @@ idSoundSample* idSoundSystemLocal::LoadSample( const char* name )
 	idSoundSample* sample = new idSoundSample;
 	sample->SetName( canonical );
 	sampleHash.Add( hashKey, samples.Append( sample ) );
-	if( !insideLevelLoad )
-	{
+	//if( !insideLevelLoad )
+	//{
 		// Sound sample referenced before any map is loaded
 		sample->SetNeverPurge();
 		sample->LoadResource();
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		sample->SetLevelLoadReferenced();
-	}
+	//}
 
 	if( cvarSystem->GetCVarBool( "fs_buildgame" ) )
 	{
