@@ -85,7 +85,7 @@ set(Q4GAME
 	game/Weapon.h 
 	game/WorldSpawn.cpp 
 	game/WorldSpawn.h)
-	
+
 # Quake 4 Game Code Globs	
 file(GLOB Q4GAME_AI_INCLUDES game/ai/*.h)
 file(GLOB Q4GAME_AI_SOURCES game/ai/*.cpp)
@@ -232,18 +232,54 @@ set(QUAKE4_SOURCES
 		${Q4GAME_WEAPON_SOURCES}
 	)
 
-
 add_definitions(-DUSE_OPENAL)
 
 if(MSVC)
-add_compile_options(/J)
+	add_compile_options(/J)
 else()
-add_compile_options(-Wno-multichar)
+	add_compile_options(-Wno-multichar)
 endif()
 
-# add the executable
+# Output one folder up
+set(Q4_OUTPUT_DIR "${PROJECT_SOURCE_DIR}/..")
+
+# Main executable
 add_executable(Quake4 ${QUAKE4_SOURCES})
 target_precompile_headers(Quake4 PRIVATE idLib/precompiled.h)
-target_link_libraries(Quake4 opengl32.lib Dbghelp.lib Iphlpapi.lib dinput8.lib Winmm.lib dxguid.lib ws2_32.lib ${PROJECT_SOURCE_DIR}/external/openal-soft/lib/win64/openal32.lib)
+target_link_libraries(Quake4 
+	opengl32.lib 
+	Dbghelp.lib 
+	Iphlpapi.lib 
+	dinput8.lib 
+	Winmm.lib 
+	dxguid.lib 
+	ws2_32.lib 
+	${PROJECT_SOURCE_DIR}/external/openal-soft/lib/win64/openal32.lib
+)
 target_include_directories(Quake4 PRIVATE "external/openal-soft/include")
-set_target_properties(Quake4 PROPERTIES OUTPUT_NAME "Quake4" LINK_FLAGS "/STACK:16777216,16777216 /SUBSYSTEM:WINDOWS /PDB:\"Quake4.pdb\"")
+set_target_properties(Quake4 PROPERTIES
+	OUTPUT_NAME "Quake4"
+	RUNTIME_OUTPUT_DIRECTORY "${Q4_OUTPUT_DIR}"
+	LINK_FLAGS "/STACK:16777216,16777216 /SUBSYSTEM:WINDOWS /PDB:\"Quake4.pdb\""
+)
+
+# Expansion executable
+add_executable(Quake4x ${QUAKE4_SOURCES})
+target_precompile_headers(Quake4x PRIVATE idLib/precompiled.h)
+target_compile_definitions(Quake4x PRIVATE QUAKE4X)
+target_link_libraries(Quake4x 
+	opengl32.lib 
+	Dbghelp.lib 
+	Iphlpapi.lib 
+	dinput8.lib 
+	Winmm.lib 
+	dxguid.lib 
+	ws2_32.lib 
+	${PROJECT_SOURCE_DIR}/external/openal-soft/lib/win64/openal32.lib
+)
+target_include_directories(Quake4x PRIVATE "external/openal-soft/include")
+set_target_properties(Quake4x PROPERTIES
+	OUTPUT_NAME "Quake4x"
+	RUNTIME_OUTPUT_DIRECTORY "${Q4_OUTPUT_DIR}"
+	LINK_FLAGS "/STACK:16777216,16777216 /SUBSYSTEM:WINDOWS /PDB:\"Quake4x.pdb\""
+)
