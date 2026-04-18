@@ -287,6 +287,38 @@ void GLW_CheckWGLExtensions( HDC hDC ) {
 		glConfig.wgl_extensions_string = "";
 	}
 
+	qwglChoosePixelFormatARB =
+		(BOOL(WINAPI*)(HDC, const int*, const FLOAT*, UINT, int*, UINT*))
+		GLimp_ExtensionPointer("wglChoosePixelFormatARB");
+
+	qwglCreatePbufferARB =
+		(HPBUFFERARB(WINAPI*)(HDC, int, int, int, const int*))
+		GLimp_ExtensionPointer("wglCreatePbufferARB");
+
+	qwglGetPbufferDCARB =
+		(HDC(WINAPI*)(HPBUFFERARB))
+		GLimp_ExtensionPointer("wglGetPbufferDCARB");
+
+	qwglReleasePbufferDCARB =
+		(int (WINAPI*)(HPBUFFERARB, HDC))
+		GLimp_ExtensionPointer("wglReleasePbufferDCARB");
+
+	qwglDestroyPbufferARB =
+		(BOOL(WINAPI*)(HPBUFFERARB))
+		GLimp_ExtensionPointer("wglDestroyPbufferARB");
+
+	qwglBindTexImageARB =
+		(BOOL(WINAPI*)(HPBUFFERARB, int))
+		GLimp_ExtensionPointer("wglBindTexImageARB");
+
+	qwglReleaseTexImageARB =
+		(BOOL(WINAPI*)(HPBUFFERARB, int))
+		GLimp_ExtensionPointer("wglReleaseTexImageARB");
+
+	qwglSetPbufferAttribARB =
+		(BOOL(WINAPI*)(HPBUFFERARB, const int*))
+		GLimp_ExtensionPointer("wglSetPbufferAttribARB");
+
 	// WGL_EXT_swap_control
 	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) GLimp_ExtensionPointer( "wglSwapIntervalEXT" );
 	r_swapInterval.SetModified();	// force a set next frame

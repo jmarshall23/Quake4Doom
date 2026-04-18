@@ -46,7 +46,7 @@ If you have questions concerning this license or the applicable additional terms
 #define	LIGHT_CLIP_EPSILON			0.1f
 
 
-typedef struct {
+struct srfCullInfo_t {
 	// For each triangle a byte set to 1 if facing the light origin.
 	byte *					facing;
 
@@ -58,7 +58,7 @@ typedef struct {
 
 	// Clip planes in surface space used to calculate the cull bits.
 	idPlane					localClipPlanes[6];
-} srfCullInfo_t;
+};
 
 
 typedef struct {		

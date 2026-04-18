@@ -26,6 +26,8 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+#pragma once
+
 /*
 ===============================================================================
 
@@ -362,6 +364,8 @@ public:
 	virtual int		PointContents(const idVec3 p, idCollisionModel* model);
 
 	void			DrawNodePolygons(idCollisionModelLocal* model, cm_node_t* node, const idVec3& origin, const idMat3& axis, const idVec3& viewOrigin, const float radius);
+
+	void			PolygonFromWinding(idCollisionModelLocal* model, idFixedWinding* w, const idPlane& plane, const idMaterial* material, int primitiveNum);
 private:			// CollisionMap_translate.cpp
 	int				TranslateEdgeThroughEdge( idVec3 &cross, idPluecker &l1, idPluecker &l2, float *fraction );
 	void			TranslateTrmEdgeThroughPolygon( cm_traceWork_t *tw, cm_polygon_t *poly, cm_trmEdge_t *trmEdge );
@@ -469,7 +473,6 @@ private:			// CollisionMap_load.cpp
 	int				GetVertex( idCollisionModelLocal *model, const idVec3 &v, int *vertexNum );
 	int				GetEdge( idCollisionModelLocal *model, const idVec3 &v1, const idVec3 &v2, int *edgeNum, int v1num );
 	void			CreatePolygon( idCollisionModelLocal *model, idFixedWinding *w, const idPlane &plane, const idMaterial *material, int primitiveNum );
-	void			PolygonFromWinding( idCollisionModelLocal *model, idFixedWinding *w, const idPlane &plane, const idMaterial *material, int primitiveNum );
 	void			CalculateEdgeNormals( idCollisionModelLocal *model, cm_node_t *node );
 	void			CreatePatchPolygons( idCollisionModelLocal *model, idSurface_Patch &mesh, const idMaterial *material, int primitiveNum );
 	void			ConvertPatch( idCollisionModelLocal *model, const idMapPatch *patch, int primitiveNum );

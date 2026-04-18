@@ -97,7 +97,6 @@ public:
 	float *			ToFloatPtr( void );
 	const char *	ToString( int precision = 2 ) const;
 
-private:
 	float			a;
 	float			b;
 	float			c;

@@ -42,6 +42,16 @@ If you have questions concerning this license or the applicable additional terms
 #include "win_local.h"
 #include "../../renderer/tr_local.h"
 
+// ============================================================
+
+BOOL(WINAPI* qwglBindTexImageARB)(HPBUFFERARB, int) = NULL;
+BOOL(WINAPI* qwglChoosePixelFormatARB)(HDC, const int*, const FLOAT*, UINT, int*, UINT*) = NULL;
+HPBUFFERARB(WINAPI* qwglCreatePbufferARB)(HDC, int, int, int, const int*) = NULL;
+BOOL(WINAPI* qwglDestroyPbufferARB)(HPBUFFERARB) = NULL;
+HDC(WINAPI* qwglGetPbufferDCARB)(HPBUFFERARB) = NULL;
+int         (WINAPI* qwglReleasePbufferDCARB)(HPBUFFERARB, HDC) = NULL;
+BOOL(WINAPI* qwglReleaseTexImageARB)(HPBUFFERARB, int) = NULL;
+BOOL(WINAPI* qwglSetPbufferAttribARB)(HPBUFFERARB, const int*) = NULL;
 
 int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
 int   ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);

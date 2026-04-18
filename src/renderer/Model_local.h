@@ -382,4 +382,6 @@ public:
 	virtual	idBounds		Bounds( const struct renderEntity_s *ent ) const;
 };
 
+#include "rvRenderModelMD5R.h"
+
 #endif /* !__MODEL_LOCAL_H__ */

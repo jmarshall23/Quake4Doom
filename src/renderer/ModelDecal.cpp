@@ -237,7 +237,7 @@ void idRenderModelDecal::AddWinding( const idWinding &w, const idMaterial *decal
 			tri.verts[tri.numVerts + i].st[0] = w[i].s;
 			tri.verts[tri.numVerts + i].st[1] = w[i].t;
 			for ( int k = 0 ; k < 4 ; k++ ) {
-				int icolor = idMath::FtoiFast( decalInfo.start[k] * fade * 255.0f );
+				int icolor = 0; // idMath::FtoiFast(decalInfo.start[k] * fade * 255.0f);
 				if ( icolor < 0 ) {
 					icolor = 0;
 				} else if ( icolor > 255 ) {
@@ -407,7 +407,7 @@ idRenderModelDecal *idRenderModelDecal::RemoveFadedDecals( idRenderModelDecal *d
 	}
 	
 	decalInfo = decals->material->GetDecalInfo();
-	minTime = time - ( decalInfo.stayTime + decalInfo.fadeTime );
+	//minTime = time - ( decalInfo.stayTime + decalInfo.fadeTime );
 
 	newNumIndexes = 0;
 	for ( i = 0; i < decals->tri.numIndexes; i += 3 ) {
@@ -472,28 +472,28 @@ void idRenderModelDecal::AddDecalDrawSurf( viewEntity_t *space ) {
 
 	// fade down all the verts with time
 	decalInfo = material->GetDecalInfo();
-	maxTime = decalInfo.stayTime + decalInfo.fadeTime;
+	//maxTime = decalInfo.stayTime + decalInfo.fadeTime;
 
 	// set vertex colors and remove faded triangles
 	for ( i = 0 ; i < tri.numIndexes ; i += 3 ) {
 		int	deltaTime = tr.viewDef->renderView.time - indexStartTime[i];
 
-		if ( deltaTime > maxTime ) {
-			continue;
-		}
+	//	if ( deltaTime > maxTime ) {
+	//		continue;
+	//	}
 
 		if ( deltaTime <= decalInfo.stayTime ) {
 			continue;
 		}
 
 		deltaTime -= decalInfo.stayTime;
-		f = (float)deltaTime / decalInfo.fadeTime;
+		f = 1.0f; // (float)deltaTime / decalInfo.fadeTime;
 
 		for ( j = 0; j < 3; j++ ) {
 			int	ind = tri.indexes[i+j];
 
 			for ( int k = 0; k < 4; k++ ) {
-				float fcolor = decalInfo.start[k] + ( decalInfo.end[k] - decalInfo.start[k] ) * f;
+				float fcolor = 1.0f; // decalInfo.start[k] + (decalInfo.end[k] - decalInfo.start[k]) * f;
 				int icolor = idMath::FtoiFast( fcolor * vertDepthFade[ind] * 255.0f );
 				if ( icolor < 0 ) {
 					icolor = 0;

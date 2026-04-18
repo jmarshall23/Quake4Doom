@@ -123,72 +123,72 @@ void RB_PrepareStageTexturing( const shaderStage_t *pStage,  const drawSurf_t *s
 		qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane );
 	}
 
-	if ( pStage->texture.texgen == TG_SCREEN2 ) {
-		qglEnable( GL_TEXTURE_GEN_S );
-		qglEnable( GL_TEXTURE_GEN_T );
-		qglEnable( GL_TEXTURE_GEN_Q );
+	//if ( pStage->texture.texgen == TG_SCREEN2 ) {
+	//	qglEnable( GL_TEXTURE_GEN_S );
+	//	qglEnable( GL_TEXTURE_GEN_T );
+	//	qglEnable( GL_TEXTURE_GEN_Q );
+	//
+	//	float	mat[16], plane[4];
+	//	myGlMultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
+	//
+	//	plane[0] = mat[0];
+	//	plane[1] = mat[4];
+	//	plane[2] = mat[8];
+	//	plane[3] = mat[12];
+	//	qglTexGenfv( GL_S, GL_OBJECT_PLANE, plane );
+	//
+	//	plane[0] = mat[1];
+	//	plane[1] = mat[5];
+	//	plane[2] = mat[9];
+	//	plane[3] = mat[13];
+	//	qglTexGenfv( GL_T, GL_OBJECT_PLANE, plane );
+	//
+	//	plane[0] = mat[3];
+	//	plane[1] = mat[7];
+	//	plane[2] = mat[11];
+	//	plane[3] = mat[15];
+	//	qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane );
+	//}
 
-		float	mat[16], plane[4];
-		myGlMultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
-
-		plane[0] = mat[0];
-		plane[1] = mat[4];
-		plane[2] = mat[8];
-		plane[3] = mat[12];
-		qglTexGenfv( GL_S, GL_OBJECT_PLANE, plane );
-
-		plane[0] = mat[1];
-		plane[1] = mat[5];
-		plane[2] = mat[9];
-		plane[3] = mat[13];
-		qglTexGenfv( GL_T, GL_OBJECT_PLANE, plane );
-
-		plane[0] = mat[3];
-		plane[1] = mat[7];
-		plane[2] = mat[11];
-		plane[3] = mat[15];
-		qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane );
-	}
-
-	if ( pStage->texture.texgen == TG_GLASSWARP ) {
-		if ( tr.backEndRenderer == BE_ARB2 /*|| tr.backEndRenderer == BE_NV30*/ ) {
-			qglBindProgramARB( GL_FRAGMENT_PROGRAM_ARB, FPROG_GLASSWARP );
-			qglEnable( GL_FRAGMENT_PROGRAM_ARB );
-
-			GL_SelectTexture( 2 );
-			globalImages->scratchImage->Bind();
-
-			GL_SelectTexture( 1 );
-			globalImages->scratchImage2->Bind();
-
-			qglEnable( GL_TEXTURE_GEN_S );
-			qglEnable( GL_TEXTURE_GEN_T );
-			qglEnable( GL_TEXTURE_GEN_Q );
-
-			float	mat[16], plane[4];
-			myGlMultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
-
-			plane[0] = mat[0];
-			plane[1] = mat[4];
-			plane[2] = mat[8];
-			plane[3] = mat[12];
-			qglTexGenfv( GL_S, GL_OBJECT_PLANE, plane );
-
-			plane[0] = mat[1];
-			plane[1] = mat[5];
-			plane[2] = mat[9];
-			plane[3] = mat[13];
-			qglTexGenfv( GL_T, GL_OBJECT_PLANE, plane );
-
-			plane[0] = mat[3];
-			plane[1] = mat[7];
-			plane[2] = mat[11];
-			plane[3] = mat[15];
-			qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane );
-
-			GL_SelectTexture( 0 );
-		}
-	}
+	//if ( pStage->texture.texgen == TG_GLASSWARP ) {
+	//	if ( tr.backEndRenderer == BE_ARB2 /*|| tr.backEndRenderer == BE_NV30*/ ) {
+	//		qglBindProgramARB( GL_FRAGMENT_PROGRAM_ARB, FPROG_GLASSWARP );
+	//		qglEnable( GL_FRAGMENT_PROGRAM_ARB );
+	//
+	//		GL_SelectTexture( 2 );
+	//		globalImages->scratchImage->Bind();
+	//
+	//		GL_SelectTexture( 1 );
+	//		globalImages->scratchImage2->Bind();
+	//
+	//		qglEnable( GL_TEXTURE_GEN_S );
+	//		qglEnable( GL_TEXTURE_GEN_T );
+	//		qglEnable( GL_TEXTURE_GEN_Q );
+	//
+	//		float	mat[16], plane[4];
+	//		myGlMultMatrix( surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat );
+	//
+	//		plane[0] = mat[0];
+	//		plane[1] = mat[4];
+	//		plane[2] = mat[8];
+	//		plane[3] = mat[12];
+	//		qglTexGenfv( GL_S, GL_OBJECT_PLANE, plane );
+	//
+	//		plane[0] = mat[1];
+	//		plane[1] = mat[5];
+	//		plane[2] = mat[9];
+	//		plane[3] = mat[13];
+	//		qglTexGenfv( GL_T, GL_OBJECT_PLANE, plane );
+	//
+	//		plane[0] = mat[3];
+	//		plane[1] = mat[7];
+	//		plane[2] = mat[11];
+	//		plane[3] = mat[15];
+	//		qglTexGenfv( GL_Q, GL_OBJECT_PLANE, plane );
+	//
+	//		GL_SelectTexture( 0 );
+	//	}
+	//}
 
 	if ( pStage->texture.texgen == TG_REFLECT_CUBE ) {
 		if ( tr.backEndRenderer == BE_ARB2 ) {
@@ -266,29 +266,29 @@ void RB_FinishStageTexturing( const shaderStage_t *pStage, const drawSurf_t *sur
 		qglDisable( GL_TEXTURE_GEN_T );
 		qglDisable( GL_TEXTURE_GEN_Q );
 	}
-	if ( pStage->texture.texgen == TG_SCREEN2 ) {
-		qglDisable( GL_TEXTURE_GEN_S );
-		qglDisable( GL_TEXTURE_GEN_T );
-		qglDisable( GL_TEXTURE_GEN_Q );
-	}
-
-	if ( pStage->texture.texgen == TG_GLASSWARP ) {
-		if ( tr.backEndRenderer == BE_ARB2 /*|| tr.backEndRenderer == BE_NV30*/ ) {
-			GL_SelectTexture( 2 );
-			globalImages->BindNull();
-
-			GL_SelectTexture( 1 );
-			if ( pStage->texture.hasMatrix ) {
-				RB_LoadShaderTextureMatrix( surf->shaderRegisters, &pStage->texture );
-			}
-			qglDisable( GL_TEXTURE_GEN_S );
-			qglDisable( GL_TEXTURE_GEN_T );
-			qglDisable( GL_TEXTURE_GEN_Q );
-			qglDisable( GL_FRAGMENT_PROGRAM_ARB );
-			globalImages->BindNull();
-			GL_SelectTexture( 0 );
-		}
-	}
+//	if ( pStage->texture.texgen == TG_SCREEN2 ) {
+//		qglDisable( GL_TEXTURE_GEN_S );
+//		qglDisable( GL_TEXTURE_GEN_T );
+//		qglDisable( GL_TEXTURE_GEN_Q );
+//	}
+//
+//	if ( pStage->texture.texgen == TG_GLASSWARP ) {
+//		if ( tr.backEndRenderer == BE_ARB2 /*|| tr.backEndRenderer == BE_NV30*/ ) {
+//			GL_SelectTexture( 2 );
+//			globalImages->BindNull();
+//
+//			GL_SelectTexture( 1 );
+//			if ( pStage->texture.hasMatrix ) {
+//				RB_LoadShaderTextureMatrix( surf->shaderRegisters, &pStage->texture );
+//			}
+//			qglDisable( GL_TEXTURE_GEN_S );
+//			qglDisable( GL_TEXTURE_GEN_T );
+//			qglDisable( GL_TEXTURE_GEN_Q );
+//			qglDisable( GL_FRAGMENT_PROGRAM_ARB );
+//			globalImages->BindNull();
+//			GL_SelectTexture( 0 );
+//		}
+//	}
 
 	if ( pStage->texture.texgen == TG_REFLECT_CUBE ) {
 		if ( tr.backEndRenderer == BE_ARB2 ) {

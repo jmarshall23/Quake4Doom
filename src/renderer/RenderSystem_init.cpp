@@ -310,6 +310,26 @@ PFNGLPROGRAMLOCALPARAMETER4FVARBPROC	qglProgramLocalParameter4fvARB;
 // GL_EXT_depth_bounds_test
 PFNGLDEPTHBOUNDSEXTPROC                 qglDepthBoundsEXT;
 
+// GLSL / ARB shader objects
+PFNGLCREATESHADEROBJECTARBPROC		qglCreateShaderObjectARB = NULL;
+PFNGLDELETEOBJECTARBPROC			qglDeleteObjectARB = NULL;
+PFNGLSHADERSOURCEARBPROC			qglShaderSourceARB = NULL;
+PFNGLCOMPILESHADERARBPROC			qglCompileShaderARB = NULL;
+PFNGLGETOBJECTPARAMETERIVARBPROC	qglGetObjectParameterivARB = NULL;
+PFNGLCREATEPROGRAMOBJECTARBPROC		qglCreateProgramObjectARB = NULL;
+PFNGLATTACHOBJECTARBPROC			qglAttachObjectARB = NULL;
+PFNGLDETACHOBJECTARBPROC			qglDetachObjectARB = NULL;
+PFNGLLINKPROGRAMARBPROC				qglLinkProgramARB = NULL;
+PFNGLUSEPROGRAMOBJECTARBPROC		qglUseProgramObjectARB = NULL;
+PFNGLGETUNIFORMLOCATIONARBPROC		qglGetUniformLocationARB = NULL;
+PFNGLUNIFORM1FARBPROC				qglUniform1fARB = NULL;
+PFNGLUNIFORM1IARBPROC				qglUniform1iARB = NULL;
+PFNGLUNIFORM1FVARBPROC				qglUniform1fvARB = NULL;
+PFNGLUNIFORM2FVARBPROC				qglUniform2fvARB = NULL;
+PFNGLUNIFORM3FVARBPROC				qglUniform3fvARB = NULL;
+PFNGLUNIFORM4FVARBPROC				qglUniform4fvARB = NULL;
+PFNGLGETINFOLOGARBPROC				qglGetInfoLogARB = NULL;
+
 /*
 =================
 R_CheckExtension
@@ -421,6 +441,47 @@ static void R_CheckPortableExtensions( void ) {
 	} else {
 		tr.stencilIncr = GL_INCR;
 		tr.stencilDecr = GL_DECR;
+	}
+
+	// GL_ARB_shader_objects / GLSL
+	glConfig.GLSLProgramAvailable =
+		R_CheckExtension("GL_ARB_shader_objects") &&
+		R_CheckExtension("GL_ARB_shading_language_100") &&
+		R_CheckExtension("GL_ARB_vertex_shader") &&
+		R_CheckExtension("GL_ARB_fragment_shader");
+
+	if (glConfig.GLSLProgramAvailable) {
+		qglCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC)GLimp_ExtensionPointer("glCreateShaderObjectARB");
+		qglDeleteObjectARB = (PFNGLDELETEOBJECTARBPROC)GLimp_ExtensionPointer("glDeleteObjectARB");
+		qglShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)GLimp_ExtensionPointer("glShaderSourceARB");
+		qglCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)GLimp_ExtensionPointer("glCompileShaderARB");
+		qglGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)GLimp_ExtensionPointer("glGetObjectParameterivARB");
+		qglCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC)GLimp_ExtensionPointer("glCreateProgramObjectARB");
+		qglAttachObjectARB = (PFNGLATTACHOBJECTARBPROC)GLimp_ExtensionPointer("glAttachObjectARB");
+		qglDetachObjectARB = (PFNGLDETACHOBJECTARBPROC)GLimp_ExtensionPointer("glDetachObjectARB");
+		qglLinkProgramARB = (PFNGLLINKPROGRAMARBPROC)GLimp_ExtensionPointer("glLinkProgramARB");
+		qglUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC)GLimp_ExtensionPointer("glUseProgramObjectARB");
+		qglGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)GLimp_ExtensionPointer("glGetUniformLocationARB");
+		qglUniform1fARB = (PFNGLUNIFORM1FARBPROC)GLimp_ExtensionPointer("glUniform1fARB");
+		qglUniform1iARB = (PFNGLUNIFORM1IARBPROC)GLimp_ExtensionPointer("glUniform1iARB");
+		qglUniform1fvARB = (PFNGLUNIFORM1FVARBPROC)GLimp_ExtensionPointer("glUniform1fvARB");
+		qglUniform2fvARB = (PFNGLUNIFORM2FVARBPROC)GLimp_ExtensionPointer("glUniform2fvARB");
+		qglUniform3fvARB = (PFNGLUNIFORM3FVARBPROC)GLimp_ExtensionPointer("glUniform3fvARB");
+		qglUniform4fvARB = (PFNGLUNIFORM4FVARBPROC)GLimp_ExtensionPointer("glUniform4fvARB");
+		qglGetInfoLogARB = (PFNGLGETINFOLOGARBPROC)GLimp_ExtensionPointer("glGetInfoLogARB");
+
+		if (!qglCreateShaderObjectARB || !qglDeleteObjectARB || !qglShaderSourceARB ||
+			!qglCompileShaderARB || !qglGetObjectParameterivARB || !qglCreateProgramObjectARB ||
+			!qglAttachObjectARB || !qglDetachObjectARB || !qglLinkProgramARB ||
+			!qglUseProgramObjectARB || !qglGetUniformLocationARB || !qglUniform1iARB ||
+			!qglUniform1fvARB || !qglUniform2fvARB || !qglUniform3fvARB ||
+			!qglUniform4fvARB || !qglGetInfoLogARB) {
+			common->Printf("X..GL_ARB_shader_objects load failed\n");
+			glConfig.GLSLProgramAvailable = false;
+		}
+	}
+	else {
+		common->Printf("X..GLSL extensions not found\n");
 	}
 
 	// GL_NV_register_combiners
@@ -554,8 +615,15 @@ typedef struct vidmode_s {
 } vidmode_t;
 
 vidmode_t r_vidModes[] = {
-    { "Mode  0: 1280x720",		1280,   720 },
-    { "Mode  1: 1920x1080",		1920,	1080 }    
+	{ "Mode  0: 320x240",		320,	240 },
+	{ "Mode  1: 400x300",		400,	300 },
+	{ "Mode  2: 512x384",		512,	384 },
+	{ "Mode  3: 640x480",		640,	480 },
+	{ "Mode  4: 800x600",		800,	600 },
+	{ "Mode  5: 1024x768",		1024,	768 },
+	{ "Mode  6: 1152x864",		1152,	864 },
+	{ "Mode  7: 1280x1024",		1280,	1024 },
+	{ "Mode  8: 1600x1200",		1600,	1200 },
 };
 static int	s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 

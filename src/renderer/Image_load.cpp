@@ -1738,6 +1738,8 @@ void idImage::Bind() {
 
 	tmu_t			*tmu = &backEnd.glState.tmu[backEnd.glState.currenttmu];
 
+	tmu->image = this;
+
 	// enable or disable apropriate texture modes
 	if ( tmu->textureType != type && ( backEnd.glState.currenttmu <	glConfig.maxTextureUnits ) ) {
 		if ( tmu->textureType == TT_CUBIC ) {
@@ -2209,4 +2211,172 @@ void idImage::Print() const {
 	common->Printf( "%4ik ", StorageSize() / 1024 );
 
 	common->Printf( " %s\n", imgName.c_str() );
+}
+
+
+/*
+========================
+idImageManager::AllocPBufferImage
+========================
+*/
+idPBufferImage* idImageManager::AllocPBufferImage(const char* name) {
+	idStr			fileName;
+	const int		hash = idStr(name).FileNameHash();
+	idImage* image;
+	idPBufferImage* pbufferImage = nullptr;
+
+	if (strlen(name) >= 256) {
+		common->Error("idImageManagerLocal::AllocPBufferImage: \"%s\" is too long\n", name);
+	}
+
+	fileName = name;
+
+	// Check for an existing image with the same name.
+	for (image = imageHashTable[hash]; image != nullptr; image = image->hashNext) {
+		if (idStr::Icmp(fileName.c_str(), image->imgName.c_str()) == 0) {
+			pbufferImage = dynamic_cast<idPBufferImage*>(image);
+			if (pbufferImage == nullptr) {
+				common->Error("Trying to attach a pbuffer to an existing image '%s'", name);
+			}
+			return pbufferImage;
+		}
+	}
+
+	// Allocate and initialize a new pbuffer image.
+	pbufferImage = new idPBufferImage();
+	if (pbufferImage == nullptr) {
+		return nullptr;
+	}
+
+	// Run default construction in-place if needed by this codebase.
+	new (pbufferImage) idPBufferImage();
+
+	// Initialize inherited idImage state to match the original code.
+	pbufferImage->texnum = static_cast<GLuint>(-1);
+	pbufferImage->partialImage = nullptr;
+	pbufferImage->type = TT_DISABLED;
+	pbufferImage->isPartialImage = false;
+	pbufferImage->frameUsed = 0;
+	pbufferImage->classification = 0;
+	pbufferImage->backgroundLoadInProgress = false;
+	pbufferImage->bgl.opcode = DLTYPE_FILE;
+	pbufferImage->bgl.f = nullptr;
+	pbufferImage->bglNext = nullptr;
+	pbufferImage->generatorFunction = nullptr;
+	pbufferImage->allowDownSize = false;
+	pbufferImage->filter = TF_DEFAULT;
+	pbufferImage->repeat = TR_REPEAT;
+	pbufferImage->depth = TD_DEFAULT;
+	pbufferImage->cubeFiles = CF_2D;
+	pbufferImage->referencedOutsideLevelLoad = false;
+	pbufferImage->levelLoadReferenced = false;
+	pbufferImage->precompressedFile = false;
+	pbufferImage->defaulted = false;
+	pbufferImage->timestamp = 0;
+	pbufferImage->bindCount = 0;
+	pbufferImage->uploadDepth = 0;
+	pbufferImage->uploadHeight = 0;
+	pbufferImage->uploadWidth = 0;
+	pbufferImage->internalFormat = 0;
+	pbufferImage->cacheUsageNext = nullptr;
+	pbufferImage->cacheUsagePrev = nullptr;
+	pbufferImage->hashNext = nullptr;
+	pbufferImage->isMonochrome = false;
+	pbufferImage->refCount = 0;
+	//pbufferImage->cubeFaceBound = 0;
+	//pbufferImage->flags = 0;
+	pbufferImage->useCount = 0;
+	pbufferImage->imgName = name;
+	pbufferImage->mRenderTarget = nullptr;
+
+	// Add to image list.
+	images.Append(pbufferImage);
+
+	// Add to hash table.
+	pbufferImage->hashNext = imageHashTable[hash];
+	imageHashTable[hash] = pbufferImage;
+
+	// Create GL texture.
+	qglGenTextures(1, &pbufferImage->texnum);
+
+	// Allocate render target.
+	pbufferImage->mRenderTarget = new rvTexRenderTarget();
+
+	return pbufferImage;
+}
+
+/*
+========================
+idPBufferImage::Bind
+========================
+*/
+void idPBufferImage::Bind(void) {
+	if (mRenderTarget != nullptr) {
+		mRenderTarget->BeginTexture(texnum, 9728, 9728, 33071);
+	}
+}
+
+/*
+========================
+idPBufferImage::UnBind
+========================
+*/
+void idPBufferImage::UnBind(void) {
+	if (mRenderTarget != nullptr) {
+		mRenderTarget->EndTexture();
+	}
+}
+
+/*
+========================
+idPBufferImage::PurgeImage
+========================
+*/
+void idPBufferImage::PurgeImage(void) {
+	if (mRenderTarget != nullptr) {
+		mRenderTarget->Release();
+	}
+
+	if (texnum != static_cast<GLuint>(-1)) {
+		if (qglDeleteTextures != nullptr) {
+			qglDeleteTextures(1, &texnum);
+		}
+		texnum = static_cast<GLuint>(-1);
+	}
+}
+
+/*
+========================
+idPBufferImage::Reload
+========================
+*/
+void idPBufferImage::Reload(bool checkPrecompressed, bool force) {
+	if (mRenderTarget != nullptr) {
+		mRenderTarget->Restore();
+		mRenderTarget->DefaultD3GL();
+		qglGenTextures(1, &texnum);
+	}
+}
+
+/*
+========================
+idPBufferImage::~idPBufferImage
+========================
+*/
+idPBufferImage::~idPBufferImage() {
+	if (mRenderTarget != nullptr) {
+		mRenderTarget->Release();
+	}
+
+	if (texnum != static_cast<GLuint>(-1)) {
+		if (qglDeleteTextures != nullptr) {
+			qglDeleteTextures(1, &texnum);
+		}
+		texnum = static_cast<GLuint>(-1);
+	}
+
+	if (mRenderTarget != nullptr) {
+		delete mRenderTarget;
+		mRenderTarget = nullptr;
+	}
 }

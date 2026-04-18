@@ -39,10 +39,10 @@ If you have questions concerning this license or the applicable additional terms
 
 const int MAX_OVERLAY_SURFACES	= 16;
 
-typedef struct overlayVertex_s {
+struct overlayVertex_t {
 	int							vertexNum;
 	float						st[2];
-} overlayVertex_t;
+};
 
 typedef struct overlaySurface_s {
 	int							surfaceNum;

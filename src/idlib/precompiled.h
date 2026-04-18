@@ -31,6 +31,9 @@ If you have questions concerning this license or the applicable additional terms
 
 #ifdef __cplusplus
 
+#include <string>
+#include <vector>
+
 class ThreadedAlloc;		// class that is only used to expand the AutoCrit template to tag allocs/frees called from inside the R_AddModelSurfaces call graph
 #define PC_CVAR_ARCHIVE CVAR_ARCHIVE
 

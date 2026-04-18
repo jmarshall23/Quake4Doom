@@ -710,7 +710,7 @@ void R_BoundTriSurf( srfTriangles_t *tri ) {
 R_CreateSilRemap
 =================
 */
-static int *R_CreateSilRemap( const srfTriangles_t *tri ) {
+int *R_CreateSilRemap( const srfTriangles_t *tri ) {
 	int		c_removed, c_unique;
 	int		*remap;
 	int		i, j, hashKey;

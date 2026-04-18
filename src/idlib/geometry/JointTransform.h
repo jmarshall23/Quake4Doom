@@ -78,7 +78,6 @@ public:
 	ID_INLINE void	Invert( );
 // RAVEN END
 
-private:
 	float			mat[3*4];
 };
 

@@ -1058,11 +1058,5 @@ void R_DeformDrawSurf( drawSurf_t *drawSurf ) {
 	case DFRM_EYEBALL:
 		R_EyeballDeform( drawSurf );
 		break;
-	case DFRM_PARTICLE:
-		R_ParticleDeform( drawSurf, true );
-		break;
-	case DFRM_PARTICLE2:
-		R_ParticleDeform( drawSurf, false );
-		break;
 	}
 }

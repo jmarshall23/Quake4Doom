@@ -55,6 +55,8 @@ qglDisable( GL_TEXTURE_* )
 ====================================================================
 */
 
+class idPBufferImage;
+
 typedef enum {
 	IS_UNLOADED,	// no gl texture number
 	IS_PARTIAL,		// has a texture number and the low mip levels loaded
@@ -151,13 +153,14 @@ public:
 	// automatically enables or disables cube mapping or texture3D
 	// May perform file loading if the image was not preloaded.
 	// May start a background image read.
-	void		Bind();
+	virtual void		Bind();
+	virtual void		UnBind(void) {};
 
 	// for use with fragment programs, doesn't change any enable2D/3D/cube states
 	void		BindFragment();
 
 	// deletes the texture object, but leaves the structure so it can be reloaded
-	void		PurgeImage();
+	virtual void		PurgeImage();
 
 	// used by callback functions to specify the actual data
 	// data goes from the bottom to the top line of the image, as OpenGL expects it
@@ -189,7 +192,7 @@ public:
 	void		Print() const;
 
 	// check for changed timestamp on disk and reload if necessary
-	void		Reload( bool checkPrecompressed, bool force );
+	virtual void		Reload( bool checkPrecompressed, bool force );
 
 	void		AddReference()				{ refCount++; };
 
@@ -234,6 +237,8 @@ public:
 	textureDepth_t		depth;
 	cubeFiles_t			cubeFiles;				// determines the naming and flipping conventions for the six images
 
+	int					useCount;
+
 	bool				referencedOutsideLevelLoad;
 	bool				levelLoadReferenced;	// for determining if it needs to be purged
 	bool				precompressedFile;		// true when it was loaded from a .d3t file
@@ -272,6 +277,7 @@ ID_INLINE idImage::idImage() {
 	allowDownSize = false;
 	filter = TF_DEFAULT;
 	repeat = TR_REPEAT;
+	useCount = 0;
 	depth = TD_DEFAULT;
 	cubeFiles = CF_2D;
 	referencedOutsideLevelLoad = false;
@@ -300,6 +306,8 @@ class idImageManager {
 public:
 	void				Init();
 	void				Shutdown();
+
+	idPBufferImage*		AllocPBufferImage(const char* name);
 
 	// If the exact combination of parameters has been asked for already, an existing
 	// image will be returned, otherwise a new image will be created.
@@ -494,3 +502,25 @@ IMAGEPROGRAM
 void R_LoadImageProgram( const char *name, byte **pic, int *width, int *height, ID_TIME_T *timestamp, textureDepth_t *depth = NULL );
 const char *R_ParsePastImageProgram( idLexer &src );
 
+/*
+===============================================================================
+
+	idPBufferImage
+
+===============================================================================
+*/
+
+class rvTexRenderTarget;
+
+class idPBufferImage : public idImage {
+public:
+	idPBufferImage() = default;
+	virtual ~idPBufferImage();
+
+	virtual void	Bind(void) override;
+	virtual void	UnBind(void) override;
+	virtual void	PurgeImage(void) override;
+	virtual void	Reload(bool checkPrecompressed, bool force) override;
+
+	rvTexRenderTarget* mRenderTarget = nullptr;
+};

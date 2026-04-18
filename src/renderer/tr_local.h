@@ -31,6 +31,33 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "Image.h"
 #include "MegaTexture.h"
+#include "rvTexRenderTarget.h"
+#include "Shaders.h"
+#include "rvGLSLShader.h"
+#include "rvVertexFormat.h"
+#include "rvIndexBuffer.h"
+
+struct rvBlend4DrawVert
+{
+	idVec3 xyz;
+	int blendIndex[4];
+	float blendWeight[4];
+	idVec3 normal;
+	idVec3 tangent;
+	idVec3 binormal;
+	unsigned __int8 color[4];
+	idVec2 st;
+};
+
+struct rvSilTraceVertT
+{
+	idVec4 xyzw;
+};
+
+#include "rvVertexBuffer.h"
+#include "rvMesh.h"
+#include "rvPrimBatch.h"
+#include "rvSpecial.h"
 
 class idRenderWorldLocal;
 
@@ -433,7 +460,7 @@ typedef struct viewDef_s {
 
 // complex light / surface interactions are broken up into multiple passes of a
 // simple interaction shader
-typedef struct {
+struct drawInteraction_t {
 	const drawSurf_t *	surf;
 
 	idImage *			lightImage;
@@ -456,7 +483,7 @@ typedef struct {
 	idVec4				bumpMatrix[2];
 	idVec4				diffuseMatrix[2];
 	idVec4				specularMatrix[2];
-} drawInteraction_t;
+};
 
 
 /*
@@ -488,10 +515,10 @@ typedef struct {
 	int		frameCount;
 } setBufferCommand_t;
 
-typedef struct {
+struct drawSurfsCommand_t {
 	renderCommand_t		commandId, *next;
 	viewDef_t	*viewDef;
-} drawSurfsCommand_t;
+};
 
 typedef struct {
 	renderCommand_t		commandId, *next;
@@ -596,6 +623,7 @@ typedef struct {
 	int		current3DMap;
 	int		currentCubeMap;
 	int		texEnv;
+	idImage* image;
 	textureType_t	textureType;
 } tmu_t;
 
@@ -740,7 +768,8 @@ public:
 	void					Clear( void );
 	void					SetBackEndRenderer();			// sets tr.backEndRenderer based on cvars
 	void					RenderViewToViewport( const renderView_t *renderView, idScreenRect *viewport );
-
+	void					SetSpecialEffect(ESpecialEffectType which, bool enabled);
+	void					ShutdownSpecialEffects();
 public:
 	// renderer globals
 	bool					registered;		// cleared at shutdown, set at InitOpenGL
@@ -768,6 +797,8 @@ public:
 	idVec4					ambientLightVector;	// used for "ambient bump mapping"
 
 	float					sortOffset;				// for determinist sorting of equal sort materials
+
+	int						specialEffectsEnabled = 0;
 
 	idList<idRenderWorldLocal*>worlds;
 
@@ -1656,13 +1687,15 @@ TR_TRACE
 =============================================================
 */
 
-typedef struct {
-	float		fraction;
-	// only valid if fraction < 1.0
-	idVec3		point;
-	idVec3		normal;
-	int			indexes[3];
-} localTrace_t;
+struct localTrace_t {
+	float fraction;
+	const rvDeclMatType* materialType;
+	idVec3 point;
+	idVec3 normal;
+	int indexes[3];
+	idVec3 vertices[3];
+	int drawIndices[3];
+};
 
 localTrace_t R_LocalTrace( const idVec3 &start, const idVec3 &end, const float radius, const srfTriangles_t *tri );
 void RB_ShowTrace( drawSurf_t **drawSurfs, int numDrawSurfs );
@@ -1683,5 +1716,10 @@ idScreenRect R_CalcIntersectionScissor( const idRenderLightLocal * lightDef,
 #include "RenderWorld_local.h"
 #include "GuiModel.h"
 #include "VertexCache.h"
+
+void RB_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf, idDrawVert* ac);
+void RB_FinishStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf, idDrawVert* ac);
+
+int* R_CreateSilRemap(const srfTriangles_t* tri);
 
 #endif /* !__TR_LOCAL_H__ */

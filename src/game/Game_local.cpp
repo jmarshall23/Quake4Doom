@@ -3777,15 +3777,15 @@ idGameLocal::CalcFov
 Calculates the horizontal and vertical field of view based on a horizontal field of view and custom aspect ratio
 ====================
 */
-void idGameLocal::CalcFov( float base_fov, float &fov_x, float &fov_y ) const {
+void idGameLocal::CalcFov(float base_fov, float& fov_x, float& fov_y) const {
 	float	x;
 	float	y;
 	float	ratio_x;
 	float	ratio_y;
 
 	// first, calculate the vertical fov based on a 640x480 view
-	x = SCREEN_WIDTH / tan(base_fov / 360.0f * idMath::PI);
-	y = atan2(SCREEN_HEIGHT, x);
+	x = 640.0f / tan(base_fov / 360.0f * idMath::PI);
+	y = atan2(480.0f, x);
 	fov_y = y * 360.0f / idMath::PI;
 
 	// FIXME: somehow, this is happening occasionally
@@ -3798,12 +3798,18 @@ void idGameLocal::CalcFov( float base_fov, float &fov_x, float &fov_y ) const {
 	switch (aspectChoice) {
 	default:
 	case 0:
+		// 4:3
+		fov_x = base_fov;
+		return;
+		break;
+
+	case 1:
 		// 16:9
 		ratio_x = 16.0f;
 		ratio_y = 9.0f;
 		break;
 
-	case 1:
+	case 2:
 		// 16:10
 		ratio_x = 16.0f;
 		ratio_y = 10.0f;
