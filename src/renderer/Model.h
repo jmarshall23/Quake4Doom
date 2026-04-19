@@ -557,7 +557,7 @@ public:
 //			   for traces and silhouette determination) that are separate from pairs of video-memory 
 //			   meshes - one used for shadow volume drawing and one used for normal interaction drawing
 //			   NOTE: currently, only MD5R models return true, all others return false
-	virtual bool				HasSeparateSilTraceMeshes( void ) const;		
+	virtual bool				HasSeparateSilTraceMeshes(void) const { return false; }
 #endif
 // RAVEN END
 

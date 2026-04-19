@@ -36,24 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "rvGLSLShader.h"
 #include "rvVertexFormat.h"
 #include "rvIndexBuffer.h"
-
-struct rvBlend4DrawVert
-{
-	idVec3 xyz;
-	int blendIndex[4];
-	float blendWeight[4];
-	idVec3 normal;
-	idVec3 tangent;
-	idVec3 binormal;
-	unsigned __int8 color[4];
-	idVec2 st;
-};
-
-struct rvSilTraceVertT
-{
-	idVec4 xyzw;
-};
-
+#include "../idlib/geometry/rvVertex.h"
 #include "rvVertexBuffer.h"
 #include "rvMesh.h"
 #include "rvPrimBatch.h"
@@ -145,6 +128,7 @@ typedef struct drawSurf_s {
 	idScreenRect			scissorRect;	// for scissor clipping, local inside renderView viewport
 	int						dsFlags;			// DSF_VIEW_INSIDE_SHADOW, etc
 	struct vertCache_s		*dynamicTexCoords;	// float * in vertex cache memory
+	float* texGenTransformAndViewOrg;
 	// specular directions for non vertex program cards, skybox texcoords, etc
 } drawSurf_t;
 
@@ -501,6 +485,7 @@ typedef enum {
 	RC_DRAW_VIEW,
 	RC_SET_BUFFER,
 	RC_COPY_RENDER,
+	RC_DRAW_DEPTH_TEXTURE,
 	RC_SWAP_BUFFERS		// can't just assume swap at end of list because
 						// of forced list submission before syncs
 } renderCommand_t;
@@ -1722,4 +1707,11 @@ void RB_FinishStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf
 
 int* R_CreateSilRemap(const srfTriangles_t* tri);
 
+void RB_ARB2_LoadMVPMatrixIntoVPParams(const drawSurf_t* surf);
+void RB_ARB2_LoadLocalViewOriginIntoVPParams(const drawSurf_t* surf);
+void RB_ARB2_LoadProjectionMatrixIntoVPParams(void);
+void RB_ARB2_LoadModelViewMatrixIntoVPParams(const drawSurf_t* surf);
+void RB_ARB2_MD5R_DrawDepthElements(const drawSurf_t* surf);
+void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf, bool fillingDepth);
+void RB_ARB2_DisableStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf);
 #endif /* !__TR_LOCAL_H__ */

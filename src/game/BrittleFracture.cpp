@@ -1142,7 +1142,7 @@ void idBrittleFracture::CreateFractures( const idRenderModel *renderModel ) {
 // RAVEN BEGIN
 // dluetscher: added support for MD5R meshes
 		srfTriangles_t * tri = surf->geometry;
-#ifdef _MD5R_SUPPORT
+#if 0 // jmarsha;ll
 		if ( tri->primBatchMesh != NULL ) {
 
 			srfTriangles_t *tempTri = (srfTriangles_t *) _alloca16( sizeof(srfTriangles_t) );

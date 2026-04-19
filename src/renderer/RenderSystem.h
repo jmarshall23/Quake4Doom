@@ -259,7 +259,7 @@ public:
 	virtual	void			ExportMD5R( bool compressed ) = 0;
 #endif
 #if defined( _MD5R_SUPPORT )
-	virtual void			CopyPrimBatchTriangles( idDrawVert *destDrawVerts, glIndex_t *destIndices, rvMesh *primBatchMesh, const rvSilTraceVertT *silTraceVerts ) = 0;
+	//virtual void			CopyPrimBatchTriangles( idDrawVert *destDrawVerts, glIndex_t *destIndices, rvMesh *primBatchMesh, const rvSilTraceVertT *silTraceVerts ) = 0; // jmarshall - add SDK support
 #endif
 
 #endif // !Q4SDK_MD5R

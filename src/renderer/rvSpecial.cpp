@@ -172,7 +172,7 @@ rvAL::rvAL() {
 
 	mDepthMaterial = declManager->FindMaterial("hs/ALSetup", true);
 	ALMaterial = mDepthMaterial;
-	regs = static_cast<float*>(Mem_ClearedAlloc(sizeof(float) * mDepthMaterial->GetNumRegisters(), TAG_RENDER));
+	regs = static_cast<float*>(Mem_ClearedAlloc(sizeof(float) * mDepthMaterial->GetNumRegisters()));
 
 	offset = 0.0f;
 	count = 0;
