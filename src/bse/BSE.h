@@ -25,6 +25,7 @@ class rvRenderModelBSE;
 class idRenderModel;
 class rvParticle;
 class idPlayerView;
+class idRenderWorld;
 
 const float WORLD_SIZE = (128.0f * 1024.0f);
 const float BSE_LARGEST = (512.0f);
@@ -61,6 +62,7 @@ typedef enum eBSESegment
 	SEG_DELAY,						// A control segment for looping
 	SEG_SHAKE,						// Triggers a screen shake
 	SEG_TUNNEL,						// Triggers the id tunnel vision effect
+	SEG_DOUBLEVISION,				// Triggers the id double-vision effect
 	SEG_COUNT
 };
 
@@ -426,7 +428,7 @@ const int LIGHTID_EFFECT_LIGHT = 300;
 class rvBSE
 {
 public:
-	rvBSE(void) { mFlags = 0; }
+	rvBSE(void) { mFlags = 0; mRenderWorld = NULL; }
 	~rvBSE(void) {}
 
 	void					Init(const rvDeclEffect* declEffect, struct renderEffect_s* parms, float time);
@@ -467,6 +469,8 @@ public:
 
 	float					GetBrightness(void) const { return(mBrightness); }
 	void					SetBrightness(float bright) { mBrightness = bright; }
+	const idVec2& GetSpriteSize(void) const { return mSpriteSize; }
+	const float* GetShaderParms(void) const { return mShaderParms; }
 
 	bool					CanInterpolate(void) { return(mCurrentTime - mLastTime > BSE_TIME_EPSILON); }
 	void					UpdateFromOwner(renderEffect_t* parms, float time, bool init = false);
@@ -477,7 +481,7 @@ public:
 
 	virtual void			DisplayDebugInfo(const struct renderEffect_s* parms, const struct viewDef_s* view, idBounds& bounds);
 	void					InitModel(idRenderModel* model);
-	//idRenderModel* Render(idRenderModel* model, const struct renderEffect_s* owner, const viewDef_t* view); // <-- jmarshall
+	idRenderModel* Render(idRenderModel* model, const struct renderEffect_s* owner, const struct viewDef_s* view);
 	const char* GetDeclName(void);
 	rvSegment* GetTrailSegment(int child) { return(&mSegments[child]); }
 	rvSegment* GetTrailSegment(const idStr& name);
@@ -502,6 +506,8 @@ public:
 	virtual const idBounds& GetCurrentLocalBounds(void) const { return(mCurrentLocalBounds); }
 	const idBounds& GetLastRenderBounds(void) const { return(mLastRenderBounds); }
 	const idVec3& GetCurrentWindVector(void) const { return(mCurrentWindVector); }
+	void					SetRenderWorld( idRenderWorld *renderWorld ) { mRenderWorld = renderWorld; }
+	idRenderWorld* GetRenderWorld( void ) const { return mRenderWorld; }
 
 	void					UpdateSegments(float time);
 	virtual int				GetValidFrames(void) const { return mValidFrames; };
@@ -515,6 +521,7 @@ private:
 	// Fixed at spawn time
 	const rvDeclEffect* mDeclEffect;
 	idSoundEmitter* mReferenceSound;
+	idRenderWorld* mRenderWorld;
 
 	idVec3					mOriginalOrigin;			// Origin in world space
 	idVec3					mOriginalEndOrigin;
@@ -535,6 +542,8 @@ private:
 	float					mShortestDistanceToCamera;	// Closest point on effects bounds to view origin
 	idVec4					mTint;						// Overridable tint
 	float					mBrightness;				// Overall brightness of effect
+	idVec2					mSpriteSize;				// Optional sprite size override from shader parms
+	float					mShaderParms[MAX_ENTITY_SHADER_PARMS];	// Owner shader parms for light/material control
 	float					mCost;						// Best guess at how expensive the effect is
 
 	idVec3					mViewOrg;
@@ -571,6 +580,7 @@ public:
 
 	virtual	bool				PlayEffect(class rvRenderEffectLocal* def, float time);
 	virtual	bool				ServiceEffect(class rvRenderEffectLocal* def, float time);
+	virtual idRenderModel*		RenderEffect(class rvRenderEffectLocal* def, const struct viewDef_s* view);
 	virtual	void				StopEffect(rvRenderEffectLocal* def);
 	virtual	void				FreeEffect(rvRenderEffectLocal* def);
 	virtual	float				EffectDuration(const rvRenderEffectLocal* def);
@@ -586,4 +596,17 @@ public:
 
 	virtual void				UpdateRateTimes(void) ;
 	virtual bool				CanPlayRateLimited(effectCategory_t category);
+
+	virtual int							AddTraceModel(idTraceModel* model);
+	virtual idTraceModel*				GetTraceModel(int index);
+	virtual void						FreeTraceModel(int index);
+private:
+	static		idBlockAlloc<rvBSE, 256, 0>	effects;
+	static		idVec3						mCubeNormals[6];
+	static		idMat3						mModelToBSE;
+	static		idList<idTraceModel*>		mTraceModels;
+	static		const char* mSegmentNames[SEG_COUNT];
+	static		int							mPerfCounters[NUM_PERF_COUNTERS];
+	static		float						mEffectRates[EC_MAX];
+	float								pauseTime;	// -1 means pause at the next time update
 };

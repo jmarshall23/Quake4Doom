@@ -486,6 +486,16 @@ void idRenderWorldLocal::FreeDefs() {
 			entityDefs[i] = NULL;
 		}
 	}
+
+	for (i = 0; i < effectsDef.Num(); i++) {
+		rvRenderEffectLocal* effect;
+
+		effect = effectsDef[i];
+		if (effect && effect->world == this) {
+			FreeEffectDef(i);
+			effectsDef[i] = NULL;
+		}
+	}
 }
 
 /*

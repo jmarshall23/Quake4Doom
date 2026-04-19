@@ -2147,3 +2147,104 @@ const idMaterial *R_RemapShaderBySkin( const idMaterial *shader, const idDeclSki
 
 	return skin->RemapShaderBySkin( shader );
 }
+
+
+/*
+===================
+AddEffectDef
+===================
+*/
+qhandle_t idRenderWorldLocal::AddEffectDef(const renderEffect_t* reffect, int time) {
+	int effectHandle = effectsDef.FindNull();
+	if (effectHandle == -1) {
+		effectHandle = effectsDef.Append(NULL);
+	}
+
+	if (effectsDef[effectHandle] == NULL) {
+		effectsDef[effectHandle] = new rvRenderEffectLocal();
+	}
+
+	rvRenderEffectLocal* def = effectsDef[effectHandle];
+	def->parms = *reffect;
+	def->gameTime = time;
+	def->serviceTime = time - 1;
+	def->newEffect = true;
+	def->expired = false;
+	def->effect = NULL;
+	def->index = effectHandle;
+	def->world = this;
+	def->dynamicModel = NULL;
+	def->dynamicModelFrameCount = 0;
+	def->referenceBounds.Clear();
+
+	const float startTimeSeconds = static_cast<float>(time) * 0.001f;
+	if (!bse->PlayEffect(def, startTimeSeconds)) {
+		def->expired = true;
+	}
+
+	return effectHandle;
+}
+
+/*
+===================
+UpdateEffectDef
+===================
+*/
+bool idRenderWorldLocal::UpdateEffectDef(qhandle_t effectHandle, const renderEffect_t* reffect, int time) {
+	// create new slots if needed
+	if (effectHandle < 0 || effectHandle > LUDICROUS_INDEX) {
+		common->Error("idRenderWorld::UpdateEffectDef: index = %i", effectHandle);
+	}
+	if (effectHandle >= effectsDef.Num() || effectsDef[effectHandle] == NULL) {
+		return true;
+	}
+
+	rvRenderEffectLocal* def = effectsDef[effectHandle];
+	def->parms = *reffect;
+	def->gameTime = time;
+
+	return def->expired;
+}
+
+void idRenderWorldLocal::FreeEffectDef(qhandle_t effectHandle) {
+	if (effectHandle < 0 || effectHandle >= effectsDef.Num()) {
+		return;
+	}
+	if (effectsDef[effectHandle] == NULL) {
+		return;
+	}
+
+	if (effectsDef[effectHandle]->dynamicModel) {
+		delete effectsDef[effectHandle]->dynamicModel;
+		effectsDef[effectHandle]->dynamicModel = NULL;
+		effectsDef[effectHandle]->dynamicModelFrameCount = 0;
+	}
+
+	bse->FreeEffect(effectsDef[effectHandle]);
+
+	if (effectsDef[effectHandle] != NULL)
+		delete effectsDef[effectHandle];
+
+	effectsDef[effectHandle] = NULL;
+}
+
+void idRenderWorldLocal::StopEffectDef(qhandle_t effectHandle) {
+	if (effectHandle < 0 || effectHandle >= effectsDef.Num()) {
+		return;
+	}
+	if (effectsDef[effectHandle] == NULL)
+		return;
+
+	bse->StopEffect(effectsDef[effectHandle]);
+}
+
+const class rvRenderEffectLocal* idRenderWorldLocal::GetEffectDef(qhandle_t effectHandle) const {
+	if (effectHandle < 0 || effectHandle >= effectsDef.Num()) {
+		return NULL;
+	}
+	return effectsDef[effectHandle];
+}
+
+bool idRenderWorldLocal::EffectDefHasSound(const renderEffect_s* reffect) {
+	return bse->CheckDefForSound(reffect);
+}

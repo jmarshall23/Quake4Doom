@@ -28,6 +28,19 @@ extern	idCVar				bse_scale;
 extern	idCVar				bse_singleEffect;
 extern	idCVar				bse_maxParticles;
 
+// Temporary BSE frame counters (spawned/serviced/rendered), reset each StartFrame.
+extern int					bse_frameSpawned;
+extern int					bse_frameServiced;
+extern int					bse_frameRendered;
+
+void						BSE_ResetFrameCounters( void );
+void						BSE_AddSpawned( int count );
+void						BSE_AddServiced( int count );
+void						BSE_AddRendered( int count );
+
+class idRenderModel;
+struct viewDef_s;
+
 // Interface to the effects system
 
 class rvBSEManager
@@ -40,6 +53,7 @@ public:
 
 	virtual	bool				PlayEffect( class rvRenderEffectLocal *def, float time ) = 0;
 	virtual	bool				ServiceEffect( class rvRenderEffectLocal *def, float time ) = 0;
+	virtual idRenderModel*		RenderEffect( class rvRenderEffectLocal *def, const struct viewDef_s *view ) = 0;
 	virtual	void				StopEffect( rvRenderEffectLocal *def ) = 0;
 	virtual	void				FreeEffect( rvRenderEffectLocal *def ) = 0;
 	virtual	float				EffectDuration( const rvRenderEffectLocal *def ) = 0;
@@ -55,6 +69,10 @@ public:
 
 	virtual void				UpdateRateTimes( void ) = 0;
 	virtual bool				CanPlayRateLimited( effectCategory_t category ) = 0;
+
+	virtual int							AddTraceModel(idTraceModel* model) = 0;
+	virtual idTraceModel*				GetTraceModel(int index) = 0;
+	virtual void						FreeTraceModel(int index) = 0;
 };
 
 extern	rvBSEManager			*bse;

@@ -46,7 +46,7 @@ public:
 			void		Finalize( void );
 			void		ClearFast( void ) { mFastLookUp = false; }
 
-private:
+public:
 			bool		Compare( const rvEnvParms &comp ) const;
 
 	const	idDeclTable	*mTable;

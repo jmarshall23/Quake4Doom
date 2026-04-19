@@ -1131,6 +1131,9 @@ void R_RenderView( viewDef_t *parms ) {
 	// add any pre-generated light shadows, and calculate the light shader values
 	R_AddLightSurfaces();
 
+	// submit dynamic effect surfaces after the model pass has initialized drawSurf lists
+	R_AddEffectSurfaces();
+
 	// adds ambient surfaces and create any necessary interaction surfaces to add to the light
 	// lists
 	R_AddModelSurfaces();

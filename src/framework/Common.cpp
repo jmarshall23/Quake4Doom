@@ -2987,6 +2987,8 @@ void idCommonLocal::InitGame( void ) {
 	// initialize the user interfaces
 	uiManager->Init();
 
+	bse->Init();
+
 	// startup the script debugger
 	// DebuggerServerInit();
 

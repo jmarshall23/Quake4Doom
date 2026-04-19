@@ -127,9 +127,9 @@ public:
 	int					GetParallelProjectionSilhouetteEdges( const idVec3 &projectionDir, int silEdges[MAX_TRACEMODEL_EDGES] ) const;
 						// calculate mass properties assuming an uniform density
 	void				GetMassProperties( const float density, float &mass, idVec3 &centerOfMass, idMat3 &inertiaTensor ) const;
-
+	void				InitBox(void);
 private:
-	void				InitBox( void );
+	
 	void				InitOctahedron( void );
 	void				InitDodecahedron( void );
 	void				InitBone( void );

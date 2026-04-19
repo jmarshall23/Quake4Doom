@@ -110,6 +110,10 @@ public:
 				int			GetTiled( void ) const { return( ( mFlags & PTFLAG_TILED ) ); }
 				int			GetPersist( void ) const { return( ( mFlags & PTFLAG_PERSIST ) ); }
 
+				int			GetFlags(void) {
+					return mFlags;
+				}
+
 				void			SetStationary( bool stopped ) { SetFlag( stopped, PTFLAG_STATIONARY ); }
 				void			SetLocked( bool locked ) { SetFlag( locked, PTFLAG_LOCKED ); }
 				void			SetHasOffset( bool hasOffset ) { SetFlag( hasOffset, PTFLAG_HAS_OFFSET ); }
@@ -158,7 +162,7 @@ public:
 	
 	virtual		void			EvaluateSize( rvEnvParms *size, const float time, float oneOverDuration, float *dest ) { assert( 0 ); }
 	virtual		void			EvaluateRotation( rvEnvParms *rotation, const float time, float oneOverDuration, float *dest ) { assert( 0 ); }
-	virtual		void			EvaluateLength( rvEnvParms *length, const float time, float oneOverDuration, idVec3 &dest ) { assert( 0 ); }
+	virtual		void			EvaluateLength( rvEnvParms *length, const float time, float oneOverDuration, idVec3 &dest ) { dest.Zero(); }
 	
 
 				void			InitTintEnv( rvEnvParms &env, float duration ) { mTintEnv.Init( env, duration ); }
@@ -167,7 +171,7 @@ public:
 				void			InitOffsetEnv( rvEnvParms &env, float duration ) { mOffsetEnv.Init( env, duration ); }
 	virtual		void			InitSizeEnv( rvEnvParms &env, float duration ) { assert( 0 ); }
 	virtual		void			InitRotationEnv( rvEnvParms &env, float duration ) { assert( 0 ); }
-	virtual		void			InitLengthEnv( rvEnvParms &env, float duration ) { assert( 0 ); }
+	virtual		void			InitLengthEnv( rvEnvParms &env, float duration ) {}
 
 	virtual		float			*GetInitSize( void ) { assert( 0 ); return( NULL ); }
 	virtual		float			*GetDestSize( void ) { assert( 0 ); return( NULL ); }
@@ -176,8 +180,8 @@ public:
 	virtual		float			*GetDestRotation( void ) { assert( 0 ); return( NULL ); }
 	virtual		void			ScaleRotation( float constant ) {}
 
-	virtual		float			*GetInitLength( void ) { assert( 0 );  return( NULL ); }
-	virtual		float			*GetDestLength( void ) { assert( 0 );  return( NULL ); }
+	virtual		float			*GetInitLength( void ) { return( NULL ); }
+	virtual		float			*GetDestLength( void ) { return( NULL ); }
 
 				void			Attenuate( float atten, rvParticleParms &parms, rvEnvParms1 &result );
 				void			Attenuate( float atten, rvParticleParms &parms, rvEnvParms2 &result );
@@ -201,7 +205,7 @@ public:
 	virtual		bool			Render( const rvBSE *effect, rvParticleTemplate *pt, const idMat3 &view, srfTriangles_t *tri, float time, float override = 1.0f ) { return( false ); }
 				void			DoRenderBurnTrail( rvBSE *effect, rvParticleTemplate *st, const idMat3 &view, srfTriangles_t *tri, float time );
 	virtual		void			RenderBurnTrail( rvBSE *effect, rvParticleTemplate *pt, const idMat3 &view, srfTriangles_t *tri, float time ) {}
-	virtual		void			RenderMotion( rvBSE *effect, rvParticleTemplate *pt, srfTriangles_t *tri, const struct renderEffect_s *owner, float time, float trailScale );
+	virtual		void			RenderMotion( rvBSE *effect, rvParticleTemplate *pt, srfTriangles_t *tri, const struct renderEffect_s *owner, float time );
 	virtual		bool			InitLight( rvBSE *effect, rvSegmentTemplate *st, float time ) { return( false ); }
 	virtual		bool			PresentLight( rvBSE *effect, rvParticleTemplate *pt, float time, bool infinite ) { return( false ); }
 	virtual		bool			Destroy( void ) { return( false ); }
@@ -380,8 +384,8 @@ public:
 	friend		class			rvParticleTemplate;
 
 				int				GetBoltCount( float length );
-				void			RenderBranch( const rvBSE *effect, struct SElecWork *work, idVec3 start, idVec3 end );
-				void			RenderLineSegment( const rvBSE *effect, struct SElecWork *work, idVec3 start, float startFraction );
+				void			RenderBranch( const rvBSE *effect, struct SElecWork *work, idVec3 start, idVec3 end, const idDeclTable *jitterTable );
+				bool			RenderLineSegment( const rvBSE *effect, struct SElecWork *work, idVec3 start, float startFraction );
 				void			ApplyShape( const rvBSE *effect, struct SElecWork *work, idVec3 start, idVec3 end, int count, float startFraction, float endFraction );
 
 	virtual		rvParticle		*GetArrayEntry( int i ) const;
@@ -421,7 +425,7 @@ public:
 	}
 	virtual		void			EvaluateLength( rvEnvParms *length, const float time, float oneOverDuration, idVec3 &dest ) {}
 
-	virtual		void			InitSizeEnv( rvEnvParms &env, float duration ) {}
+	virtual		void			InitSizeEnv( rvEnvParms &env, float duration ) { mSizeEnv.Init( env, duration ); }
 	virtual		float			*GetInitSize( void ) { return( mSizeEnv.GetStart() ); }
 	virtual		float			*GetDestSize( void ) { return( mSizeEnv.GetEnd() ); }
 	virtual		void			InitRotationEnv( rvEnvParms &env, float duration ) {}
@@ -432,7 +436,7 @@ public:
 
 	virtual		void			GetSpawnInfo( idVec4 &tint, idVec3 &size, idVec3 &rotate );
 private:
-		rvEnvParms3Particle		mSizeEnv;
+		rvEnvParms2Particle		mSizeEnv;
 		rvEnvParms1Particle		mRotationEnv;
 
 };
@@ -480,7 +484,7 @@ class rvLightParticle : public rvParticle
 public:
 	friend		class			rvParticleTemplate;
 
-								rvLightParticle( void ) { mLightDefHandle = -1; }
+								rvLightParticle( void ) { mLightDefHandle = -1; mLightRenderWorld = NULL; }
 								~rvLightParticle( void ) { Destroy(); }
 
 	virtual		rvParticle		*GetArrayEntry( int i ) const;
@@ -513,6 +517,7 @@ private:
 				// Alterable
 				qhandle_t		mLightDefHandle;
 				renderLight_t	mLight;
+				idRenderWorld* mLightRenderWorld;
 };
 
 class rvLinkedParticle : public rvParticle
@@ -602,6 +607,7 @@ struct rvElectricityInfo {
 	idVec3					mForkSizeMaxs;
 	idVec3					mJitterSize;							// Amount of jitter for the electricity
 	float					mJitterRate;
+	idStr					mJitterTableName;						// Stable table name used to resolve jitter table pointers
 	const idDeclTable		*mJitterTable;							// The envelope for the jitter in the lightning bolt
 
 	rvElectricityInfo() : mStatic(0) {
@@ -623,6 +629,7 @@ public:
 	friend		class				rvLinkedParticle;
 	friend		class				sdOrientedLinkedParticle;
 	friend      class rvSegmentTemplate;
+	friend		class				rvSegment;
 
 									rvParticleTemplate( void ) : mFlags(0) { }
 									~rvParticleTemplate( void ) {}
@@ -631,6 +638,7 @@ public:
 				bool				operator!= ( const rvParticleTemplate& a ) const { return( !Compare( a ) ); }
 				rvParticleTemplate& operator=(const rvParticleTemplate& __that);
 
+				int					GetFlags(void) { return mFlags; }
 				void				SetFlag( bool on, int flag ) { on ? mFlags |= flag : mFlags &= ~flag; }
 				bool				GetFlag( int flag ) const { return ( mFlags & flag ) != 0; }
 				bool				GetParsed( void ) const { return( !!( mFlags & PTFLAG_PARSED ) ); }
@@ -732,7 +740,7 @@ public:
 				void				Duplicate( rvParticleTemplate const &copy );
 private:
 			bool					Compare( const rvParticleTemplate& a ) const;
-			void					FixupParms( rvParticleParms &parms );
+			void					FixupParms( rvParticleParms *parms );
 			void					AllocTrail( void );
 			void					AllocElectricityInfo( void );
 

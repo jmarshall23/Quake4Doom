@@ -1450,6 +1450,269 @@ idScreenRect R_CalcEntityScissorRectangle( viewEntity_t *vEntity ) {
 }
 
 /*
+============== =
+R_AddEffectSurfaces
+============== =
+*/
+void R_AddEffectSurfaces(void) {
+	idRenderWorldLocal* world = tr.viewDef->renderWorld;
+	const int counterMode = 0;
+	int totalDefs = 0;
+	int spawned = 0;
+	int serviced = 0;
+	int expired = 0;
+	int alive = 0;
+	int renderedEffects = 0;
+	int renderedSurfaces = 0;
+	int effectsNoIndexedSurfaces = 0;
+	int effectsNoIndexedButHasVerts = 0;
+	int surfaceVisited = 0;
+	int surfaceNoGeom = 0;
+	int surfaceNoIndexes = 0;
+	int surfaceNoIndexesWithVerts = 0;
+	int surfaceFrustumCull = 0;
+	int surfaceNoShader = 0;
+	int surfaceNotDrawn = 0;
+	int surfaceCacheFail = 0;
+	int serviceSpawnGateTrue = 0;
+	int serviceSpawnGateFalse = 0;
+	int serviceGateLagMin = 0x7fffffff;
+	int serviceGateLagMax = (-0x7fffffff - 1);
+	int dropNotConnected = 0;
+	int dropViewSuppress = 0;
+	int dropNoModel = 0;
+	int dropNoModelSurfaces = 0;
+	int dropClearedBounds = 0;
+	int dropFrustumCull = 0;
+	int dropScissor = 0;
+
+	for (int i = 0; i < world->effectsDef.Num(); i++) {
+		rvRenderEffectLocal* def = world->effectsDef[i];
+		if (!def) {
+			continue;
+		}
+		++totalDefs;
+		if (def->newEffect) {
+			++spawned;
+		}
+		const int gateLag = def->gameTime - def->serviceTime;
+		if (gateLag < serviceGateLagMin) {
+			serviceGateLagMin = gateLag;
+		}
+		if (gateLag > serviceGateLagMax) {
+			serviceGateLagMax = gateLag;
+		}
+		if (gateLag > 0) {
+			++serviceSpawnGateTrue;
+		}
+		else {
+			++serviceSpawnGateFalse;
+		}
+
+		// Keep simulation/sound state moving even when the effect isn't rendered this frame.
+		++serviced;
+		const float serviceTimeSeconds = static_cast<float>(def->gameTime) * 0.001f;
+		if (bse->ServiceEffect(def, serviceTimeSeconds)) {
+			++expired;
+			if (def->dynamicModel) {
+				delete def->dynamicModel;
+				def->dynamicModel = NULL;
+				def->dynamicModelFrameCount = 0;
+			}
+			continue;
+		}
+		++alive;
+
+		if (!def->effect) {
+			continue;
+		}
+
+		if (!r_skipSuppress.GetBool()) {
+			if (def->parms.suppressSurfaceInViewID && def->parms.suppressSurfaceInViewID == tr.viewDef->renderView.viewID) {
+				++dropViewSuppress;
+				continue;
+			}
+			if (def->parms.allowSurfaceInViewID && def->parms.allowSurfaceInViewID != tr.viewDef->renderView.viewID) {
+				++dropViewSuppress;
+				continue;
+			}
+		}
+
+		def->dynamicModel = bse->RenderEffect(def, tr.viewDef);
+		if (!def->dynamicModel) {
+			++dropNoModel;
+			def->dynamicModelFrameCount = 0;
+			continue;
+		}
+		def->dynamicModelFrameCount = tr.frameCount;
+
+		idRenderModel* model = def->dynamicModel;
+		if (model->NumSurfaces() <= 0) {
+			++dropNoModelSurfaces;
+			continue;
+		}
+
+		const idBounds localBounds = model->Bounds(NULL);
+		if (localBounds.IsCleared()) {
+			++dropClearedBounds;
+			continue;
+		}
+		def->referenceBounds = localBounds;
+
+		viewEntity_t* vEffect = (viewEntity_t*)R_ClearedFrameAlloc(sizeof(*vEffect));
+		vEffect->entityDef = NULL;
+		vEffect->weaponDepthHack = (def->parms.weaponDepthHackInViewID != 0 && def->parms.weaponDepthHackInViewID == tr.viewDef->renderView.viewID);
+		vEffect->modelDepthHack = def->parms.modelDepthHack;
+		R_AxisToModelMatrix(def->parms.axis, def->parms.origin, vEffect->modelMatrix);
+		myGlMultMatrix(vEffect->modelMatrix, tr.viewDef->worldSpace.modelViewMatrix, vEffect->modelViewMatrix);
+
+		{
+			if (R_CullLocalBox(localBounds, vEffect->modelMatrix, 5, tr.viewDef->frustum)) {
+				++dropFrustumCull;
+				continue;
+			}
+		}
+
+		// Stock Quake 4 effects are portal-scissored from area visibility, not
+		// tightly projected from dynamic-model bounds. Bound-based scissors can
+		// clip deformed/sprite effect geometry (for example rocket flare cards).
+		vEffect->scissorRect = tr.viewDef->scissor;
+		if (vEffect->scissorRect.IsEmpty()) {
+			++dropScissor;
+			continue;
+		}
+
+		renderEntity_t renderParms;
+		memset(&renderParms, 0, sizeof(renderParms));
+		renderParms.origin = def->parms.origin;
+		renderParms.axis = def->parms.axis;
+		renderParms.suppressSurfaceInViewID = def->parms.suppressSurfaceInViewID;
+		renderParms.allowSurfaceInViewID = def->parms.allowSurfaceInViewID;
+		renderParms.modelDepthHack = def->parms.modelDepthHack;
+		renderParms.weaponDepthHackInViewID = def->parms.weaponDepthHackInViewID;
+		renderParms.referenceSoundHandle = def->parms.referenceSoundHandle;
+		for (int parm = 0; parm < MAX_ENTITY_SHADER_PARMS; ++parm) {
+			renderParms.shaderParms[parm] = def->parms.shaderParms[parm];
+		}
+
+		const int total = model->NumSurfaces();
+		int effectSurfaceCount = 0;
+		int effectNoIndexes = 0;
+		int effectNoIndexesWithVerts = 0;
+		for (int s = 0; s < total; ++s) {
+			++surfaceVisited;
+			if (r_singleSurface.GetInteger() >= 0 && s != r_singleSurface.GetInteger()) {
+				continue;
+			}
+
+			const modelSurface_t* surf = model->Surface(s);
+			if (!surf || !surf->geometry) {
+				++surfaceNoGeom;
+				continue;
+			}
+			if (!surf->geometry->numIndexes) {
+				if (surf->geometry->numVerts > 0) {
+					++surfaceNoIndexesWithVerts;
+					++effectNoIndexesWithVerts;
+				}
+				++surfaceNoIndexes;
+				++effectNoIndexes;
+				continue;
+			}
+
+			srfTriangles_t* tri = surf->geometry;
+			{
+				if (R_CullLocalBox(tri->bounds, vEffect->modelMatrix, 5, tr.viewDef->frustum)) {
+					++surfaceFrustumCull;
+					continue;
+				}
+			}
+
+			const idMaterial* shader = surf->shader;
+			R_GlobalShaderOverride(&shader);
+			if (!shader) {
+				++surfaceNoShader;
+				continue;
+			}
+			if (!shader->IsDrawn()) {
+				++surfaceNotDrawn;
+				continue;
+			}
+
+			if (!R_CreateAmbientCache(tri, shader->ReceivesLighting())) {
+				++surfaceCacheFail;
+				continue;
+			}
+			vertexCache.Touch(tri->ambientCache);
+
+			// BSE dynamic surfaces rebuild index data every frame; keep them on the CPU index path.
+			tri->indexCache = NULL;
+
+			R_AddDrawSurf(tri, vEffect, &renderParms, shader, vEffect->scissorRect);
+			tri->ambientViewCount = tr.viewCount;
+			def->visibleCount = tr.viewCount;
+			++effectSurfaceCount;
+			++renderedSurfaces;
+		}
+		if (effectSurfaceCount > 0) {
+			++renderedEffects;
+		}
+		else if (total > 0) {
+			++effectsNoIndexedSurfaces;
+			if (effectNoIndexesWithVerts > 0) {
+				++effectsNoIndexedButHasVerts;
+			}
+		}
+	}
+
+	if (counterMode > 0) {
+		common->Printf(
+			"BSE frame %d view %d mode=%d: spawned=%d serviced=%d rendered=%d defs=%d alive=%d expired=%d surfaces=%d\n",
+			tr.frameCount,
+			tr.viewDef->renderView.viewID,
+			counterMode,
+			spawned,
+			serviced,
+			renderedEffects,
+			totalDefs,
+			alive,
+			expired,
+			renderedSurfaces);
+		common->Printf(
+			"BSE drops: notConnected=%d viewSuppress=%d noModel=%d noSurfaces=%d clearedBounds=%d frustum=%d scissor=%d\n",
+			dropNotConnected,
+			dropViewSuppress,
+			dropNoModel,
+			dropNoModelSurfaces,
+			dropClearedBounds,
+			dropFrustumCull,
+			dropScissor);
+		common->Printf(
+			"BSE surf: visited=%d noGeom=%d noIndexes=%d noIdxWithVerts=%d frustum=%d noShader=%d notDrawn=%d cacheFail=%d added=%d\n",
+			surfaceVisited,
+			surfaceNoGeom,
+			surfaceNoIndexes,
+			surfaceNoIndexesWithVerts,
+			surfaceFrustumCull,
+			surfaceNoShader,
+			surfaceNotDrawn,
+			surfaceCacheFail,
+			renderedSurfaces);
+		common->Printf(
+			"BSE effect geom: noIndexed=%d noIndexedWithVerts=%d rendered=%d\n",
+			effectsNoIndexedSurfaces,
+			effectsNoIndexedButHasVerts,
+			renderedEffects);
+		common->Printf(
+			"BSE service gate: true=%d false=%d lagMin=%d lagMax=%d\n",
+			serviceSpawnGateTrue,
+			serviceSpawnGateFalse,
+			(serviceGateLagMin == 0x7fffffff) ? 0 : serviceGateLagMin,
+			(serviceGateLagMax == (-0x7fffffff - 1)) ? 0 : serviceGateLagMax);
+	}
+}
+
+/*
 ===================
 R_AddModelSurfaces
 

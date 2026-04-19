@@ -1208,12 +1208,6 @@
     <ClCompile Include="framework\DeclMatType.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="bse\BSE_EffectTemplate.cpp">
-      <Filter>BSE</Filter>
-    </ClCompile>
-    <ClCompile Include="bse\BSE_Manager.cpp">
-      <Filter>BSE</Filter>
-    </ClCompile>
     <ClCompile Include="aas\AASFile.cpp">
       <Filter>AAS</Filter>
     </ClCompile>
@@ -1303,6 +1297,39 @@
     </ClCompile>
     <ClCompile Include="renderer\rvPrimBatch.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_ParseParticle2.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Segment.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Effect.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_EffectTemplate.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Envelopes.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Manager.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Module.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_Particle.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_SegmentRuntime.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_SegmentTemplate.cpp">
+      <Filter>BSE</Filter>
+    </ClCompile>
+    <ClCompile Include="bse\BSE_SpawnDomains.cpp">
+      <Filter>BSE</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

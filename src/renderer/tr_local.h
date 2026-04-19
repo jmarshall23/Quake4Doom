@@ -1714,4 +1714,7 @@ void RB_ARB2_LoadModelViewMatrixIntoVPParams(const drawSurf_t* surf);
 void RB_ARB2_MD5R_DrawDepthElements(const drawSurf_t* surf);
 void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf, bool fillingDepth);
 void RB_ARB2_DisableStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf);
+
+void R_AddEffectSurfaces(void);
+
 #endif /* !__TR_LOCAL_H__ */
