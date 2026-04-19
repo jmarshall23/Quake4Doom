@@ -32,6 +32,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "precompiled.h"
 #include "tr_local.h"
 
+#define Q4_SUPPORT_GLSL_PATH 0
+
 // ----------------------------------------------------------------------------
 // ErrorWithInfoLog
 // ----------------------------------------------------------------------------
@@ -40,8 +42,8 @@ void ErrorWithInfoLog(unsigned int obj, const char* name) {
 	int infoLogLength = 0;
 	int charsWritten = 0;
 	int objectSubtype = 0;
-
-	qglGetObjectParameterivARB(obj, 0x8B84, &infoLogLength); // GL_OBJECT_INFO_LOG_LENGTH_ARB
+#if Q4_SUPPORT_GLSL_PATH
+	glGetObjectParameterivARB(obj, 0x8B84, &infoLogLength); // GL_OBJECT_INFO_LOG_LENGTH_ARB
 
 	const char* infoText = "Unknown error";
 	char* dynamicLog = nullptr;
@@ -49,12 +51,12 @@ void ErrorWithInfoLog(unsigned int obj, const char* name) {
 	if (infoLogLength > 0) {
 		dynamicLog = new char[infoLogLength + 1];
 		dynamicLog[0] = '\0';
-		qglGetInfoLogARB(obj, infoLogLength, &charsWritten, dynamicLog);
+		glGetInfoLogARB(obj, infoLogLength, &charsWritten, dynamicLog);
 		dynamicLog[charsWritten < infoLogLength ? charsWritten : infoLogLength] = '\0';
 		infoText = dynamicLog;
 	}
 
-	qglGetObjectParameterivARB(obj, 0x8B4F, &objectSubtype); // GL_OBJECT_SUBTYPE_ARB
+	glGetObjectParameterivARB(obj, 0x8B4F, &objectSubtype); // GL_OBJECT_SUBTYPE_ARB
 
 	const char* shaderType = "unknown";
 	if (objectSubtype == 35633) {
@@ -72,6 +74,7 @@ void ErrorWithInfoLog(unsigned int obj, const char* name) {
 	}
 
 	delete[] dynamicLog;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -79,46 +82,58 @@ void ErrorWithInfoLog(unsigned int obj, const char* name) {
 // ----------------------------------------------------------------------------
 
 rvGLSLShader::~rvGLSLShader() {
+#if Q4_SUPPORT_GLSL_PATH
 	if (program && vertexShader) {
-		qglDetachObjectARB(program, vertexShader);
+		glDetachObjectARB(program, vertexShader);
 	}
 
 	if (program && fragmentShader) {
-		qglDetachObjectARB(program, fragmentShader);
+		glDetachObjectARB(program, fragmentShader);
 	}
 
 	if (vertexShader) {
-		qglDeleteObjectARB(vertexShader);
+		glDeleteObjectARB(vertexShader);
 		vertexShader = 0;
 	}
 
 	if (fragmentShader) {
-		qglDeleteObjectARB(fragmentShader);
+		glDeleteObjectARB(fragmentShader);
 		fragmentShader = 0;
 	}
 
 	if (program) {
-		qglDeleteObjectARB(program);
+		glDeleteObjectARB(program);
 		program = 0;
 	}
+#endif
 }
 
 unsigned int rvGLSLShader::GetVariablePosition(const char* name) {
-	return qglGetUniformLocationARB(program, name);
+#if Q4_SUPPORT_GLSL_PATH
+	return glGetUniformLocationARB(program, name);
+#else
+	return 0;
+#endif
 }
 
 void rvGLSLShader::Bind() {
-	qglUseProgramObjectARB(program);
+#if Q4_SUPPORT_GLSL_PATH
+	glUseProgramObjectARB(program);
+#endif
 }
 
 void rvGLSLShader::UnBind() {
-	qglUseProgramObjectARB(0);
+#if Q4_SUPPORT_GLSL_PATH
+	glUseProgramObjectARB(0);
+#endif
 }
 
 void rvGLSLShader::SetTexture(int position, int unit, idImage* image) {
 	GL_SelectTexture(unit);
 	image->Bind();
-	qglUniform1iARB(position, unit);
+#if Q4_SUPPORT_GLSL_PATH
+	glUniform1iARB(position, unit);
+#endif
 }
 
 void rvGLSLShader::UnBindTexture(int position, int unit, idImage* image) {
@@ -128,6 +143,7 @@ void rvGLSLShader::UnBindTexture(int position, int unit, idImage* image) {
 }
 
 bool rvGLSLShader::LoadProgram() {
+#if Q4_SUPPORT_GLSL_PATH
 	idStr fullPath("glprogs/");
 	fullPath += name;
 
@@ -160,17 +176,17 @@ bool rvGLSLShader::LoadProgram() {
 
 	int status = 0;
 
-	vertexShader = qglCreateShaderObjectARB(0x8B31);   // GL_VERTEX_SHADER_ARB
-	fragmentShader = qglCreateShaderObjectARB(0x8B30); // GL_FRAGMENT_SHADER_ARB
+	vertexShader = glCreateShaderObjectARB(0x8B31);   // GL_VERTEX_SHADER_ARB
+	fragmentShader = glCreateShaderObjectARB(0x8B30); // GL_FRAGMENT_SHADER_ARB
 
-	qglShaderSourceARB(
+	glShaderSourceARB(
 		vertexShader,
 		1,
 		const_cast<const char**>(&vertexBuffer),
 		(vertexLength != 0) ? &vertexLength : nullptr
 	);
 
-	qglShaderSourceARB(
+	glShaderSourceARB(
 		fragmentShader,
 		1,
 		const_cast<const char**>(&fragmentBuffer),
@@ -180,33 +196,33 @@ bool rvGLSLShader::LoadProgram() {
 	fileSystem->FreeFile(vertexBuffer);
 	fileSystem->FreeFile(fragmentBuffer);
 
-	qglGetError(); // clear any prior error
+	glGetError(); // clear any prior error
 
-	qglCompileShaderARB(vertexShader);
-	unsigned int error = qglGetError();
-	qglGetObjectParameterivARB(vertexShader, 0x8B81, &status); // GL_OBJECT_COMPILE_STATUS_ARB
+	glCompileShaderARB(vertexShader);
+	unsigned int error = glGetError();
+	glGetObjectParameterivARB(vertexShader, 0x8B81, &status); // GL_OBJECT_COMPILE_STATUS_ARB
 
 	if (error || !status) {
 		ErrorWithInfoLog(vertexShader, name);
 		return false;
 	}
 
-	qglCompileShaderARB(fragmentShader);
-	error = qglGetError();
-	qglGetObjectParameterivARB(fragmentShader, 0x8B81, &status); // GL_OBJECT_COMPILE_STATUS_ARB
+	glCompileShaderARB(fragmentShader);
+	error = glGetError();
+	glGetObjectParameterivARB(fragmentShader, 0x8B81, &status); // GL_OBJECT_COMPILE_STATUS_ARB
 
 	if (error || !status) {
 		ErrorWithInfoLog(fragmentShader, name);
 		return false;
 	}
 
-	program = qglCreateProgramObjectARB();
-	qglAttachObjectARB(program, vertexShader);
-	qglAttachObjectARB(program, fragmentShader);
-	qglLinkProgramARB(program);
+	program = glCreateProgramObjectARB();
+	glAttachObjectARB(program, vertexShader);
+	glAttachObjectARB(program, fragmentShader);
+	glLinkProgramARB(program);
 
-	error = qglGetError();
-	qglGetObjectParameterivARB(program, 0x8B82, &status); // GL_OBJECT_LINK_STATUS_ARB
+	error = glGetError();
+	glGetObjectParameterivARB(program, 0x8B82, &status); // GL_OBJECT_LINK_STATUS_ARB
 
 	if (error || !status) {
 		ErrorWithInfoLog(program, name);
@@ -214,6 +230,9 @@ bool rvGLSLShader::LoadProgram() {
 	}
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -295,20 +314,22 @@ void rvGLSLShaderStage::BindShaderParameter(
 	const float* floatVector,
 	int arraySize
 ) {
+#if Q4_SUPPORT_GLSL_PATH
 	switch (numParms) {
 	case 1:
-		qglUniform1fvARB(shaderParmLocations[slot], arraySize, floatVector);
+		glUniform1fvARB(shaderParmLocations[slot], arraySize, floatVector);
 		break;
 	case 2:
-		qglUniform2fvARB(shaderParmLocations[slot], arraySize, floatVector);
+		glUniform2fvARB(shaderParmLocations[slot], arraySize, floatVector);
 		break;
 	case 3:
-		qglUniform3fvARB(shaderParmLocations[slot], arraySize, floatVector);
+		glUniform3fvARB(shaderParmLocations[slot], arraySize, floatVector);
 		break;
 	case 4:
-		qglUniform4fvARB(shaderParmLocations[slot], arraySize, floatVector);
+		glUniform4fvARB(shaderParmLocations[slot], arraySize, floatVector);
 		break;
 	default:
 		break;
 	}
+#endif
 }

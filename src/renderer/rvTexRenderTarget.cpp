@@ -97,8 +97,8 @@ bool rvTexRenderTarget::Init(
 	int numStencilBits,
 	int flags
 ) {
-	HDC   currentDC = qwglGetCurrentDC();
-	HGLRC currentGLRC = qwglGetCurrentContext();
+	HDC   currentDC = wglGetCurrentDC();
+	HGLRC currentGLRC = (HGLRC)wglGetCurrentContext();
 
 	int pixelFormatIndex = 0;
 	UINT formatCount = 0;
@@ -156,13 +156,13 @@ bool rvTexRenderTarget::Init(
 	attribs[attribIndex++] = 0;
 	attribs[attribIndex++] = 0;
 
-	if (!qwglChoosePixelFormatARB(currentDC, attribs, nullptr, 1, &pixelFormatIndex, &formatCount)) {
-		common->Warning("qwglChoosePixelFormatARB() failed, last error %x\n", GetLastError());
+	if (!wglChoosePixelFormatARB(currentDC, attribs, nullptr, 1, &pixelFormatIndex, &formatCount)) {
+		common->Warning("wglChoosePixelFormatARB() failed, last error %x\n", GetLastError());
 		return false;
 	}
 
 	if (formatCount == 0) {
-		common->Warning("qwglChoosePixelFormatARB() couldn't find any matches\n");
+		common->Warning("wglChoosePixelFormatARB() couldn't find any matches\n");
 		return false;
 	}
 
@@ -214,32 +214,32 @@ bool rvTexRenderTarget::Init(
 	attribs[texAttribIndex++] = 0;
 	attribs[texAttribIndex++] = 0;
 
-	m_hPBuffer = qwglCreatePbufferARB(currentDC, pixelFormatIndex, resWidth, resHeight, attribs);
+	m_hPBuffer = wglCreatePbufferARB(currentDC, pixelFormatIndex, resWidth, resHeight, attribs);
 	if (!m_hPBuffer) {
-		common->Warning("qwglCreatePbufferARB() failed, last error %x\n", GetLastError());
+		common->Warning("wglCreatePbufferARB() failed, last error %x\n", GetLastError());
 		return false;
 	}
 
-	m_hDC = qwglGetPbufferDCARB(m_hPBuffer);
+	m_hDC = wglGetPbufferDCARB(m_hPBuffer);
 	if (!m_hDC) {
-		qwglDestroyPbufferARB(m_hPBuffer);
+		wglDestroyPbufferARB(m_hPBuffer);
 		ResetValues();
 		return false;
 	}
 
-	m_hGLRC = qwglCreateContext(m_hDC);
+	m_hGLRC = (HGLRC)wglCreateContext(m_hDC);
 	if (!m_hGLRC) {
-		qwglReleasePbufferDCARB(m_hPBuffer, m_hDC);
-		qwglDestroyPbufferARB(m_hPBuffer);
+		wglReleasePbufferDCARB(m_hPBuffer, m_hDC);
+		wglDestroyPbufferARB(m_hPBuffer);
 		ResetValues();
 		return false;
 	}
 
-	if (currentGLRC && !qwglShareLists(currentGLRC, m_hGLRC)) {
-		common->Warning("qwglShareLists() couldn't share display list resources\n");
-		qwglDeleteContext(m_hGLRC);
-		qwglReleasePbufferDCARB(m_hPBuffer, m_hDC);
-		qwglDestroyPbufferARB(m_hPBuffer);
+	if (currentGLRC && !wglShareLists(currentGLRC, m_hGLRC)) {
+		common->Warning("wglShareLists() couldn't share display list resources\n");
+		wglDeleteContext(m_hGLRC);
+		wglReleasePbufferDCARB(m_hPBuffer, m_hDC);
+		wglDestroyPbufferARB(m_hPBuffer);
 		ResetValues();
 		return false;
 	}
@@ -281,14 +281,14 @@ void rvTexRenderTarget::Release() {
 	if (m_hPBuffer) {
 		if (m_hDC) {
 			if (m_hGLRC) {
-				qwglDeleteContext(m_hGLRC);
+				wglDeleteContext(m_hGLRC);
 				m_hGLRC = nullptr;
 			}
-			qwglReleasePbufferDCARB(m_hPBuffer, m_hDC);
+			wglReleasePbufferDCARB(m_hPBuffer, m_hDC);
 			m_hDC = nullptr;
 		}
 
-		qwglDestroyPbufferARB(m_hPBuffer);
+		wglDestroyPbufferARB(m_hPBuffer);
 		m_hPBuffer = nullptr;
 	}
 
@@ -312,17 +312,17 @@ bool rvTexRenderTarget::Restore() {
 
 void rvTexRenderTarget::BeginRender(int cubeFace) {
 	if (m_textureObjName) {
-		qwglReleaseTexImageARB(m_hPBuffer, 8323);
+		wglReleaseTexImageARB(m_hPBuffer, 8323);
 		m_textureObjName = 0;
 	}
 
 	if (!m_hPrevDC && !m_hPrevGLRC) {
-		m_hPrevDC = qwglGetCurrentDC();
-		m_hPrevGLRC = qwglGetCurrentContext();
+		m_hPrevDC = wglGetCurrentDC();
+		m_hPrevGLRC = (HGLRC)wglGetCurrentContext();
 
-		qglGetIntegerv(0x0C01, &m_prevDrawBuffer);    // GL_DRAW_BUFFER
-		qglGetIntegerv(0x0C02, &m_prevReadBuffer);    // GL_READ_BUFFER
-		qglGetIntegerv(0x0BA2, m_prevViewport);       // GL_VIEWPORT
+		glGetIntegerv(0x0C01, &m_prevDrawBuffer);    // GL_DRAW_BUFFER
+		glGetIntegerv(0x0C02, &m_prevReadBuffer);    // GL_READ_BUFFER
+		glGetIntegerv(0x0BA2, m_prevViewport);       // GL_VIEWPORT
 	}
 
 	if (m_flags & 4) {
@@ -331,16 +331,16 @@ void rvTexRenderTarget::BeginRender(int cubeFace) {
 		attribs[1] = cubeFace;
 		attribs[2] = 0;
 		attribs[3] = 0;
-		qwglSetPbufferAttribARB(m_hPBuffer, attribs);
+		wglSetPbufferAttribARB(m_hPBuffer, attribs);
 	}
 
-	if (!qwglMakeCurrent(m_hDC, m_hGLRC)) {
-		common->Printf("qwglMakeCurrent(m_hDC, m_hGLRC) failed, last error %x\n", GetLastError());
+	if (!wglMakeCurrent(m_hDC, m_hGLRC)) {
+		common->Printf("wglMakeCurrent(m_hDC, m_hGLRC) failed, last error %x\n", GetLastError());
 	}
 
-	qglDrawBuffer(0x0404); // GL_FRONT
-	qglReadBuffer(0x0404); // GL_FRONT
-	qglViewport(0, 0, m_resWidth, m_resHeight);
+	glDrawBuffer(0x0404); // GL_FRONT
+	glReadBuffer(0x0404); // GL_FRONT
+	glViewport(0, 0, m_resWidth, m_resHeight);
 }
 
 void rvTexRenderTarget::EndRender(bool restorePreviousDC) {
@@ -348,13 +348,13 @@ void rvTexRenderTarget::EndRender(bool restorePreviousDC) {
 		return;
 	}
 
-	if (!qwglMakeCurrent(m_hPrevDC, m_hPrevGLRC)) {
-		common->Printf("qwglMakeCurrent(m_hPrevDC, m_hPrevGLRC) failed, last error %x\n", GetLastError());
+	if (!wglMakeCurrent(m_hPrevDC, m_hPrevGLRC)) {
+		common->Printf("wglMakeCurrent(m_hPrevDC, m_hPrevGLRC) failed, last error %x\n", GetLastError());
 	}
 
-	qglDrawBuffer(m_prevDrawBuffer);
-	qglReadBuffer(m_prevReadBuffer);
-	qglViewport(
+	glDrawBuffer(m_prevDrawBuffer);
+	glReadBuffer(m_prevReadBuffer);
+	glViewport(
 		m_prevViewport[0],
 		m_prevViewport[1],
 		m_prevViewport[2],
@@ -372,51 +372,51 @@ void rvTexRenderTarget::BeginTexture(
 	int wrap
 ) {
 	if (m_textureObjName) {
-		qwglReleaseTexImageARB(m_hPBuffer, 8323);
+		wglReleaseTexImageARB(m_hPBuffer, 8323);
 		m_textureObjName = 0;
 	}
 
-	qglBindTexture(m_target, textureObjName);
-	qglTexParameteri(m_target, 0x2801, minFilter); // GL_TEXTURE_MIN_FILTER
-	qglTexParameteri(m_target, 0x2800, magFilter); // GL_TEXTURE_MAG_FILTER
-	qglTexParameteri(m_target, 0x2802, wrap);      // GL_TEXTURE_WRAP_S
-	qglTexParameteri(m_target, 0x2803, wrap);      // GL_TEXTURE_WRAP_T
+	glBindTexture(m_target, textureObjName);
+	glTexParameteri(m_target, 0x2801, minFilter); // GL_TEXTURE_MIN_FILTER
+	glTexParameteri(m_target, 0x2800, magFilter); // GL_TEXTURE_MAG_FILTER
+	glTexParameteri(m_target, 0x2802, wrap);      // GL_TEXTURE_WRAP_S
+	glTexParameteri(m_target, 0x2803, wrap);      // GL_TEXTURE_WRAP_T
 
-	qwglBindTexImageARB(m_hPBuffer, 8323);
+	wglBindTexImageARB(m_hPBuffer, 8323);
 	m_textureObjName = textureObjName;
 }
 
 void rvTexRenderTarget::EndTexture() {
-	qwglReleaseTexImageARB(m_hPBuffer, 8323);
+	wglReleaseTexImageARB(m_hPBuffer, 8323);
 	m_textureObjName = 0;
 }
 
 void rvTexRenderTarget::DefaultD3GL() {
 	BeginRender(0);
 
-	qglClearDepth(1.0);
-	qglClear(0x4100); // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+	glClearDepth(1.0);
+	glClear(0x4100); // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
 
-	qglEnable(0x0B71);               // GL_DEPTH_TEST
-	qglDisable(0x0BC0);              // GL_ALPHA_TEST
-	qglDepthFunc(0x0203);            // GL_LEQUAL
+	glEnable(0x0B71);               // GL_DEPTH_TEST
+	glDisable(0x0BC0);              // GL_ALPHA_TEST
+	glDepthFunc(0x0203);            // GL_LEQUAL
 
-	qglMatrixMode(0x1700);           // GL_MODELVIEW
-	qglLoadIdentity();
-	qglMatrixMode(0x1701);           // GL_PROJECTION
-	qglLoadIdentity();
+	glMatrixMode(0x1700);           // GL_MODELVIEW
+	glLoadIdentity();
+	glMatrixMode(0x1701);           // GL_PROJECTION
+	glLoadIdentity();
 
-	qglEnableClientState(0x8074);    // GL_VERTEX_ARRAY
-	qglDisableClientState(0x8075);   // GL_NORMAL_ARRAY
-	qglEnableClientState(0x8078);    // GL_TEXTURE_COORD_ARRAY
-	qglDisableClientState(0x8076);   // GL_COLOR_ARRAY
+	glEnableClientState(0x8074);    // GL_VERTEX_ARRAY
+	glDisableClientState(0x8075);   // GL_NORMAL_ARRAY
+	glEnableClientState(0x8078);    // GL_TEXTURE_COORD_ARRAY
+	glDisableClientState(0x8076);   // GL_COLOR_ARRAY
 
-	qglShadeModel(0x1D01);           // GL_SMOOTH
-	qglCullFace(0x0405);             // GL_BACK
-	qglEnable(0x0B44);               // GL_CULL_FACE
-	qglDisable(0x0BE2);              // GL_BLEND
-	qglDisable(0x0B50);              // GL_LIGHTING
-	qglDisable(0x0DE1);              // GL_TEXTURE_2D
+	glShadeModel(0x1D01);           // GL_SMOOTH
+	glCullFace(0x0405);             // GL_BACK
+	glEnable(0x0B44);               // GL_CULL_FACE
+	glDisable(0x0BE2);              // GL_BLEND
+	glDisable(0x0B50);              // GL_LIGHTING
+	glDisable(0x0DE1);              // GL_TEXTURE_2D
 
 	EndRender(true);
 }

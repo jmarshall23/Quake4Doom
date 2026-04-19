@@ -61,7 +61,7 @@ void rvIndexBuffer::CreateIndexStorage() {
 	}
 
 	if (m_flags & IBF_VIDEO_MEMORY) {
-		qglGenBuffersARB(1, &m_ibID);
+		glGenBuffersARB(1, &m_ibID);
 		if (!m_ibID) {
 			idLib::common->FatalError("rvIndexBuffer: Unable to gen index buffer id");
 			return;
@@ -71,14 +71,14 @@ void rvIndexBuffer::CreateIndexStorage() {
 			const int bytesPerIndex = (m_flags & IBF_INDEX16) ? 2 : 4;
 			const int totalBytes = bytesPerIndex * m_numIndices;
 
-			qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
-			qglBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, totalBytes, NULL, GL_STATIC_DRAW_ARB);
+			glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
+			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, totalBytes, NULL, GL_STATIC_DRAW_ARB);
 
-			if (qglGetError() != GL_NO_ERROR) {
+			if (glGetError() != GL_NO_ERROR) {
 				idLib::common->FatalError("Unable to allocate index storage");
 			}
 
-			qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+			glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 		}
 	}
 }
@@ -183,7 +183,7 @@ bool rvIndexBuffer::Lock(int indexOffset, int numIndicesToLock, unsigned int loc
 		return true;
 	}
 
-	qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
 
 	unsigned int mapAccess = GL_READ_WRITE_ARB;
 	unsigned int effectiveLockFlags = lockFlags;
@@ -201,14 +201,14 @@ bool rvIndexBuffer::Lock(int indexOffset, int numIndicesToLock, unsigned int loc
 			if (effectiveLockFlags & IBLOCK_DISCARD) {
 				const int lockBytes = bytesPerIndex * m_lockIndexCount;
 				m_lockIndexOffset = 0;
-				qglBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, lockBytes, NULL, usage);
+				glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, lockBytes, NULL, usage);
 			}
 		}
 	}
 
-	m_lockedBase = reinterpret_cast<unsigned char*>(qglMapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mapAccess));
+	m_lockedBase = reinterpret_cast<unsigned char*>(glMapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mapAccess));
 	if (m_lockedBase == NULL) {
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 		return false;
 	}
 
@@ -234,15 +234,15 @@ void rvIndexBuffer::Unlock() {
 			const int byteOffset = bytesPerIndex * m_lockIndexOffset;
 			const int byteCount = bytesPerIndex * m_lockIndexCount;
 
-			qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
-			qglBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, byteOffset, byteCount, m_systemMemStorage + byteOffset);
-			qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+			glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
+			glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, byteOffset, byteCount, m_systemMemStorage + byteOffset);
+			glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 		}
 	}
 	else if (m_flags & IBF_VIDEO_MEMORY) {
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
-		qglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
+		glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
 
 	m_lockStatus = 0;
@@ -367,7 +367,7 @@ void rvIndexBuffer::Shutdown() {
 	}
 
 	if (m_ibID) {
-		qglDeleteBuffersARB(1, &m_ibID);
+		glDeleteBuffersARB(1, &m_ibID);
 		m_ibID = 0;
 	}
 
@@ -410,9 +410,9 @@ void rvIndexBuffer::Resize(int numIndices) {
 	m_systemMemStorage = reinterpret_cast<unsigned char*>(newStorage);
 
 	if (m_flags & IBF_VIDEO_MEMORY) {
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
-		qglBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, newSizeBytes, m_systemMemStorage, GL_STATIC_DRAW_ARB);
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_ibID);
+		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, newSizeBytes, m_systemMemStorage, GL_STATIC_DRAW_ARB);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
 
 	m_numIndices = numIndices;

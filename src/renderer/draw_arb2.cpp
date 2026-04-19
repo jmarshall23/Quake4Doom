@@ -228,11 +228,11 @@ static void RB_Q4_MaybeInteractionPolygonOffset(const drawInteraction_t* din, bo
 	}
 
 	if (enable) {
-		qglEnable(GL_POLYGON_OFFSET_FILL);
-		qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat());
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat());
 	}
 	else {
-		qglDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 }
 
@@ -244,7 +244,7 @@ static void RB_Q4_LoadMatrixRowIntoVPParam(const float m[16], int row, int vpPar
 	parm[2] = m[row + 8];
 	parm[3] = m[row + 12];
 
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParam, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParam, parm);
 }
 
 void RB_ARB2_LoadMVPMatrixIntoVPParams(const drawSurf_t* surf) {
@@ -319,7 +319,7 @@ void RB_ARB2_LoadLocalViewOriginIntoVPParams(const drawSurf_t* surf) {
 	parm[2] = localPos[2];
 	parm[3] = 1.0f;
 
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_LOCAL_VIEW_ORIGIN, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_LOCAL_VIEW_ORIGIN, parm);
 }
 
 
@@ -352,7 +352,7 @@ GL_SelectTextureNoClient
 */
 static void GL_SelectTextureNoClient(int unit) {
 	backEnd.glState.currenttmu = unit;
-	qglActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
 	RB_LogComment("glActiveTextureARB( %i )\n", unit);
 }
 
@@ -373,23 +373,23 @@ void	RB_ARB2_DrawInteraction(const drawInteraction_t* din) {
 #endif
 
 	// load all the vertex program parameters
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_ORIGIN, din->localLightOrigin.ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_VIEW_ORIGIN, din->localViewOrigin.ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_PROJECT_S, din->lightProjection[0].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_PROJECT_T, din->lightProjection[1].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_PROJECT_Q, din->lightProjection[2].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_FALLOFF_S, din->lightProjection[3].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_BUMP_MATRIX_S, din->bumpMatrix[0].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_BUMP_MATRIX_T, din->bumpMatrix[1].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_DIFFUSE_MATRIX_S, din->diffuseMatrix[0].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_DIFFUSE_MATRIX_T, din->diffuseMatrix[1].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_SPECULAR_MATRIX_S, din->specularMatrix[0].ToFloatPtr());
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_SPECULAR_MATRIX_T, din->specularMatrix[1].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_ORIGIN, din->localLightOrigin.ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_VIEW_ORIGIN, din->localViewOrigin.ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_PROJECT_S, din->lightProjection[0].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_PROJECT_T, din->lightProjection[1].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_PROJECT_Q, din->lightProjection[2].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_LIGHT_FALLOFF_S, din->lightProjection[3].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_BUMP_MATRIX_S, din->bumpMatrix[0].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_BUMP_MATRIX_T, din->bumpMatrix[1].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_DIFFUSE_MATRIX_S, din->diffuseMatrix[0].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_DIFFUSE_MATRIX_T, din->diffuseMatrix[1].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_SPECULAR_MATRIX_S, din->specularMatrix[0].ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_SPECULAR_MATRIX_T, din->specularMatrix[1].ToFloatPtr());
 
 	// testing fragment based normal mapping
 	if (r_testARBProgram.GetBool()) {
-		qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 2, din->localLightOrigin.ToFloatPtr());
-		qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 3, din->localViewOrigin.ToFloatPtr());
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 2, din->localLightOrigin.ToFloatPtr());
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 3, din->localViewOrigin.ToFloatPtr());
 	}
 
 	static const float zero[4] = { 0, 0, 0, 0 };
@@ -398,21 +398,21 @@ void	RB_ARB2_DrawInteraction(const drawInteraction_t* din) {
 
 	switch (din->vertexColor) {
 	case SVC_IGNORE:
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_MODULATE, zero);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_ADD, one);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_MODULATE, zero);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_ADD, one);
 		break;
 	case SVC_MODULATE:
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_MODULATE, one);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_ADD, zero);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_MODULATE, one);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_ADD, zero);
 		break;
 	case SVC_INVERSE_MODULATE:
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_MODULATE, negOne);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_ADD, one);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_MODULATE, negOne);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, vpParamOffset + PP_COLOR_ADD, one);
 		break;
 	}
 
 	// set the constant colors
-	qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, din->diffuseColor.ToFloatPtr());
+	glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, din->diffuseColor.ToFloatPtr());
 
 	if (r_q4SpecularColorX2.GetBool()) {
 		float specularColorX2[4];
@@ -423,10 +423,10 @@ void	RB_ARB2_DrawInteraction(const drawInteraction_t* din) {
 		specularColorX2[2] = src[2] + src[2];
 		specularColorX2[3] = src[3] + src[3];
 
-		qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, specularColorX2);
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, specularColorX2);
 	}
 	else {
-		qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, din->specularColor.ToFloatPtr());
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, din->specularColor.ToFloatPtr());
 	}
 
 	// set the textures
@@ -477,27 +477,27 @@ void RB_ARB2_CreateDrawInteractions(const drawSurf_t* surf) {
 
 	// bind the vertex program
 	if (r_testARBProgram.GetBool()) {
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_TEST);
-		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_TEST);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_TEST);
+		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_TEST);
 	}
 	else if (useSimpleInteraction) {
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, Q4_VPROG_SIMPLE_INTERACTION);
-		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, Q4_FPROG_SIMPLE_INTERACTION);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, Q4_VPROG_SIMPLE_INTERACTION);
+		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, Q4_FPROG_SIMPLE_INTERACTION);
 	}
 	else {
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_INTERACTION);
-		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_INTERACTION);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_INTERACTION);
+		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_INTERACTION);
 	}
 
-	qglEnable(GL_VERTEX_PROGRAM_ARB);
-	qglEnable(GL_FRAGMENT_PROGRAM_ARB);
+	glEnable(GL_VERTEX_PROGRAM_ARB);
+	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
 	// enable the vertex arrays
-	qglEnableVertexAttribArrayARB(8);
-	qglEnableVertexAttribArrayARB(9);
-	qglEnableVertexAttribArrayARB(10);
-	qglEnableVertexAttribArrayARB(11);
-	qglEnableClientState(GL_COLOR_ARRAY);
+	glEnableVertexAttribArrayARB(8);
+	glEnableVertexAttribArrayARB(9);
+	glEnableVertexAttribArrayARB(10);
+	glEnableVertexAttribArrayARB(11);
+	glEnableClientState(GL_COLOR_ARRAY);
 
 	// texture 0 is the normalization cube map for the vector towards the light
 	GL_SelectTextureNoClient(0);
@@ -538,23 +538,23 @@ void RB_ARB2_CreateDrawInteractions(const drawSurf_t* surf) {
 
 		// set the vertex pointers
 		idDrawVert* ac = (idDrawVert*)vertexCache.Position(surf->geo->ambientCache);
-		qglColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), ac->color);
-		qglVertexAttribPointerARB(11, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->normal.ToFloatPtr());
-		qglVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
-		qglVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
-		qglVertexAttribPointerARB(8, 2, GL_FLOAT, false, sizeof(idDrawVert), ac->st.ToFloatPtr());
-		qglVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
+		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), ac->color);
+		glVertexAttribPointerARB(11, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+		glVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
+		glVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
+		glVertexAttribPointerARB(8, 2, GL_FLOAT, false, sizeof(idDrawVert), ac->st.ToFloatPtr());
+		glVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
 
 		// this may cause RB_ARB2_DrawInteraction to be executed multiple
 		// times with different colors and images if the surface or light have multiple layers
 		RB_CreateSingleDrawInteractions(surf, RB_ARB2_DrawInteraction);
 	}
 
-	qglDisableVertexAttribArrayARB(8);
-	qglDisableVertexAttribArrayARB(9);
-	qglDisableVertexAttribArrayARB(10);
-	qglDisableVertexAttribArrayARB(11);
-	qglDisableClientState(GL_COLOR_ARRAY);
+	glDisableVertexAttribArrayARB(8);
+	glDisableVertexAttribArrayARB(9);
+	glDisableVertexAttribArrayARB(10);
+	glDisableVertexAttribArrayARB(11);
+	glDisableClientState(GL_COLOR_ARRAY);
 
 	// disable features
 	GL_SelectTextureNoClient(6);
@@ -578,8 +578,8 @@ void RB_ARB2_CreateDrawInteractions(const drawSurf_t* surf) {
 	backEnd.glState.currenttmu = -1;
 	GL_SelectTexture(0);
 
-	qglDisable(GL_VERTEX_PROGRAM_ARB);
-	qglDisable(GL_FRAGMENT_PROGRAM_ARB);
+	glDisable(GL_VERTEX_PROGRAM_ARB);
+	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 }
 
 /*
@@ -592,7 +592,7 @@ void RB_ARB2_DrawInteractions(void) {
 	const idMaterial* lightShader;
 
 	GL_SelectTexture(0);
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	//
 	// for each light, perform adding and shadowing
@@ -619,30 +619,30 @@ void RB_ARB2_DrawInteractions(void) {
 		if (vLight->globalShadows || vLight->localShadows) {
 			backEnd.currentScissor = vLight->scissorRect;
 			if (r_useScissor.GetBool()) {
-				qglScissor(backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
+				glScissor(backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
 					backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
 					backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
 					backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1);
 			}
-			qglClear(GL_STENCIL_BUFFER_BIT);
+			glClear(GL_STENCIL_BUFFER_BIT);
 		}
 		else {
 			// no shadows, so no need to read or write the stencil buffer
 			// we might in theory want to use GL_ALWAYS instead of disabling
 			// completely, to satisfy the invarience rules
-			qglStencilFunc(GL_ALWAYS, 128, 255);
+			glStencilFunc(GL_ALWAYS, 128, 255);
 		}
 
 		if (r_useShadowVertexProgram.GetBool()) {
-			qglEnable(GL_VERTEX_PROGRAM_ARB);
-			qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_STENCIL_SHADOW);
+			glEnable(GL_VERTEX_PROGRAM_ARB);
+			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_STENCIL_SHADOW);
 			RB_StencilShadowPass(vLight->globalShadows);
 			RB_ARB2_CreateDrawInteractions(vLight->localInteractions);
-			qglEnable(GL_VERTEX_PROGRAM_ARB);
-			qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_STENCIL_SHADOW);
+			glEnable(GL_VERTEX_PROGRAM_ARB);
+			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_STENCIL_SHADOW);
 			RB_StencilShadowPass(vLight->localShadows);
 			RB_ARB2_CreateDrawInteractions(vLight->globalInteractions);
-			qglDisable(GL_VERTEX_PROGRAM_ARB);	// if there weren't any globalInteractions, it would have stayed on
+			glDisable(GL_VERTEX_PROGRAM_ARB);	// if there weren't any globalInteractions, it would have stayed on
 		}
 		else {
 			RB_StencilShadowPass(vLight->globalShadows);
@@ -656,7 +656,7 @@ void RB_ARB2_DrawInteractions(void) {
 			continue;
 		}
 
-		qglStencilFunc(GL_ALWAYS, 128, 255);
+		glStencilFunc(GL_ALWAYS, 128, 255);
 
 		backEnd.depthFunc = GLS_DEPTHFUNC_LESS;
 		RB_ARB2_CreateDrawInteractions(vLight->translucentInteractions);
@@ -665,10 +665,10 @@ void RB_ARB2_DrawInteractions(void) {
 	}
 
 	// disable stencil shadow test
-	qglStencilFunc(GL_ALWAYS, 128, 255);
+	glStencilFunc(GL_ALWAYS, 128, 255);
 
 	GL_SelectTexture(0);
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 
@@ -767,7 +767,7 @@ static void RB_ARB2_MD5R_SetupInteractionVertexProgram(const drawSurf_t* surf, b
 		return;
 	}
 
-	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB,
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB,
 		useSimpleInteraction ? q4Md5rSimplePrograms[formatIndex] : q4Md5rInteractionPrograms[formatIndex]);
 
 	mesh->SetupForDrawRender(&supportedMD5RVertexFormats[formatIndex]);
@@ -786,19 +786,19 @@ void RB_ARB2_MD5R_DrawDepthElements(const drawSurf_t* surf) {
 		return;
 	}
 
-	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rSimplePrograms[formatIndex]);
-	qglEnable(GL_VERTEX_PROGRAM_ARB);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rSimplePrograms[formatIndex]);
+	glEnable(GL_VERTEX_PROGRAM_ARB);
 
 	RB_ARB2_LoadMVPMatrixIntoVPParams(surf);
 
 	mesh->SetupForDrawRender(&supportedMD5RDepthVertexFormats[formatIndex]);
-	qglDisableVertexAttribArrayARB(4);
+	glDisableVertexAttribArrayARB(4);
 	mesh->Draw(surf->geo->skinToModelTransforms, &supportedMD5RDepthVertexFormats[formatIndex]);
 
-	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
-	qglDisable(GL_VERTEX_PROGRAM_ARB);
-	qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-	qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
+	glDisable(GL_VERTEX_PROGRAM_ARB);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 }
 
 void RB_ARB2_MD5R_DrawShadowElements(const drawSurf_t* surf, int numIndices) {
@@ -822,8 +822,8 @@ void RB_ARB2_MD5R_DrawShadowElements(const drawSurf_t* surf, int numIndices) {
 	localLight[2] = localLight3[2];
 	localLight[3] = 0.0f;
 
-	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rShadowPrograms[formatIndex]);
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_LOCAL_LIGHT, localLight.ToFloatPtr());
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rShadowPrograms[formatIndex]);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_LOCAL_LIGHT, localLight.ToFloatPtr());
 
 	RB_ARB2_LoadMVPMatrixIntoVPParams(surf);
 
@@ -834,9 +834,9 @@ void RB_ARB2_MD5R_DrawShadowElements(const drawSurf_t* surf, int numIndices) {
 		numIndices == surf->geo->numIndexes,
 		&supportedMD5RShadowVolVertexFormats[formatIndex]);
 
-	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_STENCIL_SHADOW);
-	qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-	qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_STENCIL_SHADOW);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 }
 
 void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf, bool fillingDepth) {
@@ -853,8 +853,8 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 	}
 
 	if (pStage->privatePolygonOffset != 0.0f) {
-		qglEnable(GL_POLYGON_OFFSET_FILL);
-		qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset);
 	}
 
 	if (!mesh->m_drawSetUp) {
@@ -863,8 +863,8 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 
 	switch (pStage->texture.texgen) {
 	case TG_DIFFUSE_CUBE:
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rEnvNormalPrograms[formatIndex]);
-		qglEnable(GL_VERTEX_PROGRAM_ARB);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rEnvNormalPrograms[formatIndex]);
+		glEnable(GL_VERTEX_PROGRAM_ARB);
 		break;
 
 	case TG_REFLECT_CUBE: {
@@ -873,15 +873,15 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 			GL_SelectTexture(1);
 			bumpStage->texture.image->Bind();
 			GL_SelectTexture(0);
-			qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_BUMPY_ENVIRONMENT);
-			qglEnable(GL_FRAGMENT_PROGRAM_ARB);
-			qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rEnvBumpPrograms[formatIndex]);
-			qglEnable(GL_VERTEX_PROGRAM_ARB);
+			glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_BUMPY_ENVIRONMENT);
+			glEnable(GL_FRAGMENT_PROGRAM_ARB);
+			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rEnvBumpPrograms[formatIndex]);
+			glEnable(GL_VERTEX_PROGRAM_ARB);
 			RB_ARB2_LoadModelMatrixIntoVPParams(surf);
 		}
 		else {
-			qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rEnvReflectPrograms[formatIndex]);
-			qglEnable(GL_VERTEX_PROGRAM_ARB);
+			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rEnvReflectPrograms[formatIndex]);
+			glEnable(GL_VERTEX_PROGRAM_ARB);
 		}
 		RB_ARB2_LoadLocalViewOriginIntoVPParams(surf);
 		break;
@@ -889,20 +889,20 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 
 	case TG_SKYBOX_CUBE:
 	case TG_WOBBLESKY_CUBE:
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rSkyBoxPrograms[formatIndex]);
-		qglEnable(GL_VERTEX_PROGRAM_ARB);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_LOCAL_VIEW_ORIGIN, (const float*)surf->texGenTransformAndViewOrg + 12);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_PROJECTION_X, surf->texGenTransformAndViewOrg);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_PROJECTION_Y, (const float*)surf->texGenTransformAndViewOrg + 4);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_PROJECTION_Z, (const float*)surf->texGenTransformAndViewOrg + 8);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rSkyBoxPrograms[formatIndex]);
+		glEnable(GL_VERTEX_PROGRAM_ARB);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_LOCAL_VIEW_ORIGIN, (const float*)surf->texGenTransformAndViewOrg + 12);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_PROJECTION_X, surf->texGenTransformAndViewOrg);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_PROJECTION_Y, (const float*)surf->texGenTransformAndViewOrg + 4);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_PROJECTION_Z, (const float*)surf->texGenTransformAndViewOrg + 8);
 		break;
 
 	case TG_SCREEN:
 		return;
 
 	default:
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rStdTexPrograms[formatIndex]);
-		qglEnable(GL_VERTEX_PROGRAM_ARB);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, q4Md5rStdTexPrograms[formatIndex]);
+		glEnable(GL_VERTEX_PROGRAM_ARB);
 		break;
 	}
 
@@ -910,25 +910,25 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 
 	if (fillingDepth) {
 		color[0] = color[1] = color[2] = color[3] = 0.0f;
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_MODULATE, color);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_MODULATE, color);
 		color[3] = surf->shaderRegisters[pStage->color.registers[3]];
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_ADD, color);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_ADD, color);
 	}
 	else if (pStage->vertexColor) {
 		color[0] = color[1] = color[2] = color[3] = 1.0f;
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_MODULATE, color);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_MODULATE, color);
 		color[0] = color[1] = color[2] = color[3] = 0.0f;
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_ADD, color);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_ADD, color);
 	}
 	else {
 		color[0] = color[1] = color[2] = color[3] = 0.0f;
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_MODULATE, color);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_MODULATE, color);
 
 		color[0] = surf->shaderRegisters[pStage->color.registers[0]];
 		color[1] = surf->shaderRegisters[pStage->color.registers[1]];
 		color[2] = surf->shaderRegisters[pStage->color.registers[2]];
 		color[3] = surf->shaderRegisters[pStage->color.registers[3]];
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_ADD, color);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_STAGE_COLOR_ADD, color);
 	}
 
 	RB_ARB2_LoadMVPMatrixIntoVPParams(surf);
@@ -937,22 +937,22 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 		RB_ARB2_LoadShaderTextureMatrixIntoVPParams(surf->shaderRegisters, &pStage->texture);
 	}
 	else {
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_TEXTURE_MATRIX_S, q4TexIdentityS);
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_TEXTURE_MATRIX_T, q4TexIdentityT);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_TEXTURE_MATRIX_S, q4TexIdentityS);
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, Q4_PP_TEXTURE_MATRIX_T, q4TexIdentityT);
 	}
 }
 
 void RB_ARB2_DisableStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf) {
 	if (pStage && pStage->privatePolygonOffset != 0.0f &&
 		(!surf || !surf->material || !surf->material->TestMaterialFlag(MF_POLYGONOFFSET))) {
-		qglDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 
-	qglDisable(GL_FRAGMENT_PROGRAM_ARB);
-	qglDisable(GL_VERTEX_PROGRAM_ARB);
-	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
-	qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-	qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	glDisable(GL_FRAGMENT_PROGRAM_ARB);
+	glDisable(GL_VERTEX_PROGRAM_ARB);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
 	if (pStage && surf && pStage->texture.texgen == TG_REFLECT_CUBE) {
 		if (surf->material && surf->material->GetBumpStage()) {
@@ -1147,22 +1147,22 @@ void R_LoadARBProgram(int progIndex) {
 
 #if defined( Q4_ARB2_ENABLE_NV_FRAGMENT_PROGRAM )
 	if (progs[progIndex].target == GL_FRAGMENT_PROGRAM_NV) {
-		qglLoadProgramNV(GL_FRAGMENT_PROGRAM_NV, progs[progIndex].ident, strlen(start), (unsigned char*)start);
+		glLoadProgramNV(GL_FRAGMENT_PROGRAM_NV, progs[progIndex].ident, strlen(start), (unsigned char*)start);
 	}
 	else
 #endif
 	{
-		qglBindProgramARB(progs[progIndex].target, progs[progIndex].ident);
-		qglGetError();
+		glBindProgramARB(progs[progIndex].target, progs[progIndex].ident);
+		glGetError();
 
-		qglProgramStringARB(progs[progIndex].target, GL_PROGRAM_FORMAT_ASCII_ARB,
+		glProgramStringARB(progs[progIndex].target, GL_PROGRAM_FORMAT_ASCII_ARB,
 			strlen(start), (unsigned char*)start);
 	}
 
-	err = qglGetError();
-	qglGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, (GLint*)&ofs);
+	err = glGetError();
+	glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, (GLint*)&ofs);
 	if (err == GL_INVALID_OPERATION) {
-		const GLubyte* str = qglGetString(GL_PROGRAM_ERROR_STRING_ARB);
+		const GLubyte* str = glGetString(GL_PROGRAM_ERROR_STRING_ARB);
 		common->Printf("\nGL_PROGRAM_ERROR_STRING_ARB: %s\n", str);
 		if (ofs < 0) {
 			common->Printf("GL_PROGRAM_ERROR_POSITION_ARB < 0 with error\n");

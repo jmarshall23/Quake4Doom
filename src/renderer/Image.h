@@ -37,20 +37,20 @@ No texture is ever used that does not have a corresponding idImage.
 
 no code outside this unit should call any of these OpenGL functions:
 
-qglGenTextures
-qglDeleteTextures
-qglBindTexture
+glGenTextures
+glDeleteTextures
+glBindTexture
 
-qglTexParameter
+glTexParameter
 
-qglTexImage
-qglTexSubImage
+glTexImage
+glTexSubImage
 
-qglCopyTexImage
-qglCopyTexSubImage
+glCopyTexImage
+glCopyTexSubImage
 
-qglEnable( GL_TEXTURE_* )
-qglDisable( GL_TEXTURE_* )
+glEnable( GL_TEXTURE_* )
+glDisable( GL_TEXTURE_* )
 
 ====================================================================
 */

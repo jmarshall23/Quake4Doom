@@ -252,8 +252,8 @@ void RB_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* sur
 
 	// set privatePolygonOffset if necessary
 	if (pStage->privatePolygonOffset) {
-		qglEnable(GL_POLYGON_OFFSET_FILL);
-		qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset);
 	}
 
 	// set the texture matrix if needed
@@ -263,15 +263,15 @@ void RB_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* sur
 
 	// texgens
 	if (pStage->texture.texgen == TG_DIFFUSE_CUBE) {
-		qglTexCoordPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+		glTexCoordPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
 	}
 	if (pStage->texture.texgen == TG_SKYBOX_CUBE || pStage->texture.texgen == TG_WOBBLESKY_CUBE) {
-		qglTexCoordPointer(3, GL_FLOAT, 0, vertexCache.Position(surf->dynamicTexCoords));
+		glTexCoordPointer(3, GL_FLOAT, 0, vertexCache.Position(surf->dynamicTexCoords));
 	}
 	if (pStage->texture.texgen == TG_SCREEN) {
-		qglEnable(GL_TEXTURE_GEN_S);
-		qglEnable(GL_TEXTURE_GEN_T);
-		qglEnable(GL_TEXTURE_GEN_Q);
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
+		glEnable(GL_TEXTURE_GEN_Q);
 
 		float	mat[16], plane[4];
 		myGlMultMatrix(surf->space->modelViewMatrix, backEnd.viewDef->projectionMatrix, mat);
@@ -280,19 +280,19 @@ void RB_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* sur
 		plane[1] = mat[4];
 		plane[2] = mat[8];
 		plane[3] = mat[12];
-		qglTexGenfv(GL_S, GL_OBJECT_PLANE, plane);
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, plane);
 
 		plane[0] = mat[1];
 		plane[1] = mat[5];
 		plane[2] = mat[9];
 		plane[3] = mat[13];
-		qglTexGenfv(GL_T, GL_OBJECT_PLANE, plane);
+		glTexGenfv(GL_T, GL_OBJECT_PLANE, plane);
 
 		plane[0] = mat[3];
 		plane[1] = mat[7];
 		plane[2] = mat[11];
 		plane[3] = mat[15];
-		qglTexGenfv(GL_Q, GL_OBJECT_PLANE, plane);
+		glTexGenfv(GL_Q, GL_OBJECT_PLANE, plane);
 	}
 
 	if (pStage->texture.texgen == TG_REFLECT_CUBE) {
@@ -305,49 +305,49 @@ void RB_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t* sur
 				bumpStage->texture.image->Bind();
 				GL_SelectTexture(0);
 
-				qglNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
-				qglVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
-				qglVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
+				glNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+				glVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
+				glVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
 
-				qglEnableVertexAttribArrayARB(9);
-				qglEnableVertexAttribArrayARB(10);
-				qglEnableClientState(GL_NORMAL_ARRAY);
+				glEnableVertexAttribArrayARB(9);
+				glEnableVertexAttribArrayARB(10);
+				glEnableClientState(GL_NORMAL_ARRAY);
 
 				// Program env 5, 6, 7, 8 have been set in RB_SetProgramEnvironmentSpace
 
-				qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_BUMPY_ENVIRONMENT);
-				qglEnable(GL_FRAGMENT_PROGRAM_ARB);
-				qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_BUMPY_ENVIRONMENT);
-				qglEnable(GL_VERTEX_PROGRAM_ARB);
+				glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_BUMPY_ENVIRONMENT);
+				glEnable(GL_FRAGMENT_PROGRAM_ARB);
+				glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_BUMPY_ENVIRONMENT);
+				glEnable(GL_VERTEX_PROGRAM_ARB);
 			}
 			else {
 				// per-pixel reflection mapping without a normal map
-				qglNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
-				qglEnableClientState(GL_NORMAL_ARRAY);
+				glNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+				glEnableClientState(GL_NORMAL_ARRAY);
 
-				qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_ENVIRONMENT);
-				qglEnable(GL_FRAGMENT_PROGRAM_ARB);
-				qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_ENVIRONMENT);
-				qglEnable(GL_VERTEX_PROGRAM_ARB);
+				glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FPROG_ENVIRONMENT);
+				glEnable(GL_FRAGMENT_PROGRAM_ARB);
+				glBindProgramARB(GL_VERTEX_PROGRAM_ARB, VPROG_ENVIRONMENT);
+				glEnable(GL_VERTEX_PROGRAM_ARB);
 			}
 		}
 		else {
-			qglEnable(GL_TEXTURE_GEN_S);
-			qglEnable(GL_TEXTURE_GEN_T);
-			qglEnable(GL_TEXTURE_GEN_R);
-			qglTexGenf(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_EXT);
-			qglTexGenf(GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_EXT);
-			qglTexGenf(GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_EXT);
-			qglEnableClientState(GL_NORMAL_ARRAY);
-			qglNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+			glEnable(GL_TEXTURE_GEN_S);
+			glEnable(GL_TEXTURE_GEN_T);
+			glEnable(GL_TEXTURE_GEN_R);
+			glTexGenf(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_EXT);
+			glTexGenf(GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_EXT);
+			glTexGenf(GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_EXT);
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
 
-			qglMatrixMode(GL_TEXTURE);
+			glMatrixMode(GL_TEXTURE);
 			float	mat[16];
 
 			R_TransposeGLMatrix(backEnd.viewDef->worldSpace.modelViewMatrix, mat);
 
-			qglLoadMatrixf(mat);
-			qglMatrixMode(GL_MODELVIEW);
+			glLoadMatrixf(mat);
+			glMatrixMode(GL_MODELVIEW);
 		}
 	}
 }
@@ -371,18 +371,18 @@ void RB_FinishStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf
 
 	// unset privatePolygonOffset if necessary
 	if (pStage->privatePolygonOffset && !surf->material->TestMaterialFlag(MF_POLYGONOFFSET)) {
-		qglDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 
 	if (pStage->texture.texgen == TG_DIFFUSE_CUBE || pStage->texture.texgen == TG_SKYBOX_CUBE
 		|| pStage->texture.texgen == TG_WOBBLESKY_CUBE) {
-		qglTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), (void*)&ac->st);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), (void*)&ac->st);
 	}
 
 	if (pStage->texture.texgen == TG_SCREEN) {
-		qglDisable(GL_TEXTURE_GEN_S);
-		qglDisable(GL_TEXTURE_GEN_T);
-		qglDisable(GL_TEXTURE_GEN_Q);
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
+		glDisable(GL_TEXTURE_GEN_Q);
 	}
 
 	if (pStage->texture.texgen == TG_REFLECT_CUBE) {
@@ -395,38 +395,38 @@ void RB_FinishStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf
 				globalImages->BindNull();
 				GL_SelectTexture(0);
 
-				qglDisableVertexAttribArrayARB(9);
-				qglDisableVertexAttribArrayARB(10);
+				glDisableVertexAttribArrayARB(9);
+				glDisableVertexAttribArrayARB(10);
 			}
 			else {
 				// per-pixel reflection mapping without bump mapping
 			}
 
-			qglDisableClientState(GL_NORMAL_ARRAY);
-			qglDisable(GL_FRAGMENT_PROGRAM_ARB);
-			qglDisable(GL_VERTEX_PROGRAM_ARB);
+			glDisableClientState(GL_NORMAL_ARRAY);
+			glDisable(GL_FRAGMENT_PROGRAM_ARB);
+			glDisable(GL_VERTEX_PROGRAM_ARB);
 			// Fixme: Hack to get around an apparent bug in ATI drivers.  Should remove as soon as it gets fixed.
-			qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
+			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
 		}
 		else {
-			qglDisable(GL_TEXTURE_GEN_S);
-			qglDisable(GL_TEXTURE_GEN_T);
-			qglDisable(GL_TEXTURE_GEN_R);
-			qglTexGenf(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-			qglTexGenf(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-			qglTexGenf(GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-			qglDisableClientState(GL_NORMAL_ARRAY);
+			glDisable(GL_TEXTURE_GEN_S);
+			glDisable(GL_TEXTURE_GEN_T);
+			glDisable(GL_TEXTURE_GEN_R);
+			glTexGenf(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+			glTexGenf(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+			glTexGenf(GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+			glDisableClientState(GL_NORMAL_ARRAY);
 
-			qglMatrixMode(GL_TEXTURE);
-			qglLoadIdentity();
-			qglMatrixMode(GL_MODELVIEW);
+			glMatrixMode(GL_TEXTURE);
+			glLoadIdentity();
+			glMatrixMode(GL_MODELVIEW);
 		}
 	}
 
 	if (pStage->texture.hasMatrix) {
-		qglMatrixMode(GL_TEXTURE);
-		qglLoadIdentity();
-		qglMatrixMode(GL_MODELVIEW);
+		glMatrixMode(GL_TEXTURE);
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
 	}
 }
 
@@ -467,7 +467,7 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 
 		R_GlobalPlaneToLocal(surf->space->modelMatrix, backEnd.viewDef->clipPlanes[0], plane);
 		plane[3] += 0.5f;	// the notch is in the middle
-		qglTexGenfv(GL_S, GL_OBJECT_PLANE, plane.ToFloatPtr());
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, plane.ToFloatPtr());
 		GL_SelectTexture(0);
 
 		GLdouble clipPlane[4];
@@ -475,8 +475,8 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 		clipPlane[1] = plane[1];
 		clipPlane[2] = plane[2];
 		clipPlane[3] = plane[3];
-		qglEnable(GL_CLIP_PLANE0);
-		qglClipPlane(GL_CLIP_PLANE0, clipPlane);
+		glEnable(GL_CLIP_PLANE0);
+		glClipPlane(GL_CLIP_PLANE0, clipPlane);
 	}
 
 	if (!shader->IsDrawn()) {
@@ -520,8 +520,8 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 
 	// set polygon offset if necessary
 	if (shader->TestMaterialFlag(MF_POLYGONOFFSET)) {
-		qglEnable(GL_POLYGON_OFFSET_FILL);
-		qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset());
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset());
 	}
 
 	// subviews will just down-modulate the color buffer by overbright
@@ -545,8 +545,8 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 	if (!tri->primBatchMesh) {
 #endif
 		ac = (idDrawVert*)vertexCache.Position(tri->ambientCache);
-		qglVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
-		qglTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
+		glVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
+		glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 	}
 #endif
@@ -565,7 +565,7 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 		bool alphaTestOn = true;
 		bool alphaToCoverageOn = false;
 
-		qglEnable(GL_ALPHA_TEST);
+		glEnable(GL_ALPHA_TEST);
 		// perforated surfaces may have multiple alpha tested stages
 		for (stage = 0; stage < shader->GetNumStages(); stage++) {
 			pStage = shader->GetStage(stage);
@@ -594,30 +594,30 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 			if (color[3] <= 0) {
 				continue;
 			}
-			qglColor4fv(color);
+			glColor4fv(color);
 
 			const float alphaRef = regs[pStage->alphaTestRegister];
 			const GLenum alphaFunc = RB_Q4_AlphaTestModeForStage(pStage);
 			if (RB_Q4_ShouldUseAlphaToCoverage(alphaFunc, alphaRef)) {
 				if (!alphaToCoverageOn) {
 					if (alphaTestOn) {
-						qglDisable(GL_ALPHA_TEST);
+						glDisable(GL_ALPHA_TEST);
 						alphaTestOn = false;
 					}
-					qglEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+					glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
 					alphaToCoverageOn = true;
 				}
 			}
 			else {
 				if (alphaToCoverageOn) {
-					qglDisable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+					glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
 					alphaToCoverageOn = false;
 				}
 				if (!alphaTestOn) {
-					qglEnable(GL_ALPHA_TEST);
+					glEnable(GL_ALPHA_TEST);
 					alphaTestOn = true;
 				}
-				qglAlphaFunc(alphaFunc, alphaRef);
+				glAlphaFunc(alphaFunc, alphaRef);
 			}
 
 			// bind the texture
@@ -632,10 +632,10 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 			RB_FinishStageTexturing(pStage, surf, ac);
 		}
 		if (alphaToCoverageOn) {
-			qglDisable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+			glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
 		}
 		if (alphaTestOn) {
-			qglDisable(GL_ALPHA_TEST);
+			glDisable(GL_ALPHA_TEST);
 		}
 		if (!didDraw) {
 			drawSolid = true;
@@ -644,7 +644,7 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 
 	// draw the entire surface solid
 	if (drawSolid) {
-		qglColor4fv(color);
+		glColor4fv(color);
 		globalImages->whiteImage->Bind();
 
 		// draw it
@@ -654,7 +654,7 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 
 	// reset polygon offset
 	if (shader->TestMaterialFlag(MF_POLYGONOFFSET)) {
-		qglDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 
 	// reset blending
@@ -685,34 +685,34 @@ void RB_STD_FillDepthBuffer(drawSurf_t * *drawSurfs, int numDrawSurfs) {
 	if (backEnd.viewDef->numClipPlanes) {
 		GL_SelectTexture(1);
 		globalImages->alphaNotchImage->Bind();
-		qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		qglEnable(GL_TEXTURE_GEN_S);
-		qglTexCoord2f(1, 0.5);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnable(GL_TEXTURE_GEN_S);
+		glTexCoord2f(1, 0.5);
 	}
 
 	// the first texture will be used for alpha tested surfaces
 	GL_SelectTexture(0);
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// decal surfaces may enable polygon offset
-	qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat());
+	glPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat());
 
 	GL_State(GLS_DEPTHFUNC_LESS);
 
 	// Enable stencil test if we are going to be using it for shadows.
 	// If we didn't do this, it would be legal behavior to get z fighting
 	// from the ambient pass and the light passes.
-	qglEnable(GL_STENCIL_TEST);
-	qglStencilFunc(GL_ALWAYS, 1, 255);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 255);
 
 	RB_RenderDrawSurfListWithFunction(drawSurfs, numDrawSurfs, RB_T_FillDepthBuffer);
 
 	if (backEnd.viewDef->numClipPlanes) {
 		GL_SelectTexture(1);
 		globalImages->BindNull();
-		qglDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_S);
 		GL_SelectTexture(0);
-		qglDisable(GL_CLIP_PLANE0);
+		glDisable(GL_CLIP_PLANE0);
 	}
 
 }
@@ -766,7 +766,7 @@ void RB_SetProgramEnvironment(void) {
 
 	parm[2] = 0;
 	parm[3] = 1;
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 0, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 0, parm);
 #else
 	// screen power of two correction factor, assuming the copy to _currentRender
 	// also copied an extra row and column for the bilerp
@@ -780,18 +780,18 @@ void RB_SetProgramEnvironment(void) {
 
 	parm[2] = 0;
 	parm[3] = 1;
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 0, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 0, parm);
 #endif
 
 	if (glConfig.ARBFragmentProgramAvailable) {
-		qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, parm);
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, parm);
 
 		// window coord to 0.0 to 1.0 conversion
 		parm[0] = 1.0 / w;
 		parm[1] = 1.0 / h;
 		parm[2] = 0;
 		parm[3] = 1;
-		qglProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, parm);
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, parm);
 	}
 
 	//
@@ -801,7 +801,7 @@ void RB_SetProgramEnvironment(void) {
 	parm[1] = backEnd.viewDef->renderView.vieworg[1];
 	parm[2] = backEnd.viewDef->renderView.vieworg[2];
 	parm[3] = 1.0;
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 1, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 1, parm);
 }
 
 /*
@@ -824,7 +824,7 @@ void RB_SetProgramEnvironmentSpace(void) {
 	// set eye position in local space
 	R_GlobalPointToLocal(space->modelMatrix, backEnd.viewDef->renderView.vieworg, *(idVec3*)parm);
 	parm[3] = 1.0;
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 5, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 5, parm);
 
 	// we need the model matrix without it being combined with the view matrix
 	// so we can transform local vectors to global coordinates
@@ -832,17 +832,17 @@ void RB_SetProgramEnvironmentSpace(void) {
 	parm[1] = space->modelMatrix[4];
 	parm[2] = space->modelMatrix[8];
 	parm[3] = space->modelMatrix[12];
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 6, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 6, parm);
 	parm[0] = space->modelMatrix[1];
 	parm[1] = space->modelMatrix[5];
 	parm[2] = space->modelMatrix[9];
 	parm[3] = space->modelMatrix[13];
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 7, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 7, parm);
 	parm[0] = space->modelMatrix[2];
 	parm[1] = space->modelMatrix[6];
 	parm[2] = space->modelMatrix[10];
 	parm[3] = space->modelMatrix[14];
-	qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 8, parm);
+	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 8, parm);
 }
 
 /*
@@ -873,7 +873,7 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 
 	// change the matrix if needed
 	if (surf->space != backEnd.currentSpace) {
-		qglLoadMatrixf(surf->space->modelViewMatrix);
+		glLoadMatrixf(surf->space->modelViewMatrix);
 		backEnd.currentSpace = surf->space;
 		RB_SetProgramEnvironmentSpace();
 	}
@@ -888,7 +888,7 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 	// change the scissor if needed
 	if (r_useScissor.GetBool() && !backEnd.currentScissor.Equals(surf->scissorRect)) {
 		backEnd.currentScissor = surf->scissorRect;
-		qglScissor(backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
+		glScissor(backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
 			backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
 			backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
 			backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1);
@@ -916,8 +916,8 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 
 	// set polygon offset if necessary
 	if (shader->TestMaterialFlag(MF_POLYGONOFFSET)) {
-		qglEnable(GL_POLYGON_OFFSET_FILL);
-		qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset());
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * shader->GetPolygonOffset());
 	}
 
 	if (surf->space->weaponDepthHack) {
@@ -933,8 +933,8 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 	if (!tri->primBatchMesh) {
 #endif
 		ac = (idDrawVert*)vertexCache.Position(tri->ambientCache);
-		qglVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
-		qglTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
+		glVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
+		glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 	}
 #endif
@@ -964,13 +964,13 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 		}
 
 		if (resetTexCoords && ac) {
-			qglTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
+			glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
 			resetTexCoords = false;
 		}
 
 #if RB_Q4_ENABLE_POT_CORRECTION_TEXGEN
 		if (pStage->texture.texgen == TG_POT_CORRECTION) {
-			qglTexCoordPointer(2, GL_FLOAT, 0, vertexCache.Position(surf->dynamicTexCoords));
+			glTexCoordPointer(2, GL_FLOAT, 0, vertexCache.Position(surf->dynamicTexCoords));
 			resetTexCoords = true;
 		}
 #endif
@@ -995,14 +995,14 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 			if (tri->primBatchMesh) {
 				if (newStage->md5rVertexProgram > 0) {
-					qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, newStage->md5rVertexProgram);
+					glBindProgramARB(GL_VERTEX_PROGRAM_ARB, newStage->md5rVertexProgram);
 					RB_ARB2_LoadLocalViewOriginIntoVPParams(surf);
 					RB_ARB2_LoadMVPMatrixIntoVPParams(surf);
 					RB_ARB2_LoadProjectionMatrixIntoVPParams();
 					RB_ARB2_LoadModelViewMatrixIntoVPParams(surf);
 				}
 				else {
-					qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, newStage->vertexProgram);
+					glBindProgramARB(GL_VERTEX_PROGRAM_ARB, newStage->vertexProgram);
 				}
 				GL_State(pStage->drawStateBits);
 				if (!tri->primBatchMesh->m_drawSetUp) {
@@ -1012,21 +1012,21 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 			else
 #endif
 			{
-				qglColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), (void*)&ac->color);
-				qglVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
-				qglVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
-				qglNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+				glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), (void*)&ac->color);
+				glVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
+				glVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
+				glNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
 
-				qglEnableClientState(GL_COLOR_ARRAY);
-				qglEnableVertexAttribArrayARB(9);
-				qglEnableVertexAttribArrayARB(10);
-				qglEnableClientState(GL_NORMAL_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+				glEnableVertexAttribArrayARB(9);
+				glEnableVertexAttribArrayARB(10);
+				glEnableClientState(GL_NORMAL_ARRAY);
 
 				GL_State(pStage->drawStateBits);
-				qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, newStage->vertexProgram);
+				glBindProgramARB(GL_VERTEX_PROGRAM_ARB, newStage->vertexProgram);
 			}
 
-			qglEnable(GL_VERTEX_PROGRAM_ARB);
+			glEnable(GL_VERTEX_PROGRAM_ARB);
 
 			// megaTextures bind a lot of images and set a lot of parameters
 			if (newStage->megaTexture) {
@@ -1042,7 +1042,7 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 				parm[1] = regs[newStage->vertexParms[i][1]];
 				parm[2] = regs[newStage->vertexParms[i][2]];
 				parm[3] = regs[newStage->vertexParms[i][3]];
-				qglProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, i, parm);
+				glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, i, parm);
 			}
 
 #if RB_Q4_ENABLE_NEW_STAGE_FRAGMENT_PARMS
@@ -1052,7 +1052,7 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 				parm[1] = regs[newStage->fragmentParms[i][1]];
 				parm[2] = regs[newStage->fragmentParms[i][2]];
 				parm[3] = regs[newStage->fragmentParms[i][3]];
-				qglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, parm);
+				glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, parm);
 			}
 #endif
 
@@ -1062,8 +1062,8 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 					newStage->fragmentProgramImages[i]->Bind();
 				}
 			}
-			qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, newStage->fragmentProgram);
-			qglEnable(GL_FRAGMENT_PROGRAM_ARB);
+			glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, newStage->fragmentProgram);
+			glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
 			// draw it
 			RB_DrawElementsWithCounters(tri);
@@ -1080,18 +1080,18 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 
 			GL_SelectTexture(0);
 
-			qglDisable(GL_VERTEX_PROGRAM_ARB);
-			qglDisable(GL_FRAGMENT_PROGRAM_ARB);
+			glDisable(GL_VERTEX_PROGRAM_ARB);
+			glDisable(GL_FRAGMENT_PROGRAM_ARB);
 			// Fixme: Hack to get around an apparent bug in ATI drivers.  Should remove as soon as it gets fixed.
-			qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
+			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
 
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 			if (!tri->primBatchMesh) {
 #endif
-				qglDisableClientState(GL_COLOR_ARRAY);
-				qglDisableVertexAttribArrayARB(9);
-				qglDisableVertexAttribArrayARB(10);
-				qglDisableClientState(GL_NORMAL_ARRAY);
+				glDisableClientState(GL_COLOR_ARRAY);
+				glDisableVertexAttribArrayARB(9);
+				glDisableVertexAttribArrayARB(10);
+				glDisableClientState(GL_NORMAL_ARRAY);
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 			}
 #endif
@@ -1112,20 +1112,20 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 				color[3] = regs[pStage->color.registers[3]];
 
 				if (pStage->vertexColor == SVC_IGNORE) {
-					qglColor4fv(color);
+					glColor4fv(color);
 				}
 				else if (!tri->primBatchMesh) {
-					qglColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), (void*)&ac->color);
-					qglEnableClientState(GL_COLOR_ARRAY);
+					glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), (void*)&ac->color);
+					glEnableClientState(GL_COLOR_ARRAY);
 				}
 
 				if (!tri->primBatchMesh) {
-					qglVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
-					qglVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
-					qglNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
-					qglEnableVertexAttribArrayARB(9);
-					qglEnableVertexAttribArrayARB(10);
-					qglEnableClientState(GL_NORMAL_ARRAY);
+					glVertexAttribPointerARB(9, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
+					glVertexAttribPointerARB(10, 3, GL_FLOAT, false, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
+					glNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+					glEnableVertexAttribArrayARB(9);
+					glEnableVertexAttribArrayARB(10);
+					glEnableClientState(GL_NORMAL_ARRAY);
 				}
 
 				GL_State(pStage->drawStateBits);
@@ -1135,12 +1135,12 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 				GL_SelectTexture(0);
 
 				if (pStage->vertexColor != SVC_IGNORE && !tri->primBatchMesh) {
-					qglDisableClientState(GL_COLOR_ARRAY);
+					glDisableClientState(GL_COLOR_ARRAY);
 				}
 				if (!tri->primBatchMesh) {
-					qglDisableVertexAttribArrayARB(9);
-					qglDisableVertexAttribArrayARB(10);
-					qglDisableClientState(GL_NORMAL_ARRAY);
+					glDisableVertexAttribArrayARB(9);
+					glDisableVertexAttribArrayARB(10);
+					glDisableClientState(GL_NORMAL_ARRAY);
 				}
 			}
 			continue;
@@ -1173,20 +1173,20 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 
 		// select the vertex color source
 		if (pStage->vertexColor == SVC_IGNORE) {
-			qglColor4fv(color);
+			glColor4fv(color);
 		}
 		else {
-			qglColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), (void*)&ac->color);
-			qglEnableClientState(GL_COLOR_ARRAY);
+			glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(idDrawVert), (void*)&ac->color);
+			glEnableClientState(GL_COLOR_ARRAY);
 
 			if (pStage->vertexColor == SVC_INVERSE_MODULATE) {
 				GL_TexEnv(GL_COMBINE_ARB);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR_ARB);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_ONE_MINUS_SRC_COLOR);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1);
+				glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+				glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+				glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR_ARB);
+				glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+				glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_ONE_MINUS_SRC_COLOR);
+				glTexEnvi(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1);
 			}
 
 			// for vertex color and modulated color, we need to enable a second
@@ -1197,21 +1197,21 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 				globalImages->whiteImage->Bind();
 				GL_TexEnv(GL_COMBINE_ARB);
 
-				qglTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color);
+				glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color);
 
-				qglTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_CONSTANT_ARB);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1);
+				glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+				glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
+				glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_CONSTANT_ARB);
+				glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+				glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+				glTexEnvi(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1);
 
-				qglTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_CONSTANT_ARB);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
-				qglTexEnvi(GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1);
+				glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+				glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
+				glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_CONSTANT_ARB);
+				glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+				glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+				glTexEnvi(GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1);
 
 				GL_SelectTexture(0);
 			}
@@ -1231,7 +1231,7 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 		RB_FinishStageTexturing(pStage, surf, ac);
 
 		if (pStage->vertexColor != SVC_IGNORE) {
-			qglDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
 
 			GL_SelectTexture(1);
 			GL_TexEnv(GL_MODULATE);
@@ -1242,19 +1242,19 @@ void RB_STD_T_RenderShaderPasses(const drawSurf_t * surf) {
 	}
 
 	if (resetTexCoords && ac) {
-		qglTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
+		glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
 	}
 
 	// reset polygon offset
 	if (shader->TestMaterialFlag(MF_POLYGONOFFSET)) {
-		qglDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	if (surf->space->weaponDepthHack || surf->space->modelDepthHack != 0.0f) {
 		RB_LeaveDepthHack();
 	}
 
 #if RB_Q4_UNBIND_ELEMENT_ARRAY_BUFFER
-	qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 #endif
 	}
 
@@ -1284,7 +1284,7 @@ static int RB_STD_DrawShaderPasses(drawSurf_t * *drawSurfs, int numDrawSurfs, ma
 	globalImages->BindNull();
 
 	GL_SelectTexture(0);
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	RB_SetProgramEnvironment();
 
@@ -1328,7 +1328,7 @@ static int RB_STD_DrawShaderPasses(drawSurf_t * *drawSurfs, int numDrawSurfs, ma
 	}
 
 	GL_Cull(CT_FRONT_SIDED);
-	qglColor4f(1, 1, 1, 1);
+	glColor4f(1, 1, 1, 1);
 
 	return 0;
 }
@@ -1371,7 +1371,7 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 
 		R_GlobalPointToLocal(surf->space->modelMatrix, backEnd.vLight->globalLightOrigin, localLight.ToVec3());
 		localLight.w = 0.0f;
-		qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, PP_LIGHT_ORIGIN, localLight.ToFloatPtr());
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, PP_LIGHT_ORIGIN, localLight.ToFloatPtr());
 	}
 
 	tri = surf->geo;
@@ -1383,7 +1383,7 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 			return;
 		}
 
-		qglVertexPointer(4, GL_FLOAT, sizeof(shadowCache_t), vertexCache.Position(tri->shadowCache));
+		glVertexPointer(4, GL_FLOAT, sizeof(shadowCache_t), vertexCache.Position(tri->shadowCache));
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 	}
 #endif
@@ -1424,49 +1424,49 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 
 	// set depth bounds
 	if (glConfig.depthBoundsTestAvailable && r_useDepthBoundsTest.GetBool()) {
-		qglDepthBoundsEXT(surf->scissorRect.zmin, surf->scissorRect.zmax);
+		glDepthBoundsEXT(surf->scissorRect.zmin, surf->scissorRect.zmax);
 	}
 
 	// debug visualization
 	if (r_showShadows.GetInteger()) {
 		if (r_showShadows.GetInteger() == 3) {
 			if (external) {
-				qglColor3f(0.1 / backEnd.overBright, 1 / backEnd.overBright, 0.1 / backEnd.overBright);
+				glColor3f(0.1 / backEnd.overBright, 1 / backEnd.overBright, 0.1 / backEnd.overBright);
 			}
 			else {
 				// these are the surfaces that require the reverse
-				qglColor3f(1 / backEnd.overBright, 0.1 / backEnd.overBright, 0.1 / backEnd.overBright);
+				glColor3f(1 / backEnd.overBright, 0.1 / backEnd.overBright, 0.1 / backEnd.overBright);
 			}
 		}
 		else {
 			// draw different color for turboshadows
 			if (surf->geo->shadowCapPlaneBits & SHADOW_CAP_INFINITE) {
 				if (numIndexes == tri->numIndexes) {
-					qglColor3f(1 / backEnd.overBright, 0.1 / backEnd.overBright, 0.1 / backEnd.overBright);
+					glColor3f(1 / backEnd.overBright, 0.1 / backEnd.overBright, 0.1 / backEnd.overBright);
 				}
 				else {
-					qglColor3f(1 / backEnd.overBright, 0.4 / backEnd.overBright, 0.1 / backEnd.overBright);
+					glColor3f(1 / backEnd.overBright, 0.4 / backEnd.overBright, 0.1 / backEnd.overBright);
 				}
 			}
 			else {
 				if (numIndexes == tri->numIndexes) {
-					qglColor3f(0.1 / backEnd.overBright, 1 / backEnd.overBright, 0.1 / backEnd.overBright);
+					glColor3f(0.1 / backEnd.overBright, 1 / backEnd.overBright, 0.1 / backEnd.overBright);
 				}
 				else if (numIndexes == tri->numShadowIndexesNoFrontCaps) {
-					qglColor3f(0.1 / backEnd.overBright, 1 / backEnd.overBright, 0.6 / backEnd.overBright);
+					glColor3f(0.1 / backEnd.overBright, 1 / backEnd.overBright, 0.6 / backEnd.overBright);
 				}
 				else {
-					qglColor3f(0.6 / backEnd.overBright, 1 / backEnd.overBright, 0.1 / backEnd.overBright);
+					glColor3f(0.6 / backEnd.overBright, 1 / backEnd.overBright, 0.1 / backEnd.overBright);
 				}
 			}
 		}
 
-		qglStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-		qglDisable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+		glDisable(GL_STENCIL_TEST);
 		GL_Cull(CT_TWO_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 		GL_Cull(CT_FRONT_SIDED);
-		qglEnable(GL_STENCIL_TEST);
+		glEnable(GL_STENCIL_TEST);
 
 		return;
 	}
@@ -1479,45 +1479,45 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 		const bool isMirror = false;
 #endif
 		if (isMirror) {
-			qglActiveStencilFaceEXT(GL_BACK);
+			glActiveStencilFaceEXT(GL_BACK);
 			if (external) {
-				qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
+				glStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
 			}
 			else {
-				qglStencilOp(GL_KEEP, tr.stencilIncr, GL_KEEP);
+				glStencilOp(GL_KEEP, tr.stencilIncr, GL_KEEP);
 			}
 
-			qglActiveStencilFaceEXT(GL_FRONT);
+			glActiveStencilFaceEXT(GL_FRONT);
 			if (external) {
-				qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
+				glStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
 			}
 			else {
-				qglStencilOp(GL_KEEP, tr.stencilDecr, GL_KEEP);
+				glStencilOp(GL_KEEP, tr.stencilDecr, GL_KEEP);
 			}
 		}
 		else {
-			qglActiveStencilFaceEXT(GL_BACK);
+			glActiveStencilFaceEXT(GL_BACK);
 			if (external) {
-				qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
+				glStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
 			}
 			else {
-				qglStencilOp(GL_KEEP, tr.stencilDecr, GL_KEEP);
+				glStencilOp(GL_KEEP, tr.stencilDecr, GL_KEEP);
 			}
 
-			qglActiveStencilFaceEXT(GL_FRONT);
+			glActiveStencilFaceEXT(GL_FRONT);
 			if (external) {
-				qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
+				glStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
 			}
 			else {
-				qglStencilOp(GL_KEEP, tr.stencilIncr, GL_KEEP);
+				glStencilOp(GL_KEEP, tr.stencilIncr, GL_KEEP);
 			}
 		}
 
-		qglEnable(GL_STENCIL_TEST_TWO_SIDE_EXT);
+		glEnable(GL_STENCIL_TEST_TWO_SIDE_EXT);
 		GL_Cull(CT_TWO_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 		GL_Cull(CT_FRONT_SIDED);
-		qglDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
+		glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
 		return;
 	}
 
@@ -1530,22 +1530,22 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 #endif
 		if (isMirror) {
 			if (external) {
-				qglStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, tr.stencilIncr);
-				qglStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, tr.stencilDecr);
+				glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, tr.stencilIncr);
+				glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, tr.stencilDecr);
 			}
 			else {
-				qglStencilOpSeparateATI(GL_FRONT, GL_KEEP, tr.stencilDecr, GL_KEEP);
-				qglStencilOpSeparateATI(GL_BACK, GL_KEEP, tr.stencilIncr, GL_KEEP);
+				glStencilOpSeparateATI(GL_FRONT, GL_KEEP, tr.stencilDecr, GL_KEEP);
+				glStencilOpSeparateATI(GL_BACK, GL_KEEP, tr.stencilIncr, GL_KEEP);
 			}
 		}
 		else {
 			if (external) {
-				qglStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, tr.stencilIncr);
-				qglStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, tr.stencilDecr);
+				glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, tr.stencilIncr);
+				glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, tr.stencilDecr);
 			}
 			else {
-				qglStencilOpSeparateATI(GL_BACK, GL_KEEP, tr.stencilDecr, GL_KEEP);
-				qglStencilOpSeparateATI(GL_FRONT, GL_KEEP, tr.stencilIncr, GL_KEEP);
+				glStencilOpSeparateATI(GL_BACK, GL_KEEP, tr.stencilDecr, GL_KEEP);
+				glStencilOpSeparateATI(GL_FRONT, GL_KEEP, tr.stencilIncr, GL_KEEP);
 			}
 		}
 		GL_Cull(CT_TWO_SIDED);
@@ -1560,20 +1560,20 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 	// Quake 4 avoids the preload pass.  External shadows use depth-pass; volumes
 	// that may be clipped by near/far use depth-fail style operations.
 	if (external) {
-		qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
+		glStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
 		GL_Cull(CT_FRONT_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 
-		qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
+		glStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
 		GL_Cull(CT_BACK_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 	}
 	else {
-		qglStencilOp(GL_KEEP, tr.stencilDecr, GL_KEEP);
+		glStencilOp(GL_KEEP, tr.stencilDecr, GL_KEEP);
 		GL_Cull(CT_FRONT_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 
-		qglStencilOp(GL_KEEP, tr.stencilIncr, GL_KEEP);
+		glStencilOp(GL_KEEP, tr.stencilIncr, GL_KEEP);
 		GL_Cull(CT_BACK_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 	}
@@ -1582,20 +1582,20 @@ static void RB_T_Shadow(const drawSurf_t * surf) {
 	if (!external) {
 		// "preload" the stencil buffer with the number of volumes
 		// that get clipped by the near or far clip plane
-		qglStencilOp(GL_KEEP, tr.stencilDecr, tr.stencilDecr);
+		glStencilOp(GL_KEEP, tr.stencilDecr, tr.stencilDecr);
 		GL_Cull(CT_FRONT_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
-		qglStencilOp(GL_KEEP, tr.stencilIncr, tr.stencilIncr);
+		glStencilOp(GL_KEEP, tr.stencilIncr, tr.stencilIncr);
 		GL_Cull(CT_BACK_SIDED);
 		RB_DrawShadowElementsWithCounters(tri, numIndexes);
 	}
 
 	// traditional depth-pass stencil shadows
-	qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
+	glStencilOp(GL_KEEP, GL_KEEP, tr.stencilIncr);
 	GL_Cull(CT_FRONT_SIDED);
 	RB_DrawShadowElementsWithCounters(tri, numIndexes);
 
-	qglStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
+	glStencilOp(GL_KEEP, GL_KEEP, tr.stencilDecr);
 	GL_Cull(CT_BACK_SIDED);
 	RB_DrawShadowElementsWithCounters(tri, numIndexes);
 #endif
@@ -1623,7 +1623,7 @@ void RB_StencilShadowPass(const drawSurf_t * drawSurfs) {
 	RB_LogComment("---------- RB_StencilShadowPass ----------\n");
 
 	globalImages->BindNull();
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// for visualizing the shadows
 	if (r_showShadows.GetInteger()) {
@@ -1642,14 +1642,14 @@ void RB_StencilShadowPass(const drawSurf_t * drawSurfs) {
 	}
 
 	if (r_shadowPolygonFactor.GetFloat() || r_shadowPolygonOffset.GetFloat()) {
-		qglPolygonOffset(r_shadowPolygonFactor.GetFloat(), -r_shadowPolygonOffset.GetFloat());
-		qglEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(r_shadowPolygonFactor.GetFloat(), -r_shadowPolygonOffset.GetFloat());
+		glEnable(GL_POLYGON_OFFSET_FILL);
 	}
 
-	qglStencilFunc(GL_ALWAYS, 1, 255);
+	glStencilFunc(GL_ALWAYS, 1, 255);
 
 	if (glConfig.depthBoundsTestAvailable && r_useDepthBoundsTest.GetBool()) {
-		qglEnable(GL_DEPTH_BOUNDS_TEST_EXT);
+		glEnable(GL_DEPTH_BOUNDS_TEST_EXT);
 	}
 
 	RB_RenderDrawSurfChainWithFunction(drawSurfs, RB_T_Shadow);
@@ -1657,17 +1657,17 @@ void RB_StencilShadowPass(const drawSurf_t * drawSurfs) {
 	GL_Cull(CT_FRONT_SIDED);
 
 	if (r_shadowPolygonFactor.GetFloat() || r_shadowPolygonOffset.GetFloat()) {
-		qglDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 
 	if (glConfig.depthBoundsTestAvailable && r_useDepthBoundsTest.GetBool()) {
-		qglDisable(GL_DEPTH_BOUNDS_TEST_EXT);
+		glDisable(GL_DEPTH_BOUNDS_TEST_EXT);
 	}
 
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	qglStencilFunc(GL_GEQUAL, 128, 255);
-	qglStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStencilFunc(GL_GEQUAL, 128, 255);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
 
@@ -1700,22 +1700,22 @@ static void RB_T_BlendLight(const drawSurf_t * surf) {
 		}
 
 		GL_SelectTexture(0);
-		qglTexGenfv(GL_S, GL_OBJECT_PLANE, lightProject[0].ToFloatPtr());
-		qglTexGenfv(GL_T, GL_OBJECT_PLANE, lightProject[1].ToFloatPtr());
-		qglTexGenfv(GL_Q, GL_OBJECT_PLANE, lightProject[2].ToFloatPtr());
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, lightProject[0].ToFloatPtr());
+		glTexGenfv(GL_T, GL_OBJECT_PLANE, lightProject[1].ToFloatPtr());
+		glTexGenfv(GL_Q, GL_OBJECT_PLANE, lightProject[2].ToFloatPtr());
 
 		GL_SelectTexture(1);
-		qglTexGenfv(GL_S, GL_OBJECT_PLANE, lightProject[3].ToFloatPtr());
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, lightProject[3].ToFloatPtr());
 	}
 
 	// this gets used for both blend lights and shadow draws
 	if (tri->ambientCache) {
 		idDrawVert* ac = (idDrawVert*)vertexCache.Position(tri->ambientCache);
-		qglVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
+		glVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
 	}
 	else if (tri->shadowCache) {
 		shadowCache_t* sc = (shadowCache_t*)vertexCache.Position(tri->shadowCache);
-		qglVertexPointer(3, GL_FLOAT, sizeof(shadowCache_t), sc->xyz.ToFloatPtr());
+		glVertexPointer(3, GL_FLOAT, sizeof(shadowCache_t), sc->xyz.ToFloatPtr());
 	}
 
 	RB_DrawElementsWithCounters(tri);
@@ -1749,17 +1749,17 @@ static void RB_BlendLight(const drawSurf_t * drawSurfs, const drawSurf_t * drawS
 
 	// texture 1 will get the falloff texture
 	GL_SelectTexture(1);
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	qglEnable(GL_TEXTURE_GEN_S);
-	qglTexCoord2f(0, 0.5);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnable(GL_TEXTURE_GEN_S);
+	glTexCoord2f(0, 0.5);
 	backEnd.vLight->falloffImage->Bind();
 
 	// texture 0 will get the projected texture
 	GL_SelectTexture(0);
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	qglEnable(GL_TEXTURE_GEN_S);
-	qglEnable(GL_TEXTURE_GEN_T);
-	qglEnable(GL_TEXTURE_GEN_Q);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+	glEnable(GL_TEXTURE_GEN_Q);
 
 	for (i = 0; i < lightShader->GetNumStages(); i++) {
 		stage = lightShader->GetStage(i);
@@ -1782,27 +1782,27 @@ static void RB_BlendLight(const drawSurf_t * drawSurfs, const drawSurf_t * drawS
 		backEnd.lightColor[1] = regs[stage->color.registers[1]];
 		backEnd.lightColor[2] = regs[stage->color.registers[2]];
 		backEnd.lightColor[3] = regs[stage->color.registers[3]];
-		qglColor4fv(backEnd.lightColor);
+		glColor4fv(backEnd.lightColor);
 
 		RB_RenderDrawSurfChainWithFunction(drawSurfs, RB_T_BlendLight);
 		RB_RenderDrawSurfChainWithFunction(drawSurfs2, RB_T_BlendLight);
 
 		if (stage->texture.hasMatrix) {
 			GL_SelectTexture(0);
-			qglMatrixMode(GL_TEXTURE);
-			qglLoadIdentity();
-			qglMatrixMode(GL_MODELVIEW);
+			glMatrixMode(GL_TEXTURE);
+			glLoadIdentity();
+			glMatrixMode(GL_MODELVIEW);
 		}
 	}
 
 	GL_SelectTexture(1);
-	qglDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_S);
 	globalImages->BindNull();
 
 	GL_SelectTexture(0);
-	qglDisable(GL_TEXTURE_GEN_S);
-	qglDisable(GL_TEXTURE_GEN_T);
-	qglDisable(GL_TEXTURE_GEN_Q);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_Q);
 }
 
 
@@ -1824,22 +1824,22 @@ static void RB_T_BasicFog(const drawSurf_t * surf) {
 
 		R_GlobalPlaneToLocal(surf->space->modelMatrix, fogPlanes[0], local);
 		local[3] += 0.5;
-		qglTexGenfv(GL_S, GL_OBJECT_PLANE, local.ToFloatPtr());
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, local.ToFloatPtr());
 
 		//		R_GlobalPlaneToLocal( surf->space->modelMatrix, fogPlanes[1], local );
 		//		local[3] += 0.5;
 		local[0] = local[1] = local[2] = 0; local[3] = 0.5;
-		qglTexGenfv(GL_T, GL_OBJECT_PLANE, local.ToFloatPtr());
+		glTexGenfv(GL_T, GL_OBJECT_PLANE, local.ToFloatPtr());
 
 		GL_SelectTexture(1);
 
 		// GL_S is constant per viewer
 		R_GlobalPlaneToLocal(surf->space->modelMatrix, fogPlanes[2], local);
 		local[3] += RB_Q4_FOG_ENTER;
-		qglTexGenfv(GL_T, GL_OBJECT_PLANE, local.ToFloatPtr());
+		glTexGenfv(GL_T, GL_OBJECT_PLANE, local.ToFloatPtr());
 
 		R_GlobalPlaneToLocal(surf->space->modelMatrix, fogPlanes[3], local);
-		qglTexGenfv(GL_S, GL_OBJECT_PLANE, local.ToFloatPtr());
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, local.ToFloatPtr());
 	}
 
 	RB_T_RenderTriangleSurface(surf);
@@ -1884,7 +1884,7 @@ static void RB_FogPass(const drawSurf_t * drawSurfs, const drawSurf_t * drawSurf
 	backEnd.lightColor[2] = regs[stage->color.registers[2]];
 	backEnd.lightColor[3] = regs[stage->color.registers[3]];
 
-	qglColor3fv(backEnd.lightColor);
+	glColor3fv(backEnd.lightColor);
 
 	// calculate the falloff planes
 	float	a;
@@ -1904,10 +1904,10 @@ static void RB_FogPass(const drawSurf_t * drawSurfs, const drawSurf_t * drawSurf
 	GL_SelectTexture(0);
 	globalImages->fogImage->Bind();
 	//GL_Bind( tr.whiteImage );
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	qglEnable(GL_TEXTURE_GEN_S);
-	qglEnable(GL_TEXTURE_GEN_T);
-	qglTexCoord2f(0.5f, 0.5f);		// make sure Q is set
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+	glTexCoord2f(0.5f, 0.5f);		// make sure Q is set
 
 	fogPlanes[0][0] = a * backEnd.viewDef->worldSpace.modelViewMatrix[2];
 	fogPlanes[0][1] = a * backEnd.viewDef->worldSpace.modelViewMatrix[6];
@@ -1923,9 +1923,9 @@ static void RB_FogPass(const drawSurf_t * drawSurfs, const drawSurf_t * drawSurf
 	// texture 1 is the entering plane fade correction
 	GL_SelectTexture(1);
 	globalImages->fogEnterImage->Bind();
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	qglEnable(GL_TEXTURE_GEN_S);
-	qglEnable(GL_TEXTURE_GEN_T);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
 
 	// T will get a texgen for the fade plane, which is always the "top" plane on unrotated lights
 	fogPlanes[2][0] = 0.001f * backEnd.vLight->fogPlane[0];
@@ -1941,7 +1941,7 @@ static void RB_FogPass(const drawSurf_t * drawSurfs, const drawSurf_t * drawSurf
 	fogPlanes[3][2] = 0;
 	fogPlanes[3][3] = RB_Q4_FOG_ENTER + s;
 
-	qglTexCoord2f(RB_Q4_FOG_ENTER + s, RB_Q4_FOG_ENTER);
+	glTexCoord2f(RB_Q4_FOG_ENTER + s, RB_Q4_FOG_ENTER);
 
 
 	// draw it
@@ -1956,13 +1956,13 @@ static void RB_FogPass(const drawSurf_t * drawSurfs, const drawSurf_t * drawSurf
 	GL_Cull(CT_FRONT_SIDED);
 
 	GL_SelectTexture(1);
-	qglDisable(GL_TEXTURE_GEN_S);
-	qglDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
 	globalImages->BindNull();
 
 	GL_SelectTexture(0);
-	qglDisable(GL_TEXTURE_GEN_S);
-	qglDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
 }
 
 
@@ -1982,7 +1982,7 @@ void RB_STD_FogAllLights(void) {
 
 	RB_LogComment("---------- RB_STD_FogAllLights ----------\n");
 
-	qglDisable(GL_STENCIL_TEST);
+	glDisable(GL_STENCIL_TEST);
 
 	for (vLight = backEnd.viewDef->viewLights; vLight; vLight = vLight->next) {
 		backEnd.vLight = vLight;
@@ -1998,21 +1998,21 @@ void RB_STD_FogAllLights(void) {
 			// units from the origin
 			backEnd.currentScissor = vLight->scissorRect;
 			if (r_useScissor.GetBool()) {
-				qglScissor(backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
+				glScissor(backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
 					backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
 					backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
 					backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1);
 			}
-			qglClear(GL_STENCIL_BUFFER_BIT);
+			glClear(GL_STENCIL_BUFFER_BIT);
 
-			qglEnable(GL_STENCIL_TEST);
+			glEnable(GL_STENCIL_TEST);
 
 			// only pass on the cleared stencil values
-			qglStencilFunc(GL_EQUAL, 128, 255);
+			glStencilFunc(GL_EQUAL, 128, 255);
 
 			// when we pass the stencil test and depth test and are going to draw,
 			// increment the stencil buffer so we don't ever draw on that pixel again
-			qglStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 		}
 #endif
 
@@ -2022,10 +2022,10 @@ void RB_STD_FogAllLights(void) {
 		else if (vLight->lightShader->IsBlendLight()) {
 			RB_BlendLight(vLight->globalInteractions, vLight->localInteractions);
 		}
-		qglDisable(GL_STENCIL_TEST);
+		glDisable(GL_STENCIL_TEST);
 	}
 
-	qglEnable(GL_STENCIL_TEST);
+	glEnable(GL_STENCIL_TEST);
 }
 
 //=========================================================================================
@@ -2053,7 +2053,7 @@ void RB_STD_LightScale(void) {
 
 	// the scissor may be smaller than the viewport for subviews
 	if (r_useScissor.GetBool()) {
-		qglScissor(backEnd.viewDef->viewport.x1 + backEnd.viewDef->scissor.x1,
+		glScissor(backEnd.viewDef->viewport.x1 + backEnd.viewDef->scissor.x1,
 			backEnd.viewDef->viewport.y1 + backEnd.viewDef->scissor.y1,
 			backEnd.viewDef->scissor.x2 - backEnd.viewDef->scissor.x1 + 1,
 			backEnd.viewDef->scissor.y2 - backEnd.viewDef->scissor.y1 + 1);
@@ -2061,17 +2061,17 @@ void RB_STD_LightScale(void) {
 	}
 
 	// full screen blends
-	qglLoadIdentity();
-	qglMatrixMode(GL_PROJECTION);
-	qglPushMatrix();
-	qglLoadIdentity();
-	qglOrtho(0, 1, 0, 1, -1, 1);
+	glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, 1, 0, 1, -1, 1);
 
 	GL_State(GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_SRC_COLOR);
 	GL_Cull(CT_TWO_SIDED);	// so mirror views also get it
 	globalImages->BindNull();
-	qglDisable(GL_DEPTH_TEST);
-	qglDisable(GL_STENCIL_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_STENCIL_TEST);
 
 	v = 1;
 	while (idMath::Fabs(v - backEnd.overBright) > 0.01) {	// a little extra slop
@@ -2080,21 +2080,21 @@ void RB_STD_LightScale(void) {
 		if (f > 1) {
 			f = 1;
 		}
-		qglColor3f(f, f, f);
+		glColor3f(f, f, f);
 		v = v * f * 2;
 
-		qglBegin(GL_QUADS);
-		qglVertex2f(0, 0);
-		qglVertex2f(0, 1);
-		qglVertex2f(1, 1);
-		qglVertex2f(1, 0);
-		qglEnd();
+		glBegin(GL_QUADS);
+		glVertex2f(0, 0);
+		glVertex2f(0, 1);
+		glVertex2f(1, 1);
+		glVertex2f(1, 0);
+		glEnd();
 	}
 
 
-	qglPopMatrix();
-	qglEnable(GL_DEPTH_TEST);
-	qglMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_MODELVIEW);
 	GL_Cull(CT_FRONT_SIDED);
 }
 
@@ -2145,26 +2145,14 @@ void	RB_STD_DrawView(void) {
 
 		// main light renderer
 		switch (tr.backEndRenderer) {
-		case BE_ARB:
-			RB_ARB_DrawInteractions();
-			break;
 		case BE_ARB2:
 			RB_ARB2_DrawInteractions();
-			break;
-		case BE_NV20:
-			RB_NV20_DrawInteractions();
-			break;
-		case BE_NV10:
-			RB_NV10_DrawInteractions();
-			break;
-		case BE_R200:
-			RB_R200_DrawInteractions();
 			break;
 		}
 	}
 
 	// disable stencil shadow test
-	qglStencilFunc(GL_ALWAYS, 128, 255);
+	glStencilFunc(GL_ALWAYS, 128, 255);
 
 	// uplight the entire screen to crutch up not having better blending range
 	RB_STD_LightScale();

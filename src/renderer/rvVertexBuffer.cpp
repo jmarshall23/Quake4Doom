@@ -351,8 +351,8 @@ void rvVertexBuffer::CreateVertexStorage() {
         return;
     }
 
-    qglGetError();
-    qglGenBuffersARB(1, &m_vbID);
+    glGetError();
+    glGenBuffersARB(1, &m_vbID);
     if (m_vbID == 0) {
         idLib::common->Error("rvVertexBuffer: Unable to generate a buffer id");
         return;
@@ -362,10 +362,10 @@ void rvVertexBuffer::CreateVertexStorage() {
         return;
     }
 
-    qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
-    qglBufferDataARB(GL_ARRAY_BUFFER_ARB, m_format.m_size * m_numVertices, NULL, GL_STATIC_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_format.m_size * m_numVertices, NULL, GL_STATIC_DRAW_ARB);
 
-    const unsigned int glError = qglGetError();
+    const unsigned int glError = glGetError();
     if (glError != 0) {
         idLib::common->Error("Unable to allocate vertex storage - %u", glError);
     }
@@ -373,7 +373,7 @@ void rvVertexBuffer::CreateVertexStorage() {
         m_format.SetVertexDeclaration(0);
     }
 
-    qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 }
 
 bool rvVertexBuffer::LockInterleaved(
@@ -389,7 +389,7 @@ bool rvVertexBuffer::LockInterleaved(
         m_lockedBase = m_interleavedStorage;
     }
     else if (m_lockStatus == 0) {
-        qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
 
         unsigned int effectiveLockFlags = lockFlags;
         unsigned int glAccess = GL_READ_ONLY_ARB;
@@ -411,7 +411,7 @@ bool rvVertexBuffer::LockInterleaved(
 
                 const int sizeBytes = m_lockVertexCount * m_format.m_size;
                 m_lockVertexOffset = 0;
-                qglBufferDataARB(
+                glBufferDataARB(
                     GL_ARRAY_BUFFER_ARB,
                     sizeBytes,
                     NULL,
@@ -419,7 +419,7 @@ bool rvVertexBuffer::LockInterleaved(
             }
         }
 
-        m_lockedBase = static_cast<unsigned char*>(qglMapBufferARB(GL_ARRAY_BUFFER_ARB, glAccess));
+        m_lockedBase = static_cast<unsigned char*>(glMapBufferARB(GL_ARRAY_BUFFER_ARB, glAccess));
         if (m_lockedBase == NULL) {
             return false;
         }
@@ -512,7 +512,7 @@ void rvVertexBuffer::SetupForRender(int vertexStartOffset, const rvVertexFormat&
         return;
     }
 
-    qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
     m_format.SetVertexDeclaration(vertexStartOffset);
     formatNeeded.EnableVertexDeclaration();
 }
@@ -538,31 +538,31 @@ void rvVertexBuffer::Unlock() {
     if (HasFlag(m_flags, kBufferFlagSystemMemory)) {
         if (HasFlag(m_lockStatus, kLockWrite) && HasFlag(m_flags, kBufferFlagVideoMemory)) {
             const int offsetBytes = m_format.m_size * m_lockVertexOffset;
-            qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
 
             if (HasFlag(m_flags, kBufferFlagSoA)) {
-                qglBufferDataARB(GL_ARRAY_BUFFER_ARB, m_format.m_size * m_numVertices, NULL, GL_STATIC_DRAW_ARB);
-                unsigned char* mapped = static_cast<unsigned char*>(qglMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB));
+                glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_format.m_size * m_numVertices, NULL, GL_STATIC_DRAW_ARB);
+                unsigned char* mapped = static_cast<unsigned char*>(glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB));
                 if (mapped != NULL) {
                     TransferSoAToAoS(mapped);
-                    qglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+                    glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
                 }
             }
             else if (m_interleavedStorage != NULL) {
-                qglBufferSubDataARB(
+                glBufferSubDataARB(
                     GL_ARRAY_BUFFER_ARB,
                     offsetBytes,
                     m_format.m_size * m_lockVertexCount,
                     m_interleavedStorage + offsetBytes);
             }
 
-            qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
         }
     }
     else if (HasFlag(m_flags, kBufferFlagVideoMemory)) {
-        qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
-        qglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-        qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+        glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
     }
 
     m_lockStatus = 0;
@@ -617,7 +617,7 @@ void rvVertexBuffer::Shutdown() {
     }
 
     if (m_vbID != 0) {
-        qglDeleteBuffersARB(1, &m_vbID);
+        glDeleteBuffersARB(1, &m_vbID);
     }
 
     m_format.Shutdown();
@@ -717,16 +717,16 @@ void rvVertexBuffer::Resize(int numVertices) {
         m_numVertices = numVertices;
 
         if (HasFlag(m_flags, kBufferFlagVideoMemory)) {
-            qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
-            qglBufferDataARB(GL_ARRAY_BUFFER_ARB, m_numVertices * m_format.m_size, NULL, GL_STATIC_DRAW_ARB);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_numVertices * m_format.m_size, NULL, GL_STATIC_DRAW_ARB);
 
-            unsigned char* mapped = static_cast<unsigned char*>(qglMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB));
+            unsigned char* mapped = static_cast<unsigned char*>(glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB));
             if (mapped != NULL) {
                 TransferSoAToAoS(mapped);
-                qglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+                glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
             }
 
-            qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
         }
 
         return;
@@ -744,9 +744,9 @@ void rvVertexBuffer::Resize(int numVertices) {
     m_numVertices = numVertices;
 
     if (HasFlag(m_flags, kBufferFlagVideoMemory)) {
-        qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
-        qglBufferDataARB(GL_ARRAY_BUFFER_ARB, m_numVertices * m_format.m_size, m_interleavedStorage, GL_STATIC_DRAW_ARB);
-        qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_numVertices * m_format.m_size, m_interleavedStorage, GL_STATIC_DRAW_ARB);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
     }
 }
 
@@ -1729,8 +1729,8 @@ void rvVertexBuffer::Write(idFile& outFile, const char* prepend) {
                 vertexData = m_interleavedStorage;
             }
             else {
-                qglBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
-                vertexData = static_cast<const unsigned char*>(qglMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_READ_ONLY_ARB));
+                glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbID);
+                vertexData = static_cast<const unsigned char*>(glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_READ_ONLY_ARB));
                 if (vertexData == NULL) {
                     idLib::common->Error("Vertex buffer cannot be mapped for access");
                     return;
@@ -1741,8 +1741,8 @@ void rvVertexBuffer::Write(idFile& outFile, const char* prepend) {
                 temporaryVertexData = AllocElements<unsigned char>((size_t)m_loadFormat.m_size * (size_t)m_numVerticesWritten);
                 if (temporaryVertexData == NULL) {
                     if (!HasFlag(m_flags, kBufferFlagSystemMemory)) {
-                        qglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-                        qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+                        glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+                        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
                     }
                     idLib::common->Error("Ran out of memory trying to allocate temporary vertex storage");
                     return;
@@ -1759,8 +1759,8 @@ void rvVertexBuffer::Write(idFile& outFile, const char* prepend) {
                 Mem_Free16(temporaryVertexData);
             }
             if (!HasFlag(m_flags, kBufferFlagSystemMemory)) {
-                qglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-                qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+                glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+                glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
             }
         }
     }

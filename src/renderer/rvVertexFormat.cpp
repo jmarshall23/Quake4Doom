@@ -305,7 +305,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((desc.m_countMask + desc.m_countAdd) & 4) +
 			((~desc.m_countMask) & desc.m_compressedCount);
 
-		qglVertexAttribPointerARB(
+		glVertexAttribPointerARB(
 			1,
 			count,
 			desc.m_glStorage,
@@ -322,7 +322,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((~desc.m_countMask) & desc.m_compressedCount) +
 			(dim & (desc.m_countMask + desc.m_countAdd));
 
-		qglVertexAttribPointerARB(
+		glVertexAttribPointerARB(
 			5,
 			count,
 			desc.m_glStorage,
@@ -332,7 +332,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 	}
 
 	if (m_flags & 0x10) {
-		qglNormalPointer(
+		glNormalPointer(
 			formatDescs[m_dataTypes[4]].m_glStorage,
 			m_size,
 			reinterpret_cast<const void*>(baseOffset + m_byteOffset[4]));
@@ -345,7 +345,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((desc.m_countMask + desc.m_countAdd) & 3) +
 			((~desc.m_countMask) & desc.m_compressedCount);
 
-		qglVertexAttribPointerARB(
+		glVertexAttribPointerARB(
 			6,
 			count,
 			desc.m_glStorage,
@@ -361,7 +361,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((desc.m_countMask + desc.m_countAdd) & 3) +
 			((~desc.m_countMask) & desc.m_compressedCount);
 
-		qglVertexAttribPointerARB(
+		glVertexAttribPointerARB(
 			7,
 			count,
 			desc.m_glStorage,
@@ -377,7 +377,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((desc.m_countMask + desc.m_countAdd) & 4) +
 			((~desc.m_countMask) & desc.m_compressedCount);
 
-		qglColorPointer(
+		glColorPointer(
 			count,
 			desc.m_glStorage,
 			m_size,
@@ -391,7 +391,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((desc.m_countMask + desc.m_countAdd) & 4) +
 			((~desc.m_countMask) & desc.m_compressedCount);
 
-		qglVertexAttribPointerARB(
+		glVertexAttribPointerARB(
 			4,
 			count,
 			desc.m_glStorage,
@@ -407,7 +407,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((desc.m_countMask + desc.m_countAdd) & 1) +
 			((~desc.m_countMask) & desc.m_compressedCount);
 
-		qglVertexAttribPointerARB(
+		glVertexAttribPointerARB(
 			15,
 			count,
 			desc.m_glStorage,
@@ -432,7 +432,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 				((~desc.m_countMask) & desc.m_compressedCount) +
 				(dim & (desc.m_countMask + desc.m_countAdd));
 
-			qglVertexAttribPointerARB(
+			glVertexAttribPointerARB(
 				8 + tc,
 				count,
 				desc.m_glStorage,
@@ -449,7 +449,7 @@ void rvVertexFormat::SetVertexDeclaration(int vertexStartOffset) const {
 			((~desc.m_countMask) & desc.m_compressedCount) +
 			((m_dimensions & 0x7) & (desc.m_countMask + desc.m_countAdd));
 
-		qglVertexPointer(
+		glVertexPointer(
 			count,
 			desc.m_glStorage,
 			m_size,

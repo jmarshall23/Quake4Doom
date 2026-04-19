@@ -683,10 +683,6 @@ const int MAX_GUI_SURFACES	= 1024;		// default size of the drawSurfs list for gu
 										// be automatically expanded as needed
 
 typedef enum {
-	BE_ARB,
-	BE_NV10,
-	BE_NV20,
-	BE_R200,
 	BE_ARB2,
 	BE_BAD
 } backEndName_t;
@@ -1310,17 +1306,6 @@ DRAW_*
 
 ============================================================
 */
-
-void	RB_ARB_DrawInteractions( void );
-
-void	R_R200_Init( void );
-void	RB_R200_DrawInteractions( void );
-
-void	R_NV10_Init( void );
-void	RB_NV10_DrawInteractions( void );
-
-void	R_NV20_Init( void );
-void	RB_NV20_DrawInteractions( void );
 
 void	R_ARB2_Init( void );
 void	RB_ARB2_DrawInteractions( void );

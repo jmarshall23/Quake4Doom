@@ -58,8 +58,8 @@ static bool RB_SurfaceHasActiveStages(const drawSurf_s* surf) {
 
 static void RB_SetupDepthTextureSurface(const drawSurf_s* surf, idDrawVert*& ac) {
 	ac = reinterpret_cast<idDrawVert*>(vertexCache.Position(surf->geo->ambientCache));
-	qglVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac);
-	qglTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), &ac->st);
+	glVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), &ac->st);
 }
 
 static void RB_DrawPerforatedSurface(const drawSurf_s* surf, idDrawVert* ac, float color[4], bool& didDraw) {
@@ -69,7 +69,7 @@ static void RB_DrawPerforatedSurface(const drawSurf_s* surf, idDrawVert* ac, flo
 
 	didDraw = false;
 
-	qglEnable(GL_ALPHA_TEST);
+	glEnable(GL_ALPHA_TEST);
 
 	for (int i = 0; i < material->GetNumStages(); ++i) {
 		const shaderStage_t* stage = material->GetStage(i);
@@ -92,15 +92,15 @@ static void RB_DrawPerforatedSurface(const drawSurf_s* surf, idDrawVert* ac, flo
 		}
 
 		didDraw = true;
-		qglColor4fv(color);
-		qglAlphaFunc(stage->alphaTestMode, shaderRegisters[stage->alphaTestRegister]);
+		glColor4fv(color);
+		glAlphaFunc(stage->alphaTestMode, shaderRegisters[stage->alphaTestRegister]);
 		stage->texture.image->Bind();
 		RB_PrepareStageTexturing(const_cast<shaderStage_t*>(stage), surf, ac, true);
 		RB_DrawElementsWithCounters(tri);
 		RB_FinishStageTexturing(const_cast<shaderStage_t*>(stage), surf, ac);
 	}
 
-	qglDisable(GL_ALPHA_TEST);
+	glDisable(GL_ALPHA_TEST);
 }
 
 bool rvBlurTexture::CreateBuffer(const char* name, idPBufferImage*& image) {
@@ -198,22 +198,22 @@ rvAL::rvAL() {
 }
 
 void RB_RestoreDrawingView() {
-	qglMatrixMode(GL_PROJECTION);
-	qglLoadMatrixf(backEnd.viewDef->projectionMatrix);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(backEnd.viewDef->projectionMatrix);
 
-	qglMatrixMode(GL_MODELVIEW);
-	qglLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	backEnd.currentSpace = NULL;
 
-	qglViewport(
+	glViewport(
 		tr.viewportOffset[0] + backEnd.viewDef->viewport.x1,
 		tr.viewportOffset[1] + backEnd.viewDef->viewport.y1,
 		backEnd.viewDef->viewport.x2 - backEnd.viewDef->viewport.x1 + 1,
 		backEnd.viewDef->viewport.y2 - backEnd.viewDef->viewport.y1 + 1
 	);
 
-	qglScissor(
+	glScissor(
 		tr.viewportOffset[0] + backEnd.viewDef->scissor.x1 + backEnd.viewDef->viewport.x1,
 		tr.viewportOffset[1] + backEnd.viewDef->scissor.y1 + backEnd.viewDef->viewport.y1,
 		backEnd.viewDef->scissor.x2 - backEnd.viewDef->scissor.x1 + 1,
@@ -225,12 +225,12 @@ void RB_RestoreDrawingView() {
 	GL_State(GLS_DEFAULT);
 
 	if (backEnd.viewDef->viewEntitys) {
-		qglEnable(GL_DEPTH_TEST);
-		qglEnable(GL_STENCIL_TEST);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_STENCIL_TEST);
 	}
 	else {
-		qglDisable(GL_DEPTH_TEST);
-		qglDisable(GL_STENCIL_TEST);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_STENCIL_TEST);
 	}
 
 	backEnd.glState.faceCulling = -1;
@@ -302,13 +302,13 @@ void RB_T_FillDepthTexture(const drawSurf_s* surf) {
 		RB_DrawPerforatedSurface(surf, ac, color, didDraw);
 
 		if (!didDraw && drawSolid) {
-			qglColor4fv(color);
+			glColor4fv(color);
 			globalImages->whiteImage->Bind();
 			RB_DrawElementsWithCounters(tri);
 		}
 	}
 	else if (drawSolid) {
-		qglColor4fv(color);
+		glColor4fv(color);
 		globalImages->whiteImage->Bind();
 		RB_DrawElementsWithCounters(tri);
 	}
@@ -326,17 +326,17 @@ void rvBlurTexture::Render(const drawSurfsCommand_t* drawSurfs) {
 	backEnd.currentRenderNeeded = true;
 
 	rvTexRenderTarget::BeginRender(mDepthImage->mRenderTarget, 0);
-	qglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	qglClearDepth(1.0f);
-	qglDepthRange(0.0f, 1.0f);
-	qglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearDepth(1.0f);
+	glDepthRange(0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	backEnd.viewDef = drawSurfs->viewDef;
 	RB_BeginDrawingView();
 
-	qglViewport(0, 0, mDepthImage->uploadWidth, mDepthImage->uploadHeight);
-	qglDisable(GL_BLEND);
-	qglColor4f(1, 1, 1, 1);
+	glViewport(0, 0, mDepthImage->uploadWidth, mDepthImage->uploadHeight);
+	glDisable(GL_BLEND);
+	glColor4f(1, 1, 1, 1);
 
 	GL_SelectTexture(1);
 	GL_SelectTexture(0);
@@ -344,11 +344,11 @@ void rvBlurTexture::Render(const drawSurfsCommand_t* drawSurfs) {
 	globalImages->GetWhiteImage()->Bind();
 	GL_SelectTexture(0);
 
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	qglEnableClientState(GL_VERTEX_ARRAY);
-	qglDepthFunc(GL_LEQUAL);
-	qglDisable(GL_STENCIL_TEST);
-	qglStencilFunc(GL_ALWAYS, 1, 255);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 255);
 
 	const_cast<idMaterial*>(mDepthMaterial)->EvaluateRegisters(
 		regs,
@@ -375,9 +375,9 @@ void rvBlurTexture::Render(const drawSurfsCommand_t* drawSurfs) {
 
 	for (int i = 0; i < backEnd.glState.currenttmu; ++i) {
 		GL_SelectTexture(i);
-		qglDisable(GL_TEXTURE_CUBE_MAP_EXT);
-		qglDisable(GL_TEXTURE_3D);
-		qglDisable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_CUBE_MAP_EXT);
+		glDisable(GL_TEXTURE_3D);
+		glDisable(GL_TEXTURE_2D);
 
 		backEnd.glState.tmu[i].textureType = TT_DISABLED;
 		backEnd.glState.tmu[i].current2DMap = -1;
@@ -396,13 +396,13 @@ void rvBlurTexture::Display(const viewEntity_s* viewEnts, bool prePass) {
 	mBlurImage[0]->mRenderTarget->BeginRender(0);
 
 	RB_SetGL2D();
-	qglViewport(0, 0, mBlurImage[0]->uploadWidth, mBlurImage[0]->uploadHeight);
-	qglColor4f(1, 1, 1, 1);
-	qglClearColor(0, 0, 0, 1);
-	qglClearDepth(1.0f);
-	qglDepthRange(0.0f, 1.0f);
-	qglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	qglDisable(GL_BLEND);
+	glViewport(0, 0, mBlurImage[0]->uploadWidth, mBlurImage[0]->uploadHeight);
+	glColor4f(1, 1, 1, 1);
+	glClearColor(0, 0, 0, 1);
+	glClearDepth(1.0f);
+	glDepthRange(0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_BLEND);
 
 	GL_SelectTexture(1);
 	GL_SelectTexture(0);
@@ -412,31 +412,31 @@ void rvBlurTexture::Display(const viewEntity_s* viewEnts, bool prePass) {
 	const shaderStage_t* stage1 = mDepthMaterial->GetStage(1);
 
 	stage1->newShaderStage->Bind(regs, 0);
-	qglBegin(GL_QUADS);
-	qglTexCoord2f(0.0f, 1.0f); qglVertex2f(0.0f, 0.0f);
-	qglTexCoord2f(1.0f, 1.0f); qglVertex2f(640.0f, 0.0f);
-	qglTexCoord2f(1.0f, 0.0f); qglVertex2f(640.0f, 480.0f);
-	qglTexCoord2f(0.0f, 0.0f); qglVertex2f(0.0f, 480.0f);
-	qglEnd();
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(640.0f, 0.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(640.0f, 480.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 480.0f);
+	glEnd();
 	stage1->newShaderStage->UnBind();
 
 	mBlurImage[0]->mRenderTarget->EndRender(true);
 
 	RB_SetGL2D();
-	qglBlendFunc(GL_ONE, GL_ZERO);
-	qglColor4f(1, 1, 1, 1);
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glColor4f(1, 1, 1, 1);
 
 	const shaderStage_t* stage2 = mDepthMaterial->GetStage(2);
 	stage2->newShaderStage->Bind(regs, 0);
-	qglEnable(GL_BLEND);
-	qglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	qglBegin(GL_QUADS);
-	qglTexCoord2f(0.0f, 1.0f); qglVertex2f(0.0f, 0.0f);
-	qglTexCoord2f(1.0f, 1.0f); qglVertex2f(640.0f, 0.0f);
-	qglTexCoord2f(1.0f, 0.0f); qglVertex2f(640.0f, 480.0f);
-	qglTexCoord2f(0.0f, 0.0f); qglVertex2f(0.0f, 480.0f);
-	qglEnd();
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(640.0f, 0.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(640.0f, 480.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 480.0f);
+	glEnd();
 
 	stage2->newShaderStage->UnBind();
 
@@ -493,7 +493,7 @@ void RB_T_FillDepthTextureAL(const drawSurf_s* surf) {
 				}
 			}
 
-			qglColor4fv(color);
+			glColor4fv(color);
 			RB_DrawElementsWithCounters(tri);
 		}
 	}
@@ -510,7 +510,7 @@ void RB_T_FillDepthTextureAL(const drawSurf_s* surf) {
 			}
 		}
 
-		qglColor4fv(color);
+		glColor4fv(color);
 		RB_DrawElementsWithCounters(tri);
 	}
 
@@ -525,18 +525,18 @@ void rvAL::Render(const drawSurfsCommand_t* drawSurfs) {
 	idVec3 randomizer;
 
 	mDepthImage->mRenderTarget->BeginRender(0);
-	qglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	qglClearDepth(1.0f);
-	qglDepthRange(0.0f, 1.0f);
-	qglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearDepth(1.0f);
+	glDepthRange(0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	backEnd.viewDef = drawSurfs->viewDef;
 	RB_BeginDrawingView();
 	memcpy(backEnd.projectionMatrix, backEnd.viewDef->projectionMatrix, sizeof(backEnd.projectionMatrix));
 
-	qglViewport(0, 0, mDepthImage->uploadWidth, mDepthImage->uploadHeight);
-	qglDisable(GL_BLEND);
-	qglColor4f(1, 1, 1, 1);
+	glViewport(0, 0, mDepthImage->uploadWidth, mDepthImage->uploadHeight);
+	glDisable(GL_BLEND);
+	glColor4f(1, 1, 1, 1);
 
 	GL_SelectTexture(1);
 	globalImages->defaultImage->Bind();
@@ -544,11 +544,11 @@ void rvAL::Render(const drawSurfsCommand_t* drawSurfs) {
 	globalImages->whiteImage->Bind();
 	GL_SelectTexture(0);
 
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	qglEnableClientState(GL_VERTEX_ARRAY);
-	qglDepthFunc(GL_LEQUAL);
-	qglDisable(GL_STENCIL_TEST);
-	qglStencilFunc(GL_ALWAYS, 1, 255);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 255);
 
 	const_cast<idMaterial*>(mDepthMaterial)->EvaluateRegisters(
 		regs,
@@ -575,9 +575,9 @@ void rvAL::Render(const drawSurfsCommand_t* drawSurfs) {
 
 	for (int i = 0; i < backEnd.glState.currenttmu; ++i) {
 		GL_SelectTexture(i);
-		qglDisable(GL_TEXTURE_CUBE_MAP_EXT);
-		qglDisable(GL_TEXTURE_3D);
-		qglDisable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_CUBE_MAP_EXT);
+		glDisable(GL_TEXTURE_3D);
+		glDisable(GL_TEXTURE_2D);
 
 		backEnd.glState.tmu[i].textureType = TT_DISABLED;
 		backEnd.glState.tmu[i].current2DMap = -1;
@@ -589,23 +589,23 @@ void rvAL::Render(const drawSurfsCommand_t* drawSurfs) {
 }
 
 void RB_SetGL2D2() {
-	qglViewport(0, 0, glConfig.vidWidth, glConfig.vidHeight);
+	glViewport(0, 0, glConfig.vidWidth, glConfig.vidHeight);
 
 	if (r_useScissor.GetBool()) {
-		qglScissor(0, 0, glConfig.vidWidth, glConfig.vidHeight);
+		glScissor(0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	}
 
-	qglMatrixMode(GL_PROJECTION);
-	qglLoadIdentity();
-	qglOrtho(0.0, 640.0, 480.0, 0.0, 0.0, 1.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, 640.0, 480.0, 0.0, 0.0, 1.0);
 
-	qglMatrixMode(GL_MODELVIEW);
-	qglLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	GL_State(GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA | GLS_DEPTHMASK);
 	GL_Cull(CT_TWO_SIDED);
-	qglDisable(GL_DEPTH_TEST);
-	qglDisable(GL_STENCIL_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_STENCIL_TEST);
 }
 
 void R_ShutdownSpecialEffects() {
@@ -730,12 +730,12 @@ void rvAL::DrawLight(idVec3& origin, float size, idVec3& color) {
 	mainStage->SetShaderParameter(mLightMinDistanceParm, regs, &minDistance, 1);
 	mainStage->UpdateShaderParms(regs, 0);
 
-	qglBegin(GL_QUADS);
-	qglTexCoord2f(x1 / 639.0f, 1.0f - y1 / 479.0f); qglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0.0f, 0.0f); qglVertex2f(x1, y1);
-	qglTexCoord2f(x2 / 639.0f, 1.0f - y1 / 479.0f); qglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1.0f, 0.0f); qglVertex2f(x2, y1);
-	qglTexCoord2f(x2 / 639.0f, 1.0f - y2 / 479.0f); qglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1.0f, 1.0f); qglVertex2f(x2, y2);
-	qglTexCoord2f(x1 / 639.0f, 1.0f - y2 / 479.0f); qglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0.0f, 1.0f); qglVertex2f(x1, y2);
-	qglEnd();
+	glBegin(GL_QUADS);
+	glTexCoord2f(x1 / 639.0f, 1.0f - y1 / 479.0f); glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0.0f, 0.0f); glVertex2f(x1, y1);
+	glTexCoord2f(x2 / 639.0f, 1.0f - y1 / 479.0f); glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1.0f, 0.0f); glVertex2f(x2, y1);
+	glTexCoord2f(x2 / 639.0f, 1.0f - y2 / 479.0f); glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1.0f, 1.0f); glVertex2f(x2, y2);
+	glTexCoord2f(x1 / 639.0f, 1.0f - y2 / 479.0f); glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0.0f, 1.0f); glVertex2f(x1, y2);
+	glEnd();
 
 	++numDrawn;
 }
@@ -752,7 +752,7 @@ void rvAL::Display(const viewEntity_s* viewEnts, bool prePass) {
 	mLightMinDistanceParm = mainStage->FindShaderParameter("LightMinDistance");
 
 	RB_SetGL2D2();
-	qglColor4f(1, 1, 1, 1);
+	glColor4f(1, 1, 1, 1);
 	GL_State(GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE);
 
 	numDrawn = 0;

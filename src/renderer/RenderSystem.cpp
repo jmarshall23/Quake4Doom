@@ -282,7 +282,7 @@ static void R_CheckCvars( void ) {
 	}
 
 	// check for changes to logging state
-	GLimp_EnableLogging( r_logFile.GetInteger() != 0 );
+	//GLimp_EnableLogging( r_logFile.GetInteger() != 0 );
 }
 
 /*
@@ -540,63 +540,12 @@ void idRenderSystemLocal::SetBackEndRenderer() {
 
 	bool oldVPstate = backEndRendererHasVertexPrograms;
 
-	backEndRenderer = BE_BAD;
-
-	if ( idStr::Icmp( r_renderer.GetString(), "arb" ) == 0 ) {
-		backEndRenderer = BE_ARB;
-	} else if ( idStr::Icmp( r_renderer.GetString(), "arb2" ) == 0 ) {
-		if ( glConfig.allowARB2Path ) {
-			backEndRenderer = BE_ARB2;
-		}
-	} else if ( idStr::Icmp( r_renderer.GetString(), "nv10" ) == 0 ) {
-		if ( glConfig.allowNV10Path ) {
-			backEndRenderer = BE_NV10;
-		}
-	} else if ( idStr::Icmp( r_renderer.GetString(), "nv20" ) == 0 ) {
-		if ( glConfig.allowNV20Path ) {
-			backEndRenderer = BE_NV20;
-		}
-	} else if ( idStr::Icmp( r_renderer.GetString(), "r200" ) == 0 ) {
-		if ( glConfig.allowR200Path ) {
-			backEndRenderer = BE_R200;
-		}
-	}
-
-	// fallback
-	if ( backEndRenderer == BE_BAD ) {
-		// choose the best
-		if ( glConfig.allowARB2Path ) {
-			backEndRenderer = BE_ARB2;
-		} else if ( glConfig.allowR200Path ) {
-			backEndRenderer = BE_R200;
-		} else if ( glConfig.allowNV20Path ) {
-			backEndRenderer = BE_NV20;
-		} else if ( glConfig.allowNV10Path ) {
-			backEndRenderer = BE_NV10;
-		} else {
-			// the others are considered experimental
-			backEndRenderer = BE_ARB;
-		}
-	}
+	backEndRenderer = BE_ARB2;
 
 	backEndRendererHasVertexPrograms = false;
 	backEndRendererMaxLight = 1.0;
 
 	switch( backEndRenderer ) {
-	case BE_ARB:
-		common->Printf( "using ARB renderSystem\n" );
-		break;
-	case BE_NV10:
-		common->Printf( "using NV10 renderSystem\n" );
-		break;
-	case BE_NV20:
-		common->Printf( "using NV20 renderSystem\n" );
-		backEndRendererHasVertexPrograms = true;
-		break;
-	case BE_R200:
-		common->Printf( "using R200 renderSystem\n" );
-		backEndRendererHasVertexPrograms = true;
-		break;
 	case BE_ARB2:
 		common->Printf( "using ARB2 renderSystem\n" );
 		backEndRendererHasVertexPrograms = true;
@@ -609,12 +558,12 @@ void idRenderSystemLocal::SetBackEndRenderer() {
 	// clear the vertex cache if we are changing between
 	// using vertex programs and not, because specular and
 	// shadows will be different data
-	if ( oldVPstate != backEndRendererHasVertexPrograms ) {
-		vertexCache.PurgeAll();
-		if ( primaryWorld ) {
-			primaryWorld->FreeInteractions();
-		}
-	}
+	//if ( oldVPstate != backEndRendererHasVertexPrograms ) {
+	//	vertexCache.PurgeAll();
+	//	if ( primaryWorld ) {
+	//		primaryWorld->FreeInteractions();
+	//	}
+	//}
 
 	r_renderer.ClearModified();
 }
@@ -960,13 +909,13 @@ void idRenderSystemLocal::CaptureRenderToFile( const char *fileName, bool fixAlp
 	guiModel->Clear();
 	R_IssueRenderCommands();
 
-	qglReadBuffer( GL_BACK );
+	glReadBuffer( GL_BACK );
 
 	// include extra space for OpenGL padding to word boundaries
 	int	c = ( rc->width + 3 ) * rc->height;
 	byte *data = (byte *)R_StaticAlloc( c * 3 );
 	
-	qglReadPixels( rc->x, rc->y, rc->width, rc->height, GL_RGB, GL_UNSIGNED_BYTE, data ); 
+	glReadPixels( rc->x, rc->y, rc->width, rc->height, GL_RGB, GL_UNSIGNED_BYTE, data ); 
 
 	byte *data2 = (byte *)R_StaticAlloc( c * 4 );
 

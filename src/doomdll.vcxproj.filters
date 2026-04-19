@@ -210,12 +210,6 @@
     <ClInclude Include="renderer\ModelOverlay.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="renderer\qgl.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="renderer\qgl_linked.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="renderer\RenderSystem.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -704,22 +698,10 @@
     <ClCompile Include="renderer\Cinematic.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\draw_arb.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="renderer\draw_arb2.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\draw_common.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\draw_nv10.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\draw_nv20.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer\draw_r200.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="renderer\GuiModel.cpp">
@@ -1110,9 +1092,6 @@
       <Filter>Sys</Filter>
     </ClCompile>
     <ClCompile Include="sys\win32\win_net.cpp">
-      <Filter>Sys</Filter>
-    </ClCompile>
-    <ClCompile Include="sys\win32\win_qgl.cpp">
       <Filter>Sys</Filter>
     </ClCompile>
     <ClCompile Include="sys\win32\win_shared.cpp">

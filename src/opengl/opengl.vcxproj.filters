@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="gl_d3d12shim.cpp" />
+    <ClCompile Include="gl_d3d12wgl.cpp" />
+    <ClCompile Include="gl_d3d12raylight.cpp" />
+    <ClCompile Include="gl_d3d12tess.cpp" />
+    <ClCompile Include="tess\dict.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\geom.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\memalloc.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\mesh.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\normal.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\priorityq.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\priorityq-heap.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\render.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\sweep.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\tess.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\tessellate.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\tessmono.c">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_d3d12arb.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="opengl.h" />
+    <ClInclude Include="tess\dict.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\dict-list.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\geom.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\glu.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\gluos.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\memalloc.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\mesh.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\normal.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\priorityq.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\priorityq-heap.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\priorityq-sort.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\render.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\sweep.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\tess.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\tessellate.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\tessmono.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="gl_d3d12arb.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="tess">
+      <UniqueIdentifier>{8e4412d9-8f8f-4888-ab36-4ef36887d7db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="streamline">
+      <UniqueIdentifier>{ac325e42-ffb4-4bbc-a4ec-b567658773a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tess\tessellate.js">
+      <Filter>tess</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="streamline\lib\x64\sl.interposer.lib">
+      <Filter>streamline</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

@@ -691,14 +691,14 @@ void R_LinkLightSurf( const drawSurf_t **link, const srfTriangles_t *tri, const 
 			shader->EvaluateRegisters( regs, space->entityDef->parms.shaderParms, tr.viewDef, NULL );
 		}
 
-		// calculate the specular coordinates if we aren't using vertex programs
-		if ( !tr.backEndRendererHasVertexPrograms && !r_skipSpecular.GetBool() && tr.backEndRenderer != BE_ARB ) {
-			R_SpecularTexGen( drawSurf, light->globalLightOrigin, tr.viewDef->renderView.vieworg );
-			// if we failed to allocate space for the specular calculations, drop the surface
-			if ( !drawSurf->dynamicTexCoords ) {
-				return;
-			}
-		}
+		// calculate the specular coordinates if we aren't using vertex programs - jmarshall
+		//if ( !tr.backEndRendererHasVertexPrograms && !r_skipSpecular.GetBool() && tr.backEndRenderer != BE_ARB ) {
+		//	R_SpecularTexGen( drawSurf, light->globalLightOrigin, tr.viewDef->renderView.vieworg );
+		//	// if we failed to allocate space for the specular calculations, drop the surface
+		//	if ( !drawSurf->dynamicTexCoords ) {
+		//		return;
+		//	}
+		//}
 	}
 
 	// actually link it in

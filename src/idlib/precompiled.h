@@ -176,7 +176,7 @@ public:
 #pragma warning(disable : 4996)				// unsafe string operations
 
 #include <malloc.h>							// no malloc.h on mac or unix
-#include <windows.h>						// for qgl.h
+#include <windows.h>						// for gl.h
 #undef FindText								// stupid namespace poluting Microsoft monkeys
 
 #endif /* _WIN32 */
@@ -241,7 +241,7 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 const float MAX_BOUND_SIZE = 65536.0f;
 
 // renderer
-#include "../renderer/qgl.h"
+#include "../opengl/opengl.h"
 #include "../renderer/Cinematic.h"
 #include "../renderer/Material.h"
 #include "../renderer/Model.h"

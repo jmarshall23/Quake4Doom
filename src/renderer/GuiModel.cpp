@@ -264,7 +264,7 @@ void idGuiModel::EmitFullScreen( void ) {
 
 	viewDef->floatTime = tr.frameShaderTime;
 
-	// qglOrtho( 0, 640, 480, 0, 0, 1 );		// always assume 640x480 virtual coordinates
+	// glOrtho( 0, 640, 480, 0, 0, 1 );		// always assume 640x480 virtual coordinates
 	viewDef->projectionMatrix[0] = 2.0f / 640.0f;
 	viewDef->projectionMatrix[5] = -2.0f / 480.0f;
 	viewDef->projectionMatrix[10] = -2.0f / 1.0f;

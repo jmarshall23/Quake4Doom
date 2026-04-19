@@ -552,9 +552,9 @@ void rvPrimBatch::LoadMatrixPaletteIntoVPParams(const float* skinToModelTransfor
 
     for (int i = 0; i < m_numTransforms; ++i, matrix += 16, programParam += 3)
     {
-        qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, programParam + 0, matrix + 0);
-        qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, programParam + 1, matrix + 4);
-        qglProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, programParam + 2, matrix + 8);
+        glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, programParam + 0, matrix + 0);
+        glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, programParam + 1, matrix + 4);
+        glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, programParam + 2, matrix + 8);
     }
 }
 
@@ -1206,7 +1206,7 @@ void rvPrimBatch::Draw(rvVertexBuffer& vertexBuffer, rvIndexBuffer& indexBuffer,
     intptr_t indexOffsetBytes = static_cast<intptr_t>(m_drawGeoSpec.m_indexStart) * GetIndexSizeBytes(indexBuffer);
     int drawCount = r_singleTriangle.GetInteger() ? 3 : numIndices;
 
-    qglDrawElements(
+    glDrawElements(
         GL_TRIANGLES,
         drawCount,
         GetGlIndexType(indexBuffer),
@@ -1229,9 +1229,9 @@ void rvPrimBatch::Draw(rvVertexBuffer& vertexBuffer, int* indices, int numIndice
     backEnd.pc.c_drawIndexes += numIndices;
     backEnd.pc.c_drawVertexes += m_drawGeoSpec.m_vertexCount;
 
-    qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     const int drawCount = r_singleTriangle.GetInteger() ? 3 : numIndices;
-    qglDrawElements(GL_TRIANGLES, drawCount, GL_UNSIGNED_INT, indices);
+    glDrawElements(GL_TRIANGLES, drawCount, GL_UNSIGNED_INT, indices);
 
     backEnd.pc.c_vboIndexes += numIndices;
 }
@@ -1254,9 +1254,9 @@ void rvPrimBatch::DrawShadowVolume(
     backEnd.pc.c_shadowIndexes += numIndices;
     backEnd.pc.c_shadowVertexes += m_shadowVolGeoSpec.m_vertexCount;
 
-    qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     const int drawCount = r_singleTriangle.GetInteger() ? 3 : numIndices;
-    qglDrawElements(GL_TRIANGLES, drawCount, GL_UNSIGNED_INT, indices);
+    glDrawElements(GL_TRIANGLES, drawCount, GL_UNSIGNED_INT, indices);
 }
 
 void rvPrimBatch::DrawShadowVolume(
@@ -1282,7 +1282,7 @@ void rvPrimBatch::DrawShadowVolume(
     intptr_t indexOffsetBytes = static_cast<intptr_t>(m_shadowVolGeoSpec.m_indexStart) * GetIndexSizeBytes(indexBuffer);
     int drawCount = r_singleTriangle.GetInteger() ? 3 : numIndices;
 
-    qglDrawElements(
+    glDrawElements(
         GL_TRIANGLES,
         drawCount,
         GetGlIndexType(indexBuffer),
