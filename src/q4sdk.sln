@@ -78,8 +78,8 @@ Global
 		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug with inlines and memory log|x64.Build.0 = Debug|x64
 		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug with inlines|x64.ActiveCfg = Debug|x64
 		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug with inlines|x64.Build.0 = Debug|x64
-		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug|x64.ActiveCfg = Debug|x64
-		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug|x64.Build.0 = Debug|x64
+		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug|x64.ActiveCfg = Release|x64
+		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Debug|x64.Build.0 = Release|x64
 		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.DebugInline|x64.ActiveCfg = Debug|x64
 		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.DebugInline|x64.Build.0 = Debug|x64
 		{58320C19-5139-47C5-AAFE-4CAD2C8ED14D}.Dedicated Debug with inlines|x64.ActiveCfg = Debug|x64

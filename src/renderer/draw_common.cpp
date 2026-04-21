@@ -169,6 +169,8 @@ static void RB_Q4_DrawDepthElements(const drawSurf_t* surf) {
 static void RB_Q4_GetCurrentRender(bool force) {
 	rb_q4CurrentRenderNeeded = false;
 
+	return; // todo fix this, its slow as written from quake 4. 
+
 	if (r_skipPostProcess.GetBool() || tr.backEndRenderer != BE_ARB2) {
 		return;
 	}
