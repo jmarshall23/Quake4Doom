@@ -2962,6 +2962,20 @@ idImage* idMaterial::GetDiffuseImage(void) const {
 	}
 	return GetEditorImage();
 }
+
+/*
+===================
+idMaterial::GetBumpImage
+===================
+*/
+idImage* idMaterial::GetBumpImage(void) const {
+	for (int i = 0; i < numStages; i++) {
+		if (stages[i].lighting == SL_BUMP && stages[i].texture.image) {
+			return stages[i].texture.image;
+		}
+	}
+	return GetEditorImage();
+}
 #endif
 
 /*

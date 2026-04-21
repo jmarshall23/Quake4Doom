@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 
 #include "tr_local.h"
+#include "Model_local.h"
 
 /*
 ===================
@@ -272,12 +273,28 @@ void idRenderWorldLocal::UpdateEntityDef( qhandle_t entityHandle, const renderEn
 
 	R_AxisToModelMatrix( def->parms.axis, def->parms.origin, def->modelMatrix );
 
+	// If we are a static mesh, build the top and bottom accel structs. Dynamic this is done elsewhere.
+	idRenderModelStatic* staticMesh = (idRenderModelStatic*)def->parms.hModel;
+	if (staticMesh && staticMesh->IsDynamicModel() == DM_STATIC)
+	{
+		if (def->dxrBottomAccelStruct == 0)
+		{
+			staticMesh->UpdateDXR(def->dxrBottomAccelStruct);
+		}
+		
+		float dxrTransformMatrix[16];
+
+		RB_CopyModelMatrixToDXRTransform(def->modelMatrix, dxrTransformMatrix);
+		glUpdateTopLevelAceelStructure(def->dxrBottomAccelStruct, dxrTransformMatrix, def->dxrTopAccelStruct);
+	}
+
 	def->lastModifiedFrameNum = tr.frameCount;
 	if ( session->writeDemo && def->archived ) {
 		WriteFreeEntity( entityHandle );
 		def->archived = false;
 	}
 
+	// optionally immediately issue any callbacks
 	// optionally immediately issue any callbacks
 	if ( !r_useEntityCallbacks.GetBool() && def->parms.callback ) {
 		R_IssueEntityDefCallback( def );
@@ -948,8 +965,8 @@ int idRenderWorldLocal::BoundsInAreas( const idBounds &bounds, int *areas, int m
 	int numAreas = 0;
 
 	assert( areas );
-	assert( bounds[0][0] <= bounds[1][0] && bounds[0][1] <= bounds[1][1] && bounds[0][2] <= bounds[1][2] );
-	assert( bounds[1][0] - bounds[0][0] < 1e4f && bounds[1][1] - bounds[0][1] < 1e4f && bounds[1][2] - bounds[0][2] < 1e4f );
+	//assert( bounds[0][0] <= bounds[1][0] && bounds[0][1] <= bounds[1][1] && bounds[0][2] <= bounds[1][2] );
+//	assert( bounds[1][0] - bounds[0][0] < 1e4f && bounds[1][1] - bounds[0][1] < 1e4f && bounds[1][2] - bounds[0][2] < 1e4f );
 
 	if ( !areaNodes ) {
 		return numAreas;

@@ -1589,6 +1589,11 @@ struct Light
     uint   twoSided;
     float  persistant;
     float  pad1;
+
+    // For point lights, this is the axis-aligned XYZ attenuation radius.
+    // The scalar radius above is still kept as a max/fallback range and for rect lights.
+    float3 pointRadius;
+    float  pointRadiusPad;
 };
 
 struct ShadowPayload
@@ -1730,6 +1735,38 @@ float3 CosineSampleHemisphere(float2 u)
     return float3(d.x, d.y, z);
 }
 
+float3 GetPointLightRadius(Light Lgt)
+{
+    float scalarRadius = max(abs(Lgt.radius), 1e-4);
+    float3 r = abs(Lgt.pointRadius);
+
+    // Allow older/zero-initialized light records to behave like the old scalar radius.
+    if (max(max(r.x, r.y), r.z) <= 1e-4)
+    {
+        r = float3(scalarRadius, scalarRadius, scalarRadius);
+    }
+
+    return max(r, float3(1e-4, 1e-4, 1e-4));
+}
+
+float GetPointLightMaxRadius(Light Lgt)
+{
+    float3 r = GetPointLightRadius(Lgt);
+    return max(max(r.x, r.y), r.z);
+}
+
+float ComputePointLightAttenuation(float3 worldPos, Light Lgt)
+{
+    float3 radii = GetPointLightRadius(Lgt);
+    float3 normalizedOffset = (worldPos - Lgt.position) / radii;
+
+    // Ellipsoidal falloff: radius.x controls X reach, radius.y controls Y reach,
+    // and radius.z controls Z reach in world space.
+    float ellipsoidDistance = length(normalizedOffset);
+    float atten = saturate(1.0 - ellipsoidDistance);
+    return atten * atten;
+}
+
 float TraceSoftShadow(float3 worldPos, float3 N, Light Lgt, float3 toLight, float dist)
 {
     const uint SHADOW_SAMPLES = 12;
@@ -1739,7 +1776,7 @@ float TraceSoftShadow(float3 worldPos, float3 N, Light Lgt, float3 toLight, floa
     float3 tangent, bitangent;
     BuildOrthonormalBasis(L, tangent, bitangent);
 
-    float areaRadius = max(Lgt.radius * 0.03, 0.12);
+    float areaRadius = max(GetPointLightMaxRadius(Lgt) * 0.03, 0.12);
 
     float shadowAccum = 0.0;
     float rand = Hash12(worldPos.xy + float2(worldPos.z, dist));
@@ -2005,12 +2042,13 @@ void RayGen()
     }
 
     float3 baseAlbedo    = albedoSample.rgb;
-    float3 worldPos      = LoadScenePosition(pixel);
+    float4 positionSample = gPositionTex.Load(int3(pixel, 0));
+	float3 worldPos       = positionSample.xyz;
     float4 normalSample  = LoadSceneNormal(pixel);
     float3 N             = normalize(normalSample.xyz);
     float3 V             = normalize(gCameraPos.xyz - worldPos);
 
-    float geoFlag = normalSample.w;
+    float geoFlag = positionSample.w;
 
     float cavity = ComputeCavity(pixel, worldPos, N);
     float microShadow = lerp(0.75, 1.0, cavity);
@@ -2028,14 +2066,14 @@ void RayGen()
 
     float skyStrength = 2.0;
 
-    float3 lightingAccum = 0.2;
+    float3 lightingAccum = 0.0;
     float3 specularAccum = 0.0;
 
     lightingAccum += skyColor * (skyStrength * skyVis);
 
     if (geoFlag == GEOMETRY_FLAG_SKELETAL)
     {
-        lightingAccum += 0.2;
+        lightingAccum += 0.1;
     }
 
     [loop]
@@ -2050,10 +2088,7 @@ void RayGen()
             float  dist    = sqrt(max(distSq, 1e-6));
             float3 L       = toLight / dist;
 
-            float radius = max(Lgt.radius, 1e-4);
-
-            float atten = saturate((radius - dist) / radius);
-            atten = atten * atten;
+            float atten = ComputePointLightAttenuation(worldPos, Lgt);
 
             float wrap = 0.35;
             float NdotLWrap = saturate((dot(N, L) + wrap) / (1.0 + wrap));
@@ -2153,7 +2188,7 @@ void RayGen()
     }
     else
     {
-        float3 finalColor = albedo * lightingAccum + specularAccum;
+        float3 finalColor = (albedo * lightingAccum) + specularAccum.xyz;
         gOutputTex[pixel] = float4(finalColor, albedoSample.a);
     }
 }
@@ -2864,15 +2899,34 @@ bool glRaytracingLightingExecute(const glRaytracingLightingPassDesc_t* pass)
 
 glRaytracingLight_t glRaytracingLightingMakePointLight(
 	float px, float py, float pz,
-	float radius,
+	float radiusX, float radiusY, float radiusZ,
 	float r, float g, float b,
 	float intensity)
 {
 	glRaytracingLight_t l = {};
+	float ax = (radiusX < 0.0f) ? -radiusX : radiusX;
+	float ay = (radiusY < 0.0f) ? -radiusY : radiusY;
+	float az = (radiusZ < 0.0f) ? -radiusZ : radiusZ;
+	float maxRadius = ax;
+	if (ay > maxRadius) maxRadius = ay;
+	if (az > maxRadius) maxRadius = az;
+	if (maxRadius <= 0.0f) maxRadius = 1e-4f;
+
+	if (ax <= 0.0f) ax = maxRadius;
+	if (ay <= 0.0f) ay = maxRadius;
+	if (az <= 0.0f) az = maxRadius;
+
 	l.position.x = px;
 	l.position.y = py;
 	l.position.z = pz;
-	l.radius = radius;
+
+	// Keep radius populated as a scalar fallback/max range, but point lights now
+	// attenuate using pointRadius.x/y/z in the ray generation shader.
+	l.radius = maxRadius;
+	l.pointRadius.x = ax;
+	l.pointRadius.y = ay;
+	l.pointRadius.z = az;
+	l.pointRadiusPad = 0.0f;
 
 	l.color.x = r;
 	l.color.y = g;
@@ -2932,6 +2986,10 @@ glRaytracingLight_t glRaytracingLightingMakeRectLight(
 
 	// Reuse radius as influence/falloff range for the rect light.
 	l.radius = (halfWidth > halfHeight ? halfWidth : halfHeight) * 6.0f;
+	l.pointRadius.x = l.radius;
+	l.pointRadius.y = l.radius;
+	l.pointRadius.z = l.radius;
+	l.pointRadiusPad = 0.0f;
 
 	l.color.x = r;
 	l.color.y = g;

@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 
 #undef max
 #undef min
@@ -101,6 +102,11 @@ namespace
 		}
 
 		return true;
+	}
+
+	static bool EqualsNoCase(const std::string& a, const char* b)
+	{
+		return Upper(a) == Upper(std::string(b));
 	}
 
 	static std::string StripComments(const std::string& source)
@@ -261,8 +267,23 @@ namespace
 
 	static std::string HlslFloat(float f)
 	{
+		if (!std::isfinite(f))
+			return "0.0f";
+
 		char buf[64];
-		std::snprintf(buf, sizeof(buf), "%.9gf", f);
+		std::snprintf(buf, sizeof(buf), "%.9f", f);
+
+		char* end = buf + std::strlen(buf) - 1;
+		while (end > buf && *end == '0' && *(end - 1) != '.')
+		{
+			*end = '\0';
+			--end;
+		}
+
+		if (std::strchr(buf, '.') == nullptr)
+			std::strcat(buf, ".0");
+
+		std::strcat(buf, "f");
 		return buf;
 	}
 
@@ -280,6 +301,71 @@ namespace
 		return true;
 	}
 
+	static std::string ReplaceNonIdentChars(const std::string& s)
+	{
+		std::string out;
+		out.reserve(s.size() + 8);
+
+		for (char c : s)
+		{
+			if (std::isalnum((unsigned char)c) || c == '_')
+				out.push_back(c);
+			else
+				out.push_back('_');
+		}
+
+		if (out.empty())
+			out = "arb_id";
+
+		if (std::isdigit((unsigned char)out[0]))
+			out = std::string("arb_") + out;
+
+		return out;
+	}
+
+	static bool IsHlslKeyword(const std::string& s)
+	{
+		static const char* kWords[] =
+		{
+			"asm","asm_fragment","bool","break","Buffer","ByteAddressBuffer","case","cbuffer",
+			"centroid","class","column_major","compile","compile_fragment","const","continue",
+			"ComputeShader","ConsumeStructuredBuffer","default","discard","do","double","DomainShader",
+			"dword","else","export","extern","false","float","for","fxgroup","GeometryShader",
+			"groupshared","half","HullShader","if","in","inline","inout","InputPatch","int",
+			"interface","line","lineadj","linear","LineStream","matrix","min16float","min10float",
+			"min16int","min12int","min16uint","namespace","nointerpolation","noperspective","NULL",
+			"out","OutputPatch","packoffset","pass","pixelfragment","PixelShader","point","PointStream",
+			"precise","RasterizerOrderedBuffer","RasterizerOrderedByteAddressBuffer",
+			"RasterizerOrderedStructuredBuffer","RasterizerOrderedTexture1D",
+			"RasterizerOrderedTexture1DArray","RasterizerOrderedTexture2D",
+			"RasterizerOrderedTexture2DArray","RasterizerOrderedTexture3D","register",
+			"return","row_major","RWBuffer","RWByteAddressBuffer","RWStructuredBuffer",
+			"RWTexture1D","RWTexture1DArray","RWTexture2D","RWTexture2DArray","RWTexture3D",
+			"sample","sampler","SamplerState","SamplerComparisonState","shared","snorm","stateblock",
+			"stateblock_state","static","string","struct","switch","tbuffer","technique","technique10",
+			"technique11","texture","Texture1D","Texture1DArray","Texture2D","Texture2DArray","Texture2DMS",
+			"Texture2DMSArray","Texture3D","TextureCube","TextureCubeArray","true","typedef","triangle",
+			"triangleadj","TriangleStream","uint","uniform","unorm","unsigned","vector","vertexfragment",
+			"VertexShader","void","volatile","while"
+		};
+
+		const std::string u = Upper(s);
+		for (const char* kw : kWords)
+		{
+			if (u == Upper(std::string(kw)))
+				return true;
+		}
+		return false;
+	}
+
+	static std::string SanitizeIdentifier(const std::string& s)
+	{
+		std::string out = ReplaceNonIdentChars(s);
+		if (IsHlslKeyword(out))
+			out = "arb_" + out;
+		return out;
+	}
+
 	class ARBTranslator
 	{
 	public:
@@ -292,6 +378,7 @@ namespace
 			m_instructions.clear();
 			m_error.clear();
 			m_errorPosition = -1;
+			m_symbolMap.clear();
 
 			std::vector<std::string> lines = LogicalLines(source);
 			for (size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
@@ -317,12 +404,194 @@ namespace
 		std::vector<std::string> m_instructions;
 		std::string m_error;
 		GLint m_errorPosition = -1;
+		std::unordered_map<std::string, std::string> m_symbolMap;
 
 		bool Fail(const std::string& msg, GLint pos)
 		{
 			m_error = msg;
 			m_errorPosition = pos;
 			return false;
+		}
+
+		std::string MapUserSymbol(const std::string& raw)
+		{
+			const std::string key = Trim(raw);
+			auto it = m_symbolMap.find(key);
+			if (it != m_symbolMap.end())
+				return it->second;
+
+			const std::string safe = SanitizeIdentifier(key);
+			m_symbolMap.emplace(key, safe);
+			return safe;
+		}
+
+		static bool ParseBracketIndex(const std::string& s, const char* prefix, int& outIdx)
+		{
+			if (!StartsWithNoCase(s, prefix))
+				return false;
+
+			const size_t p = std::strlen(prefix);
+			const size_t end = s.find(']', p);
+			if (end == std::string::npos)
+				return false;
+
+			outIdx = std::atoi(s.c_str() + p);
+			return true;
+		}
+
+		std::string MatrixRowExpr(const char* matName, int row)
+		{
+			row = std::max(0, std::min(3, row));
+			std::ostringstream ss;
+			ss << "float4(" << matName << "[" << row << "][0], "
+				<< matName << "[" << row << "][1], "
+				<< matName << "[" << row << "][2], "
+				<< matName << "[" << row << "][3])";
+			return ss.str();
+		}
+
+		std::string MatrixNameFromARB(const std::string& token)
+		{
+			if (StartsWithNoCase(token, "state.matrix.mvp"))
+				return "gMVP";
+			if (StartsWithNoCase(token, "state.matrix.modelview"))
+				return "gModelMatrix";
+			if (StartsWithNoCase(token, "state.matrix.texture[0]"))
+				return "gTexMat0";
+			if (StartsWithNoCase(token, "state.matrix.texture[1]"))
+				return "gTexMat1";
+			return std::string();
+		}
+
+		bool ExpandParamInitializerItems(const std::string& init, std::vector<std::string>& outItems, GLint pos)
+		{
+			size_t b = init.find('{');
+			size_t e = init.rfind('}');
+			if (b == std::string::npos || e == std::string::npos || e <= b)
+				return false;
+
+			std::vector<std::string> items = SplitArgs(init.substr(b + 1, e - b - 1));
+			for (const std::string& raw : items)
+			{
+				std::string t = Trim(raw);
+				if (t.empty())
+					continue;
+
+				float v[4];
+				if (ParseFloat4Initializer("{" + t + "}", v))
+				{
+					std::ostringstream fs;
+					fs << "float4(" << HlslFloat(v[0]) << ", " << HlslFloat(v[1]) << ", "
+						<< HlslFloat(v[2]) << ", " << HlslFloat(v[3]) << ")";
+					outItems.push_back(fs.str());
+					continue;
+				}
+
+				if (IsNumberToken(t))
+				{
+					outItems.push_back("float4(" + t + ", " + t + ", " + t + ", " + t + ")");
+					continue;
+				}
+
+				// PARAM mvp[4] = { state.matrix.mvp };
+				std::string mat = MatrixNameFromARB(t);
+				if (!mat.empty())
+				{
+					for (int i = 0; i < 4; ++i)
+						outItems.push_back(MatrixRowExpr(mat.c_str(), i));
+					continue;
+				}
+
+				// PARAM foo[4] = { state.matrix.mvp.row[0], ... }
+				if (StartsWithNoCase(t, "state.matrix.mvp.row["))
+				{
+					int row = 0;
+					if (ParseBracketIndex(t, "state.matrix.mvp.row[", row))
+					{
+						outItems.push_back(MatrixRowExpr("gMVP", row));
+						continue;
+					}
+				}
+				if (StartsWithNoCase(t, "state.matrix.modelview.row["))
+				{
+					int row = 0;
+					if (ParseBracketIndex(t, "state.matrix.modelview.row[", row))
+					{
+						outItems.push_back(MatrixRowExpr("gModelMatrix", row));
+						continue;
+					}
+				}
+				if (StartsWithNoCase(t, "state.matrix.texture[0].row["))
+				{
+					int row = 0;
+					if (ParseBracketIndex(t, "state.matrix.texture[0].row[", row))
+					{
+						outItems.push_back(MatrixRowExpr("gTexMat0", row));
+						continue;
+					}
+				}
+				if (StartsWithNoCase(t, "state.matrix.texture[1].row["))
+				{
+					int row = 0;
+					if (ParseBracketIndex(t, "state.matrix.texture[1].row[", row))
+					{
+						outItems.push_back(MatrixRowExpr("gTexMat1", row));
+						continue;
+					}
+				}
+
+				// PARAM a[4] = { program.local[0..3] }
+				if (StartsWithNoCase(t, "program.local["))
+				{
+					size_t dotdot = t.find("..");
+					size_t lbr = t.find('[');
+					size_t rbr = t.find(']');
+					if (dotdot != std::string::npos && lbr != std::string::npos && rbr != std::string::npos)
+					{
+						int a = std::atoi(t.c_str() + lbr + 1);
+						int bidx = std::atoi(t.c_str() + dotdot + 2);
+						if (bidx < a)
+							std::swap(a, bidx);
+
+						for (int i = a; i <= bidx; ++i)
+						{
+							char buf[64];
+							std::snprintf(buf, sizeof(buf), (m_target == GL_VERTEX_PROGRAM_ARB) ? "gARBLocalVP[%d]" : "gARBLocalFP[%d]", i);
+							outItems.push_back(buf);
+						}
+						continue;
+					}
+				}
+
+				if (StartsWithNoCase(t, "program.env["))
+				{
+					size_t dotdot = t.find("..");
+					size_t lbr = t.find('[');
+					size_t rbr = t.find(']');
+					if (dotdot != std::string::npos && lbr != std::string::npos && rbr != std::string::npos)
+					{
+						int a = std::atoi(t.c_str() + lbr + 1);
+						int bidx = std::atoi(t.c_str() + dotdot + 2);
+						if (bidx < a)
+							std::swap(a, bidx);
+
+						for (int i = a; i <= bidx; ++i)
+						{
+							char buf[64];
+							std::snprintf(buf, sizeof(buf), "gARBEnv[%d]", i);
+							outItems.push_back(buf);
+						}
+						continue;
+					}
+				}
+
+				outItems.push_back(Src(t));
+			}
+
+			if (outItems.empty())
+				return Fail("PARAM initializer produced no items", pos);
+
+			return true;
 		}
 
 		bool ParseLine(const std::string& rawLine, GLint pos)
@@ -348,7 +617,10 @@ namespace
 				{
 					std::string n = Trim(nRaw);
 					if (!n.empty())
-						m_tempDecls.push_back("    float4 " + n + " = float4(0.0, 0.0, 0.0, 0.0);\n");
+					{
+						const std::string safe = MapUserSymbol(n);
+						m_tempDecls.push_back("    float4 " + safe + " = float4(0.0, 0.0, 0.0, 0.0);\n");
+					}
 				}
 				return true;
 			}
@@ -423,13 +695,16 @@ namespace
 				return true;
 			}
 
-			if ((op == "TEX" || op == "TXP") && args.size() >= 4)
+			if (op == "TEX" || op == "TXP" || op == "TXB")
 			{
-				if (m_target != GL_FRAGMENT_PROGRAM_ARB)
-					return Fail("TEX/TXP only supported in ARBfp for this shim", pos);
+				if (args.size() >= 4)
+				{
+					if (m_target != GL_FRAGMENT_PROGRAM_ARB)
+						return Fail("TEX/TXP/TXB only supported in ARBfp for this shim", pos);
 
-				m_instructions.push_back(EmitTex(op == "TXP", args[0], args[1], args[2], args[3]));
-				return true;
+					m_instructions.push_back(EmitTex(op == "TXP", args[0], args[1], args[2], args[3]));
+					return true;
+				}
 			}
 
 			if (op == "KIL" && args.size() == 1)
@@ -438,7 +713,8 @@ namespace
 				return true;
 			}
 
-			m_instructions.push_back("    // Unsupported ARB op ignored by Doom3 subset translator: " + line + "\n");
+			// Keep build going; leave a comment instead of hard failure for unhandled ops.
+			m_instructions.push_back("    // Unsupported ARB op ignored by translator: " + line + "\n");
 			return true;
 		}
 
@@ -448,18 +724,56 @@ namespace
 			if (eq == std::string::npos)
 				return Fail("PARAM without initializer is not supported", pos);
 
-			std::string name = Trim(rest.substr(0, eq));
+			std::string namePart = Trim(rest.substr(0, eq));
 			std::string init = Trim(rest.substr(eq + 1));
-			float v[4] = {};
-			if (!ParseFloat4Initializer(init, v))
-				return Fail("Only PARAM name = {x,y,z,w} is supported", pos);
 
+			// Array form: PARAM foo[4] = { ... };
+			size_t lbr = namePart.find('[');
+			size_t rbr = namePart.find(']', lbr == std::string::npos ? 0 : lbr);
+			if (lbr != std::string::npos && rbr != std::string::npos && rbr > lbr)
+			{
+				std::string baseName = Trim(namePart.substr(0, lbr));
+				std::string safeBase = MapUserSymbol(baseName);
+				int declaredCount = std::atoi(namePart.c_str() + lbr + 1);
+				if (declaredCount <= 0)
+					return Fail("PARAM array has invalid size", pos);
+
+				std::vector<std::string> items;
+				if (!ExpandParamInitializerItems(init, items, pos))
+					return false;
+
+				std::ostringstream ss;
+				ss << "    const float4 " << safeBase << "[" << declaredCount << "] = {\n";
+				for (int i = 0; i < declaredCount; ++i)
+				{
+					const std::string item = (i < (int)items.size()) ? items[i] : "float4(0.0, 0.0, 0.0, 0.0)";
+					ss << "        " << item;
+					if (i + 1 != declaredCount)
+						ss << ",";
+					ss << "\n";
+				}
+				ss << "    };\n";
+				m_paramDecls.push_back(ss.str());
+				return true;
+			}
+
+			// Scalar float4 form
+			float v[4] = {};
+			if (ParseFloat4Initializer(init, v))
+			{
+				std::ostringstream ss;
+				ss << "    const float4 " << MapUserSymbol(namePart) << " = float4("
+					<< HlslFloat(v[0]) << ", "
+					<< HlslFloat(v[1]) << ", "
+					<< HlslFloat(v[2]) << ", "
+					<< HlslFloat(v[3]) << ");\n";
+				m_paramDecls.push_back(ss.str());
+				return true;
+			}
+
+			// Single symbolic initializer, e.g. PARAM foo = state.matrix.mvp.row[0];
 			std::ostringstream ss;
-			ss << "    const float4 " << name << " = float4("
-				<< HlslFloat(v[0]) << ", "
-				<< HlslFloat(v[1]) << ", "
-				<< HlslFloat(v[2]) << ", "
-				<< HlslFloat(v[3]) << ");\n";
+			ss << "    const float4 " << MapUserSymbol(namePart) << " = " << Src(init) << ";\n";
 			m_paramDecls.push_back(ss.str());
 			return true;
 		}
@@ -473,19 +787,34 @@ namespace
 			if (outMask)
 				*outMask = mask;
 
-			if (StartsWithNoCase(t, "result.color")) return "result_color";
-			if (StartsWithNoCase(t, "result.position")) return "o.pos";
+			if (StartsWithNoCase(t, "result.color"))
+				return (m_target == GL_VERTEX_PROGRAM_ARB) ? "o.col" : "result_color";
+
+			if (StartsWithNoCase(t, "result.position"))
+				return "o.pos";
+
+			if (StartsWithNoCase(t, "result.fogcoord"))
+				return "o.fog";
 
 			if (StartsWithNoCase(t, "result.texcoord["))
 			{
-				int idx = std::atoi(t.c_str() + std::strlen("result.texcoord["));
+				int idx = 0;
+				ParseBracketIndex(t, "result.texcoord[", idx);
 				idx = std::max(0, std::min((int)QD3D12_ARB_MAX_TEXTURE_UNITS - 1, idx));
 				char buf[32];
 				std::snprintf(buf, sizeof(buf), "o.tc%d", idx);
 				return buf;
 			}
 
-			return t;
+			// Generic named temporaries/params
+			size_t arr = t.find('[');
+			if (arr != std::string::npos)
+			{
+				std::string base = Trim(t.substr(0, arr));
+				std::string tail = t.substr(arr);
+				return MapUserSymbol(base) + tail;
+			}
+			return MapUserSymbol(t);
 		}
 
 		std::string Src(const std::string& token)
@@ -505,19 +834,57 @@ namespace
 			SplitARBComponentSuffix(t, swizzle);
 
 			std::string base;
-			if (StartsWithNoCase(t, "vertex.position")) base = "vertex_position";
-			else if (StartsWithNoCase(t, "vertex.color")) base = "vertex_color";
+
+			// Vertex inputs / aliases
+			if (StartsWithNoCase(t, "vertex.position"))
+			{
+				base = (m_target == GL_VERTEX_PROGRAM_ARB) ? "vertex_position" : "i.pos";
+			}
+			else if (StartsWithNoCase(t, "vertex.color"))
+			{
+				base = (m_target == GL_VERTEX_PROGRAM_ARB) ? "vertex_color" : "fragment_color";
+			}
+			else if (StartsWithNoCase(t, "vertex.normal"))
+			{
+				base = (m_target == GL_VERTEX_PROGRAM_ARB) ? "float4(i.normal, 0.0)" : "float4(0.0, 0.0, 1.0, 0.0)";
+			}
+			else if (StartsWithNoCase(t, "vertex.texcoord["))
+			{
+				int idx = 0;
+				ParseBracketIndex(t, "vertex.texcoord[", idx);
+				idx = std::max(0, std::min((int)QD3D12_ARB_MAX_TEXTURE_UNITS - 1, idx));
+
+				if (m_target == GL_VERTEX_PROGRAM_ARB)
+				{
+					if (idx == 0)      base = "float4(i.uv0, 0.0, 1.0)";
+					else if (idx == 1) base = "float4(i.uv1, 0.0, 1.0)";
+					else               base = "float4(0.0, 0.0, 0.0, 1.0)";
+				}
+				else
+				{
+					char buf[32];
+					std::snprintf(buf, sizeof(buf), "fragment_tc%d", idx);
+					base = buf;
+				}
+			}
+			else if (StartsWithNoCase(t, "vertex.texcoord"))
+			{
+				base = (m_target == GL_VERTEX_PROGRAM_ARB) ? "float4(i.uv0, 0.0, 1.0)" : "fragment_tc0";
+			}
 			else if (StartsWithNoCase(t, "vertex.attrib["))
 			{
-				int idx = std::atoi(t.c_str() + std::strlen("vertex.attrib["));
+				int idx = 0;
+				ParseBracketIndex(t, "vertex.attrib[", idx);
 				idx = std::max(0, std::min((int)QD3D12_ARB_MAX_VERTEX_ATTRIBS - 1, idx));
 				char buf[32];
 				std::snprintf(buf, sizeof(buf), "vertex_attrib%d", idx);
 				base = buf;
 			}
+			// Program constants
 			else if (StartsWithNoCase(t, "program.env["))
 			{
-				int idx = std::atoi(t.c_str() + std::strlen("program.env["));
+				int idx = 0;
+				ParseBracketIndex(t, "program.env[", idx);
 				idx = std::max(0, std::min((int)QD3D12_ARB_MAX_PROGRAM_PARAMETERS - 1, idx));
 				char buf[48];
 				std::snprintf(buf, sizeof(buf), "gARBEnv[%d]", idx);
@@ -525,35 +892,107 @@ namespace
 			}
 			else if (StartsWithNoCase(t, "program.local["))
 			{
-				int idx = std::atoi(t.c_str() + std::strlen("program.local["));
+				int idx = 0;
+				ParseBracketIndex(t, "program.local[", idx);
 				idx = std::max(0, std::min((int)QD3D12_ARB_MAX_PROGRAM_PARAMETERS - 1, idx));
 				char buf[64];
 				std::snprintf(buf, sizeof(buf), (m_target == GL_VERTEX_PROGRAM_ARB) ? "gARBLocalVP[%d]" : "gARBLocalFP[%d]", idx);
 				base = buf;
 			}
-			else if (StartsWithNoCase(t, "fragment.color")) base = "fragment_color";
+			// State matrices
+			else if (StartsWithNoCase(t, "state.matrix.mvp.row["))
+			{
+				int row = 0;
+				ParseBracketIndex(t, "state.matrix.mvp.row[", row);
+				base = MatrixRowExpr("gMVP", row);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.modelview.row["))
+			{
+				int row = 0;
+				ParseBracketIndex(t, "state.matrix.modelview.row[", row);
+				base = MatrixRowExpr("gModelMatrix", row);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.texture[0].row["))
+			{
+				int row = 0;
+				ParseBracketIndex(t, "state.matrix.texture[0].row[", row);
+				base = MatrixRowExpr("gTexMat0", row);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.texture[1].row["))
+			{
+				int row = 0;
+				ParseBracketIndex(t, "state.matrix.texture[1].row[", row);
+				base = MatrixRowExpr("gTexMat1", row);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.mvp"))
+			{
+				base = MatrixRowExpr("gMVP", 0);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.modelview"))
+			{
+				base = MatrixRowExpr("gModelMatrix", 0);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.texture[0]"))
+			{
+				base = MatrixRowExpr("gTexMat0", 0);
+			}
+			else if (StartsWithNoCase(t, "state.matrix.texture[1]"))
+			{
+				base = MatrixRowExpr("gTexMat1", 0);
+			}
+			// Fragment inputs
+			else if (StartsWithNoCase(t, "fragment.color"))
+			{
+				base = "fragment_color";
+			}
+			else if (StartsWithNoCase(t, "fragment.position"))
+			{
+				base = "i.pos";
+			}
 			else if (StartsWithNoCase(t, "fragment.texcoord["))
 			{
-				int idx = std::atoi(t.c_str() + std::strlen("fragment.texcoord["));
+				int idx = 0;
+				ParseBracketIndex(t, "fragment.texcoord[", idx);
 				idx = std::max(0, std::min((int)QD3D12_ARB_MAX_TEXTURE_UNITS - 1, idx));
 				char buf[32];
 				std::snprintf(buf, sizeof(buf), "fragment_tc%d", idx);
 				base = buf;
 			}
-			else if (StartsWithNoCase(t, "result.color")) base = "result_color";
-			else if (IsNumberToken(t)) base = "float4(" + t + ", " + t + ", " + t + ", " + t + ")";
-			else base = t;
+			else if (StartsWithNoCase(t, "result.color"))
+			{
+				base = (m_target == GL_VERTEX_PROGRAM_ARB) ? "o.col" : "result_color";
+			}
+			else if (StartsWithNoCase(t, "result.position"))
+			{
+				base = "o.pos";
+			}
+			else if (IsNumberToken(t))
+			{
+				base = "float4(" + t + ", " + t + ", " + t + ", " + t + ")";
+			}
+			else
+			{
+				size_t arr = t.find('[');
+				if (arr != std::string::npos)
+				{
+					std::string baseName = Trim(t.substr(0, arr));
+					std::string tail = t.substr(arr);
+					base = MapUserSymbol(baseName) + tail;
+				}
+				else
+				{
+					base = MapUserSymbol(t);
+				}
+			}
 
 			if (!swizzle.empty())
 			{
-				// ARB one-component source swizzles are scalar operands that are
-				// commonly used as vector splats, e.g.MUL R0, R0, R1.x.
-					// Emit xxxx so follow-on HLSL code can safely take .x/.xyz too.
-					if (swizzle.size() == 1)
-						base += "." + swizzle + swizzle + swizzle + swizzle;
-					else
-						base += "." + swizzle;
+				if (swizzle.size() == 1)
+					base += "." + swizzle + swizzle + swizzle + swizzle;
+				else
+					base += "." + swizzle;
 			}
+
 			if (negate)
 				base = "(-" + base + ")";
 
@@ -567,9 +1006,18 @@ namespace
 			std::ostringstream ss;
 
 			if (mask.empty())
+			{
 				ss << "    " << d << " = " << rhs << ";\n";
+			}
+			else if (mask.size() == 1)
+			{
+				// Scalar masked write; use .x from RHS scalarized/splatted value.
+				ss << "    " << d << "." << mask << " = (" << rhs << ").x;\n";
+			}
 			else
+			{
 				ss << "    " << d << "." << mask << " = (" << rhs << ")." << mask << ";\n";
+			}
 
 			return ss.str();
 		}
@@ -578,7 +1026,7 @@ namespace
 		{
 			int idx = 0;
 			if (StartsWithNoCase(token, "texture["))
-				idx = std::atoi(token.c_str() + std::strlen("texture["));
+				ParseBracketIndex(token, "texture[", idx);
 			return std::max(0, std::min((int)QD3D12_ARB_MAX_TEXTURE_UNITS - 1, idx));
 		}
 
@@ -590,9 +1038,6 @@ namespace
 
 			if (target.find("CUBE") != std::string::npos)
 			{
-				// Doom 3 uses texture[0] as a normalization cube map in the common
-				// interaction program.  The shim does not create real cubemaps, so
-				// synthesize the normalized-vector lookup result.
 				sample = "float4(QD3D12ARB_NormalizeSafe((" + coord + ").xyz) * 0.5 + 0.5, 1.0)";
 			}
 			else
@@ -623,6 +1068,8 @@ cbuffer DrawCB : register(b0)
     float4x4 gMVP;
     float4x4 gPrevMVP;
     float4x4 gModelMatrix;
+    float4x4 gTexMat0;
+    float4x4 gTexMat1;
 
     float gAlphaRef;
     float gUseTex0;
@@ -692,6 +1139,7 @@ struct VSOut
     float4 tc6 : TEXCOORD6;
     float4 tc7 : TEXCOORD7;
     float4 col : COLOR0;
+    float4 fog : TEXCOORD8;
 };
 
 VSOut VSMain(VSIn i)
@@ -707,6 +1155,7 @@ VSOut VSMain(VSIn i)
     o.tc6 = float4(0.0, 0.0, 0.0, 1.0);
     o.tc7 = float4(0.0, 0.0, 0.0, 1.0);
     o.col = i.col;
+    o.fog = float4(0.0, 0.0, 0.0, 0.0);
 
     float4 vertex_position = float4(i.pos, 1.0);
     float4 vertex_color = i.col;
@@ -757,6 +1206,7 @@ struct PSIn
     float4 tc6 : TEXCOORD6;
     float4 tc7 : TEXCOORD7;
     float4 col : COLOR0;
+    float4 fog : TEXCOORD8;
 };
 
 float4 PSMain(PSIn i) : SV_Target0

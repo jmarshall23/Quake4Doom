@@ -24,6 +24,17 @@
 #include <string.h>
 #include <algorithm>
 #include <memory>
+#include <d3d12.h>
+#include <d3dcompiler.h>
+#include <dxgi1_6.h>
+
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
+#include <string>
+#include <vector>
+
+#include <dxcapi.h>
 
 #define QD3D12_ENABLE_STREAMLINE
 
@@ -102,6 +113,19 @@ using Microsoft::WRL::ComPtr;
 #define GL_TEXTURE_INTERNAL_FORMAT 0x1003
 #endif
 
+// QD3D12-private compatibility enums used by the optional tangent-space
+// normal-map path. They intentionally live outside the official GL enum range
+// used by this shim and are only consumed by this translation layer.
+#ifndef GL_TANGENT_ARRAY_QD3D12
+#define GL_TANGENT_ARRAY_QD3D12 0x6000
+#endif
+#ifndef GL_BINORMAL_ARRAY_QD3D12
+#define GL_BINORMAL_ARRAY_QD3D12 0x6001
+#endif
+#ifndef GL_NORMAL_MAP_BINDING_QD3D12
+#define GL_NORMAL_MAP_BINDING_QD3D12 0x6002
+#endif
+
 #ifndef GL_RGB_S3TC
 #define GL_RGB_S3TC 0x83A0
 #endif
@@ -128,6 +152,15 @@ static D3D12_GPU_DESCRIPTOR_HANDLE QD3D12_SrvGpu(UINT index);
 static D3D12_CPU_DESCRIPTOR_HANDLE QD3D12_SrvCpu(UINT index);
 static Mat4 CurrentModelMatrix();
 static inline GLenum QD3D12_MapCompatTextureTarget(GLenum target);
+
+// New optional tangent-space normal-map API entry points. These are declared
+// here as well as in opengl.h so qd3d12_wglGetProcAddress can reference them
+// even when this cpp is built before the public header is refreshed.
+void APIENTRY glTangent3f(GLfloat x, GLfloat y, GLfloat z);
+void APIENTRY glTangent3fv(const GLfloat* v);
+void APIENTRY glBinormal3f(GLfloat x, GLfloat y, GLfloat z);
+void APIENTRY glBinormal3fv(const GLfloat* v);
+
 static void QD3D12_CreateUploadRingForWindow(struct QD3D12Window& w);
 static void QD3D12_DestroyUploadRingForWindow(struct QD3D12Window& w);
 static void QD3D12_SubmitOpenFrameNoPresentAndWait();
@@ -324,6 +357,12 @@ struct TextureResource
 	UINT srvIndex = UINT_MAX;
 	bool gpuValid = false;
 	D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
+
+	// Optional material role tag. Tagged textures are not treated as diffuse
+	// inputs by default; they are selected as tangent-space normal maps for the
+	// fixed-function G-buffer path when bound through glNormalMapTexture() or any
+	// active texture unit.
+	bool isNormalMap = false;
 };
 
 struct DrawConstants
@@ -393,7 +432,7 @@ struct GLBufferObject
 const char* vendor = "Justin Marshall";
 const char* renderer = "Quake D3D12 Wrapper";
 const char* version = "1.1-quake-d3d12";
-const char* extensions = "GL_SGIS_multitexture GL_ARB_multitexture GL_EXT_texture_env_add GL_ARB_texture_env_combine GL_ARB_texture_compression GL_EXT_texture_compression_s3tc GL_ARB_vertex_program GL_ARB_fragment_program GL_EXT_texture_cube_map GL_EXT_depth_bounds_test GL_EXT_stencil_two_side GL_ATI_separate_stencil";
+const char* extensions = "GL_SGIS_multitexture GL_ARB_multitexture GL_EXT_texture_env_add GL_ARB_texture_env_combine GL_ARB_texture_compression GL_EXT_texture_compression_s3tc GL_ARB_vertex_program GL_ARB_fragment_program GL_EXT_texture_cube_map GL_EXT_depth_bounds_test GL_EXT_stencil_two_side GL_ATI_separate_stencil GL_QD3D12_normal_map";
 
 enum TexEnvModeShader
 {
@@ -434,6 +473,10 @@ struct BatchKey
 	UINT tex0SrvIndex = 0;
 	UINT tex1SrvIndex = 0;
 	UINT textureSrvIndex[QD3D12_MaxTextureUnits] = {};
+	UINT normalMapSrvIndex = 0;
+	float useNormalMap = 0.0f;
+	float normalMapStrength = 1.0f;
+	float normalMapYSign = 1.0f;
 
 	bool useARBPrograms = false;
 	GLuint arbVertexProgram = 0;
@@ -538,6 +581,10 @@ static bool BatchKeyEquals(const BatchKey& a, const BatchKey& b)
 		a.topology == b.topology &&
 		a.tex0SrvIndex == b.tex0SrvIndex &&
 		a.tex1SrvIndex == b.tex1SrvIndex &&
+		a.normalMapSrvIndex == b.normalMapSrvIndex &&
+		a.useNormalMap == b.useNormalMap &&
+		a.normalMapStrength == b.normalMapStrength &&
+		a.normalMapYSign == b.normalMapYSign &&
 		a.alphaRef == b.alphaRef &&
 		a.alphaFunc == b.alphaFunc &&
 		a.useTex0 == b.useTex0 &&
@@ -915,6 +962,12 @@ struct GLState
 	float curU[QD3D12_MaxTextureUnits] = {};
 	float curV[QD3D12_MaxTextureUnits] = {};
 	float curColor[4] = { 1, 1, 1, 1 };
+	float curNormal[3] = { 0, 0, 1 };
+	float curTangent[3] = { 1, 0, 0 };
+	float curBinormal[3] = { 0, 1, 0 };
+	GLuint currentNormalMapTexture = 0;
+	float currentNormalMapStrength = 1.0f;
+	float currentNormalMapYSign = 1.0f;
 	ImmediateVertexBuffer immediateVerts;
 
 	GLenum matrixMode = GL_MODELVIEW;
@@ -1128,6 +1181,72 @@ static GLBufferObject* QD3D12_GetBuffer(GLuint id)
 	return &it->second;
 }
 
+static TextureResource* QD3D12_FindTextureResource(GLuint id)
+{
+	if (id == 0)
+		return nullptr;
+
+	auto it = g_gl.textures.find(id);
+	if (it == g_gl.textures.end())
+		return nullptr;
+
+	return &it->second;
+}
+
+static TextureResource& QD3D12_EnsureTextureName(GLuint id)
+{
+	auto it = g_gl.textures.find(id);
+	if (it != g_gl.textures.end())
+		return it->second;
+
+	TextureResource tex{};
+	tex.glId = id;
+	tex.srvIndex = UINT_MAX;
+	tex.minFilter = g_gl.defaultMinFilter;
+	tex.magFilter = g_gl.defaultMagFilter;
+	tex.wrapS = g_gl.defaultWrapS;
+	tex.wrapT = g_gl.defaultWrapT;
+	return g_gl.textures.emplace(id, std::move(tex)).first->second;
+}
+
+static bool QD3D12_IsTextureTaggedNormalMap(GLuint id)
+{
+	TextureResource* tex = QD3D12_FindTextureResource(id);
+	return tex && tex->isNormalMap;
+}
+
+static TextureResource* QD3D12_SelectNormalMapTexture(TextureResource* const* allTextures)
+{
+	// Explicit material binding wins. This lets callers bind a normal map even
+	// before they have tagged it, while glTagTextureNormalMap() enables automatic
+	// discovery from texture units.
+	if (g_gl.currentNormalMapTexture != 0)
+	{
+		TextureResource* explicitNormal = QD3D12_FindTextureResource(g_gl.currentNormalMapTexture);
+		if (explicitNormal)
+			return explicitNormal;
+	}
+
+	if (allTextures)
+	{
+		for (UINT i = 0; i < QD3D12_MaxTextureUnits; ++i)
+		{
+			TextureResource* tex = allTextures[i];
+			if (tex && tex != &g_gl.whiteTexture && tex->isNormalMap)
+				return tex;
+		}
+	}
+
+	for (UINT i = 0; i < QD3D12_MaxTextureUnits; ++i)
+	{
+		TextureResource* tex = QD3D12_FindTextureResource(g_gl.boundTexture[i]);
+		if (tex && tex->isNormalMap)
+			return tex;
+	}
+
+	return nullptr;
+}
+
 static const uint8_t* QD3D12_ResolveArrayPointer(const void* ptr)
 {
 	if (g_gl.boundArrayBuffer != 0)
@@ -1283,10 +1402,17 @@ cbuffer DrawCB : register(b0)
     float4 gTexEnvColor1;
 };
 
+#define gUseNormalMap       gMotionPad.x
+#define gNormalMapStrength  gMotionPad.y
+#define gNormalMapYSign     gMotionPad.z
+#define gParallaxScale      gMotionPad.w
+
 Texture2D gTex0 : register(t0);
 Texture2D gTex1 : register(t1);
+Texture2D gNormalMap : register(t2);
 SamplerState gSamp0 : register(s0);
 SamplerState gSamp1 : register(s1);
+SamplerState gSamp2 : register(s2);
 
 struct VSIn
 {
@@ -1295,6 +1421,8 @@ struct VSIn
     float2 uv0 : TEXCOORD0;
     float2 uv1 : TEXCOORD1;
     float4 col : COLOR0;
+    float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
 };
 
 struct VSOut
@@ -1306,9 +1434,11 @@ struct VSOut
     float fogCoord : TEXCOORD2;
     float3 worldPos : TEXCOORD3;
     float3 normal : TEXCOORD4;
-    float4 attr : TEXCOORD5;
-    float4 prevClip : TEXCOORD6;
-    float4 currClip : TEXCOORD7;
+    float3 tangent : TEXCOORD5;
+    float3 binormal : TEXCOORD6;
+    float4 attr : TEXCOORD7;
+    float4 prevClip : TEXCOORD8;
+    float4 currClip : TEXCOORD9;
     float psize : PSIZE;
 };
 
@@ -1330,17 +1460,17 @@ float4 QD3D12_GetTexEnvSource(float source, float4 texel, float4 primary, float4
 
 float3 QD3D12_ApplyRgbOperand(float4 v, float operand)
 {
-    if (operand < 0.5)       return v.rgb;          // SRC_COLOR
-    else if (operand < 1.5)  return float3(1.0, 1.0, 1.0) - v.rgb; // ONE_MINUS_SRC_COLOR
-    else if (operand < 2.5)  return v.aaa;          // SRC_ALPHA
-    else                     return float3(1.0, 1.0, 1.0) - v.aaa; // ONE_MINUS_SRC_ALPHA
+    if (operand < 0.5)       return v.rgb;
+    else if (operand < 1.5)  return float3(1.0, 1.0, 1.0) - v.rgb;
+    else if (operand < 2.5)  return v.aaa;
+    else                     return float3(1.0, 1.0, 1.0) - v.aaa;
 }
 
 float QD3D12_ApplyAlphaOperand(float4 v, float operand)
 {
-    if (operand < 0.5)       return v.a;      // SRC_ALPHA
-    else if (operand < 1.5)  return 1.0 - v.a; // ONE_MINUS_SRC_ALPHA
-    else if (operand < 2.5)  return v.r;      // SRC_COLOR fallback
+    if (operand < 0.5)       return v.a;
+    else if (operand < 1.5)  return 1.0 - v.a;
+    else if (operand < 2.5)  return v.r;
     else                     return 1.0 - v.r;
 }
 
@@ -1354,10 +1484,6 @@ float4 ApplyTexCombine(
     float4 operandDesc,
     float4 constantColor)
 {
-    // Packed C++ descriptors:
-    // rgbDesc   = { combineRGB, source0RGB, source1RGB, rgbScale }
-    // alphaDesc = { combineAlpha, source0Alpha, source1Alpha, alphaScale }
-    // operand   = { operand0RGB, operand1RGB, operand0Alpha, operand1Alpha }
     if (mode < 4.5)
     {
         if (mode < 0.5)
@@ -1371,9 +1497,6 @@ float4 ApplyTexCombine(
         }
         else if (mode < 3.5)
         {
-            // GL_BLEND texture-env:
-            // RGB = previous * (1 - texel.rgb) + envColor * texel.rgb
-            // A   = previous.a * texel.a
             float3 rgb = lerp(previous.rgb, constantColor.rgb, texel.rgb);
             return float4(rgb, previous.a * texel.a);
         }
@@ -1389,11 +1512,11 @@ float4 ApplyTexCombine(
     float3 a1rgb = QD3D12_ApplyRgbOperand(s1rgb, operandDesc.y);
 
     float3 outRgb;
-    if (rgbDesc.x < 1.5)         outRgb = a0rgb;          // REPLACE
-    else if (rgbDesc.x < 2.5)    outRgb = a0rgb * a1rgb;  // MODULATE
-    else if (rgbDesc.x < 3.5)    outRgb = a0rgb + a1rgb;  // ADD
-    else if (rgbDesc.x < 4.5)    outRgb = a0rgb + a1rgb - float3(0.5, 0.5, 0.5); // ADD_SIGNED
-    else                         outRgb = a0rgb * a1rgb;  // fallback
+    if (rgbDesc.x < 1.5)         outRgb = a0rgb;
+    else if (rgbDesc.x < 2.5)    outRgb = a0rgb * a1rgb;
+    else if (rgbDesc.x < 3.5)    outRgb = a0rgb + a1rgb;
+    else if (rgbDesc.x < 4.5)    outRgb = a0rgb + a1rgb - float3(0.5, 0.5, 0.5);
+    else                         outRgb = a0rgb * a1rgb;
     outRgb *= max(rgbDesc.w, 1.0);
 
     float4 s0a = QD3D12_GetTexEnvSource(alphaDesc.y, texel, primary, previous, constantColor);
@@ -1402,10 +1525,10 @@ float4 ApplyTexCombine(
     float a1 = QD3D12_ApplyAlphaOperand(s1a, operandDesc.w);
 
     float outA;
-    if (alphaDesc.x < 1.5)       outA = a0;          // REPLACE
-    else if (alphaDesc.x < 2.5)  outA = a0 * a1;     // MODULATE
-    else if (alphaDesc.x < 3.5)  outA = a0 + a1;     // ADD
-    else if (alphaDesc.x < 4.5)  outA = a0 + a1 - 0.5; // ADD_SIGNED
+    if (alphaDesc.x < 1.5)       outA = a0;
+    else if (alphaDesc.x < 2.5)  outA = a0 * a1;
+    else if (alphaDesc.x < 3.5)  outA = a0 + a1;
+    else if (alphaDesc.x < 4.5)  outA = a0 + a1 - 0.5;
     else                         outA = a0 * a1;
     outA *= max(alphaDesc.w, 1.0);
 
@@ -1471,25 +1594,116 @@ float4 ApplyFog(float4 color, float fogCoord)
 
 void QD3D12_AlphaTest(float alpha)
 {
-    // Encoded by MapAlphaFunc() in C++:
-    // 0 NEVER, 1 LESS, 2 EQUAL, 3 LEQUAL, 4 GREATER, 5 NOTEQUAL, 6 GEQUAL, 7 ALWAYS.
     const float eps = 0.00001;
 
     if (gAlphaFunc < 0.5)
-        clip(-1.0);                              // GL_NEVER
+        clip(-1.0);
     else if (gAlphaFunc < 1.5)
-        clip(gAlphaRef - alpha - eps);           // GL_LESS
+        clip(gAlphaRef - alpha - eps);
     else if (gAlphaFunc < 2.5)
-        clip(eps - abs(alpha - gAlphaRef));      // GL_EQUAL
+        clip(eps - abs(alpha - gAlphaRef));
     else if (gAlphaFunc < 3.5)
-        clip(gAlphaRef - alpha + eps);           // GL_LEQUAL
+        clip(gAlphaRef - alpha + eps);
     else if (gAlphaFunc < 4.5)
-        clip(alpha - gAlphaRef - eps);           // GL_GREATER
+        clip(alpha - gAlphaRef - eps);
     else if (gAlphaFunc < 5.5)
-        clip(abs(alpha - gAlphaRef) - eps);      // GL_NOTEQUAL
+        clip(abs(alpha - gAlphaRef) - eps);
     else if (gAlphaFunc < 6.5)
-        clip(alpha - gAlphaRef + eps);           // GL_GEQUAL
-    // else GL_ALWAYS: no clipping.
+        clip(alpha - gAlphaRef + eps);
+}
+
+float3 QD3D12_SafeNormalize(float3 v, float3 fallback)
+{
+    float lenSq = dot(v, v);
+    if (lenSq <= 1e-8)
+        return fallback;
+    return v * rsqrt(lenSq);
+}
+
+float3 QD3D12_DecodeTangentSpaceNormal(float3 encodedNormal)
+{
+    float3 n = encodedNormal * 2.0 - 1.0;
+    n.y *= gNormalMapYSign;
+    n.xy *= max(gNormalMapStrength, 0.0);
+    return QD3D12_SafeNormalize(n, float3(0.0, 0.0, 1.0));
+}
+
+float QD3D12_GetHeightFromNormalMap(float2 uv)
+{
+    float4 nm = gNormalMap.Sample(gSamp2, uv);
+
+    float lum = dot(nm.rgb, float3(0.299, 0.587, 0.114));
+    float h = (nm.a > 0.0001) ? nm.a : ((lum + nm.b) * 0.5);
+
+    return saturate(h);
+}
+
+float3 QD3D12_BuildFallbackTangent(float3 n)
+{
+    float3 up = (abs(n.z) < 0.999) ? float3(0.0, 0.0, 1.0) : float3(0.0, 1.0, 0.0);
+    return QD3D12_SafeNormalize(cross(up, n), float3(1.0, 0.0, 0.0));
+}
+
+void QD3D12_BuildTBN(VSOut i, out float3 n, out float3 t, out float3 b)
+{
+    n = QD3D12_SafeNormalize(i.normal, float3(0.0, 0.0, 1.0));
+
+    float3 tFallback = QD3D12_BuildFallbackTangent(n);
+    t = i.tangent - n * dot(i.tangent, n);
+    t = QD3D12_SafeNormalize(t, tFallback);
+
+    float3 bFallback = QD3D12_SafeNormalize(cross(n, t), float3(0.0, 1.0, 0.0));
+    b = i.binormal - n * dot(i.binormal, n) - t * dot(i.binormal, t);
+    b = QD3D12_SafeNormalize(b, bFallback);
+}
+
+float2 QD3D12_ComputeParallaxUV(VSOut i, float2 baseUv)
+{
+    if (gUseNormalMap < 0.5)
+        return baseUv;
+
+    float parallaxScale = gParallaxScale;
+    if (abs(parallaxScale) < 1e-6)
+        return baseUv;
+
+    float3 n, t, b;
+    QD3D12_BuildTBN(i, n, t, b);
+
+    float3 viewWS = QD3D12_SafeNormalize(-i.worldPos, n);
+
+    float3 viewTS = float3(
+        dot(viewWS, t),
+        dot(viewWS, b),
+        dot(viewWS, n)
+    );
+
+    float height = QD3D12_GetHeightFromNormalMap(baseUv);
+    float parallaxAmount = (height - 0.5) * parallaxScale;
+
+    float vz = max(abs(viewTS.z), 0.15);
+    float2 uvOffset = (viewTS.xy / vz) * parallaxAmount;
+
+    return baseUv - uvOffset;
+}
+
+float3 BuildGBufferNormal(VSOut i)
+{
+    float3 n = QD3D12_SafeNormalize(i.normal, float3(0.0, 0.0, 1.0));
+
+    if (gUseNormalMap < 0.5)
+        return n;
+
+    float3 t, b;
+    QD3D12_BuildTBN(i, n, t, b);
+
+    float2 uv0 = QD3D12_ComputeParallaxUV(i, i.uv0);
+    float3 tangentNormal = QD3D12_DecodeTangentSpaceNormal(gNormalMap.Sample(gSamp2, uv0).xyz);
+
+    return QD3D12_SafeNormalize(
+        tangentNormal.x * t +
+        tangentNormal.y * b +
+        tangentNormal.z * n,
+        n);
 }
 
 float4 BuildTexturedColor(VSOut i)
@@ -1504,6 +1718,9 @@ float4 BuildTexturedColor(VSOut i)
     uv0 += float2(n, -n);
     uv1 += float2(-n, n);
 
+    if (gUseNormalMap > 0.5)
+        uv0 = QD3D12_ComputeParallaxUV(i, uv0);
+
     if (gUseTex0 > 0.5)
     {
         float4 tex0 = gTex0.Sample(gSamp0, uv0);
@@ -1511,14 +1728,14 @@ float4 BuildTexturedColor(VSOut i)
                                    gTexComb0RGB, gTexComb0Alpha, gTexComb0Operand, gTexEnvColor0);
     }
 
-    if (gUseTex1 > 0.5)
+    if (gUseTex1 > 0.5 && !gUseNormalMap)
     {
         float4 tex1 = gTex1.Sample(gSamp1, uv1);
         outColor = ApplyTexCombine(outColor, tex1, primary, gTexEnvMode1,
                                    gTexComb1RGB, gTexComb1Alpha, gTexComb1Operand, gTexEnvColor1);
     }
 
-    outColor.xyz = ApplySoftwareRendererLook(outColor.xyz);
+    // outColor.xyz = ApplySoftwareRendererLook(outColor.xyz);
     outColor = ApplyFog(outColor, i.fogCoord);
 
     return outColor;
@@ -1535,7 +1752,6 @@ float4 BuildVelocity(VSOut i)
     float2 currUv = ClipToUv(i.currClip);
     float2 prevUv = ClipToUv(i.prevClip);
 
-    // Remove camera jitter from the motion vectors so DLSS / FSR get stable history.
     currUv -= gJitterPixels * gInvRenderSize;
     prevUv -= gPrevJitterPixels * gInvRenderSize;
 
@@ -1553,8 +1769,10 @@ VSOut VSMain(VSIn i)
     float4 currClip = mul(gMVP, float4(i.pos, 1.0));
     float4 prevClip = mul(gPrevMVP, float4(i.pos, 1.0));
     float3 worldNormal = mul((float3x3)gModelMatrix, i.normal);
+    float3 worldTangent = mul((float3x3)gModelMatrix, i.tangent);
+    float3 worldBinormal = mul((float3x3)gModelMatrix, i.binormal);
 
-	currClip.z = 0.5 * (currClip.z + currClip.w);
+    currClip.z = 0.5 * (currClip.z + currClip.w);
 
     o.pos = currClip;
     o.currClip = currClip;
@@ -1565,6 +1783,8 @@ VSOut VSMain(VSIn i)
     o.col = i.col;
     o.worldPos = worldPos.xyz;
     o.normal = normalize(worldNormal);
+    o.tangent = normalize(worldTangent);
+    o.binormal = normalize(worldBinormal);
     o.attr = float4(geometryFlag, gRoughness, gMaterialType, 0.0);
     o.psize = gPointSize;
     return o;
@@ -1574,7 +1794,7 @@ PSOut PSMain(VSOut i)
 {
     PSOut o;
     o.color = BuildTexturedColor(i);
-    o.normal = float4(i.normal, i.attr.y);
+    o.normal = float4(BuildGBufferNormal(i), i.attr.y);
     o.position = float4(i.worldPos, i.attr.x);
     o.velocity = BuildVelocity(i);
     return o;
@@ -1585,7 +1805,7 @@ PSOut PSMainAlphaTest(VSOut i)
     PSOut o;
     o.color = BuildTexturedColor(i);
     QD3D12_AlphaTest(o.color.a);
-    o.normal = float4(i.normal, i.attr.y);
+    o.normal = float4(BuildGBufferNormal(i), i.attr.y);
     o.position = float4(i.worldPos, i.attr.x);
     o.velocity = BuildVelocity(i);
     return o;
@@ -1595,7 +1815,7 @@ PSOut PSMainUntextured(VSOut i)
 {
     PSOut o;
     o.color = ApplyFog(i.col, i.fogCoord);
-    o.normal = float4(i.normal, i.attr.y);
+    o.normal = float4(BuildGBufferNormal(i), i.attr.y);
     o.position = float4(i.worldPos, i.attr.x);
     o.velocity = BuildVelocity(i);
     return o;
@@ -1700,12 +1920,12 @@ static void QD3D12_FetchArrayVertex(GLint idx, GLVertex& out)
 {
 	// Direct init is much cheaper than memset + patching fields.
 	out.px = 0.0f; out.py = 0.0f; out.pz = 0.0f;
-	out.nx = 0.0f; out.ny = 0.0f; out.nz = 1.0f;
+	out.nx = g_gl.curNormal[0]; out.ny = g_gl.curNormal[1]; out.nz = g_gl.curNormal[2];
 	out.r = 1.0f; out.g = 1.0f; out.b = 1.0f; out.a = 1.0f;
 	out.u0 = 0.0f; out.v0 = 0.0f;
 	out.u1 = 0.0f; out.v1 = 0.0f;
-	out.tx = 1.0f; out.ty = 0.0f; out.tz = 0.0f;
-	out.bx = 0.0f; out.by = 1.0f; out.bz = 0.0f;
+	out.tx = g_gl.curTangent[0]; out.ty = g_gl.curTangent[1]; out.tz = g_gl.curTangent[2];
+	out.bx = g_gl.curBinormal[0]; out.by = g_gl.curBinormal[1]; out.bz = g_gl.curBinormal[2];
 
 	//
 	// Position
@@ -2064,6 +2284,20 @@ static BatchKey BuildCurrentBatchKey(GLenum originalMode, const TextureResource*
 	key.tex1SrvIndex = tex1 ? tex1->srvIndex : 0;
 	for (UINT i = 0; i < QD3D12_MaxTextureUnits; ++i)
 		key.textureSrvIndex[i] = (allTextures && allTextures[i]) ? allTextures[i]->srvIndex : 0;
+
+	TextureResource* normalMap = QD3D12_SelectNormalMapTexture(allTextures);
+	if (normalMap && normalMap->texture && normalMap->srvIndex != UINT_MAX)
+	{
+		key.normalMapSrvIndex = normalMap->srvIndex;
+		key.useNormalMap = 1.0f;
+	}
+	else
+	{
+		key.normalMapSrvIndex = g_gl.whiteTexture.srvIndex;
+		key.useNormalMap = 0.0f;
+	}
+	key.normalMapStrength = g_gl.currentNormalMapStrength;
+	key.normalMapYSign = g_gl.currentNormalMapYSign;
 
 	key.useARBPrograms = QD3D12ARB_IsActive();
 	if (key.useARBPrograms)
@@ -3696,16 +3930,121 @@ static void QD3D12_DestroyUploadRingForWindow(QD3D12Window& w)
 
 static ComPtr<ID3DBlob> CompileShaderSourceVariant(const char* source, const char* entry, const char* target)
 {
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined(_DEBUG)
-	flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-	ComPtr<ID3DBlob> blob;
-	ComPtr<ID3DBlob> err;
-	HRESULT hr = D3DCompile(source, strlen(source), nullptr, nullptr, nullptr,
-		entry, target, flags, 0, &blob, &err);
+	ComPtr<IDxcUtils> utils;
+	ComPtr<IDxcCompiler3> compiler;
+	ComPtr<IDxcIncludeHandler> includeHandler;
+
+	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&utils));
 	if (FAILED(hr))
-		QD3D12_Fatal("Shader compile failed for %s: %s", entry, err ? (const char*)err->GetBufferPointer() : "unknown");
+	{
+		QD3D12_Fatal("DxcCreateInstance(CLSID_DxcUtils) failed 0x%08X", (unsigned)hr);
+		return nullptr;
+	}
+
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&compiler));
+	if (FAILED(hr))
+	{
+		QD3D12_Fatal("DxcCreateInstance(CLSID_DxcCompiler) failed 0x%08X", (unsigned)hr);
+		return nullptr;
+	}
+
+	hr = utils->CreateDefaultIncludeHandler(&includeHandler);
+	if (FAILED(hr))
+	{
+		QD3D12_Fatal("CreateDefaultIncludeHandler failed 0x%08X", (unsigned)hr);
+		return nullptr;
+	}
+
+	auto Utf8ToWide = [](const char* s) -> std::wstring
+		{
+			if (!s || !*s)
+				return std::wstring();
+
+			int len = MultiByteToWideChar(CP_UTF8, 0, s, -1, nullptr, 0);
+			if (len <= 0)
+				return std::wstring();
+
+			std::wstring out;
+			out.resize((size_t)len - 1);
+			MultiByteToWideChar(CP_UTF8, 0, s, -1, &out[0], len);
+			return out;
+		};
+
+	std::wstring wEntry = Utf8ToWide(entry);
+	std::wstring wTarget = Utf8ToWide(target);
+	std::wstring wName = L"InMemoryShader.hlsl";
+
+	DxcBuffer sourceBuf = {};
+	sourceBuf.Ptr = source;
+	sourceBuf.Size = strlen(source);
+	sourceBuf.Encoding = DXC_CP_UTF8;
+
+	std::vector<LPCWSTR> args;
+	args.push_back(wName.c_str());
+	args.push_back(L"-E");
+	args.push_back(wEntry.c_str());
+	args.push_back(L"-T");
+	args.push_back(wTarget.c_str());
+	args.push_back(L"-HV");
+	args.push_back(L"2021");
+
+#if defined(_DEBUG)
+	args.push_back(L"-Zi");
+	args.push_back(L"-Qembed_debug");
+	args.push_back(L"-Od");
+#else
+	args.push_back(L"-O3");
+#endif
+
+	// Optional but usually good for D3D12 shaders.
+	args.push_back(L"-all_resources_bound");
+
+	ComPtr<IDxcResult> result;
+	hr = compiler->Compile(
+		&sourceBuf,
+		args.data(),
+		(UINT32)args.size(),
+		includeHandler.Get(),
+		IID_PPV_ARGS(&result));
+
+	if (FAILED(hr))
+	{
+		QD3D12_Fatal("DXC compile call failed for %s (target %s), hr=0x%08X",
+			entry ? entry : "unknown",
+			target ? target : "unknown",
+			(unsigned)hr);
+		return nullptr;
+	}
+
+	ComPtr<IDxcBlobUtf8> errors;
+	result->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
+
+	if (errors && errors->GetStringLength() > 0)
+	{
+		OutputDebugStringA(errors->GetStringPointer());
+		OutputDebugStringA("\n");
+	}
+
+	HRESULT status = S_OK;
+	result->GetStatus(&status);
+	if (FAILED(status))
+	{
+		QD3D12_Fatal("Shader compile failed for %s: %s",
+			entry,
+			(errors && errors->GetStringLength() > 0) ? errors->GetStringPointer() : "unknown");
+		return nullptr;
+	}
+
+	ComPtr<IDxcBlob> dxil;
+	result->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&dxil), nullptr);
+	if (!dxil)
+	{
+		QD3D12_Fatal("DXC returned no object for %s", entry);
+		return nullptr;
+	}
+
+	ComPtr<ID3DBlob> blob;
+	blob.Attach(reinterpret_cast<ID3DBlob*>(dxil.Detach()));
 	return blob;
 }
 
@@ -3806,17 +4145,17 @@ static void QD3D12_CreateRootSignature()
 
 static void QD3D12_CompileShaders()
 {
-	g_gl.vsMainBlob = CompileShaderVariant("VSMain", "vs_5_0");
-	g_gl.psMainBlob = CompileShaderVariant("PSMain", "ps_5_0");
-	g_gl.psAlphaBlob = CompileShaderVariant("PSMainAlphaTest", "ps_5_0");
-	g_gl.psUntexturedBlob = CompileShaderVariant("PSMainUntextured", "ps_5_0");
-	g_gl.psMainColorOnlyBlob = CompileShaderVariant("PSMainColorOnly", "ps_5_0");
-	g_gl.psAlphaColorOnlyBlob = CompileShaderVariant("PSMainAlphaTestColorOnly", "ps_5_0");
-	g_gl.psUntexturedColorOnlyBlob = CompileShaderVariant("PSMainUntexturedColorOnly", "ps_5_0");
-	g_gl.postVsBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "VSMain", "vs_5_0");
-	g_gl.postPsCopyBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "PSCopy", "ps_5_0");
-	g_gl.postPsAddBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "PSAdd", "ps_5_0");
-	g_gl.postPsDepthCopyBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "PSDepthCopy", "ps_5_0");
+	g_gl.vsMainBlob = CompileShaderVariant("VSMain", "vs_6_0");
+	g_gl.psMainBlob = CompileShaderVariant("PSMain", "ps_6_0");
+	g_gl.psAlphaBlob = CompileShaderVariant("PSMainAlphaTest", "ps_6_0");
+	g_gl.psUntexturedBlob = CompileShaderVariant("PSMainUntextured", "ps_6_0");
+	g_gl.psMainColorOnlyBlob = CompileShaderVariant("PSMainColorOnly", "ps_6_0");
+	g_gl.psAlphaColorOnlyBlob = CompileShaderVariant("PSMainAlphaTestColorOnly", "ps_6_0");
+	g_gl.psUntexturedColorOnlyBlob = CompileShaderVariant("PSMainUntexturedColorOnly", "ps_6_0");
+	g_gl.postVsBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "VSMain", "vs_6_0");
+	g_gl.postPsCopyBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "PSCopy", "ps_6_0");
+	g_gl.postPsAddBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "PSAdd", "ps_6_0");
+	g_gl.postPsDepthCopyBlob = CompileShaderSourceVariant(kQD3D12PostHLSL, "PSDepthCopy", "ps_6_0");
 }
 
 static const D3D12_INPUT_ELEMENT_DESC kGLVertexInputLayout[] =
@@ -3826,6 +4165,8 @@ static const D3D12_INPUT_ELEMENT_DESC kGLVertexInputLayout[] =
 	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, (UINT)offsetof(GLVertex, u0), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT,       0, (UINT)offsetof(GLVertex, u1), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, (UINT)offsetof(GLVertex, r),  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, (UINT)offsetof(GLVertex, tx), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, (UINT)offsetof(GLVertex, bx), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
 
 static const D3D12_INPUT_ELEMENT_DESC kGLVertexInputLayoutARB[] =
@@ -3927,15 +4268,15 @@ static D3D12_GRAPHICS_PIPELINE_STATE_DESC BuildPSODesc(
 		rt.DestBlendAlpha = MapBlendAlpha(key.blendDst);
 		rt.BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-		if (!nativeColorOnly)
-		{
-			// Transparent passes happen after glLightScene in the RTCW path, so they
-			// must not scribble over the opaque G-buffer or motion vectors that the
-			// raytracing and upscaling passes depend on.
-			d.BlendState.RenderTarget[1].RenderTargetWriteMask = 0;
-			d.BlendState.RenderTarget[2].RenderTargetWriteMask = 0;
-			d.BlendState.RenderTarget[3].RenderTargetWriteMask = 0;
-		}
+		//if (!nativeColorOnly)
+		//{
+		//	// Transparent passes happen after glLightScene in the RTCW path, so they
+		//	// must not scribble over the opaque G-buffer or motion vectors that the
+		//	// raytracing and upscaling passes depend on.
+		//	d.BlendState.RenderTarget[1].RenderTargetWriteMask = 0;
+		//	d.BlendState.RenderTarget[2].RenderTargetWriteMask = 0;
+		//	d.BlendState.RenderTarget[3].RenderTargetWriteMask = 0;
+		//}
 	}
 
 	ApplyRasterDepthStencilState(d, key);
@@ -5639,13 +5980,20 @@ static void FlushImmediate(GLenum mode, const GLVertex* src, size_t n)
 
 	for (UINT unit = 0; unit < QD3D12_MaxTextureUnits; ++unit)
 	{
-		const bool wantsUnit = arbProgramsActive ? (g_gl.boundTexture[unit] != 0) : (g_gl.texture2D[unit] && unit < 2);
+		const bool arbUnit = arbProgramsActive && (g_gl.boundTexture[unit] != 0);
+		const bool fixedColorUnit = (!arbProgramsActive) && (g_gl.texture2D[unit] && unit < 2);
+		const bool taggedNormalUnit = (!arbProgramsActive) && QD3D12_IsTextureTaggedNormalMap(g_gl.boundTexture[unit]);
+		const bool explicitNormalUnit = (!arbProgramsActive) &&
+			(g_gl.currentNormalMapTexture != 0) &&
+			(g_gl.boundTexture[unit] == g_gl.currentNormalMapTexture);
+
+		const bool wantsUnit = arbUnit || fixedColorUnit || taggedNormalUnit || explicitNormalUnit;
 		if (!wantsUnit)
 			continue;
 
-		auto it = g_gl.textures.find(g_gl.boundTexture[unit]);
-		if (it != g_gl.textures.end())
-			boundTextures[unit] = &it->second;
+		TextureResource* tex = QD3D12_FindTextureResource(g_gl.boundTexture[unit]);
+		if (tex)
+			boundTextures[unit] = tex;
 	}
 
 	for (UINT unit = 0; unit < QD3D12_MaxTextureUnits; ++unit)
@@ -5656,6 +6004,13 @@ static void FlushImmediate(GLenum mode, const GLVertex* src, size_t n)
 			EnsureTextureResource(*tex);
 			UploadTexture(*tex);
 		}
+	}
+
+	TextureResource* normalMapTex = QD3D12_SelectNormalMapTexture(boundTextures);
+	if (normalMapTex && normalMapTex != &g_gl.whiteTexture && !normalMapTex->gpuValid)
+	{
+		EnsureTextureResource(*normalMapTex);
+		UploadTexture(*normalMapTex);
 	}
 
 	TextureResource* tex0 = boundTextures[0];
@@ -5960,8 +6315,10 @@ static void QD3D12_FlushQueuedBatches()
 	ID3D12PipelineState* lastPSO = nullptr;
 	D3D12_GPU_DESCRIPTOR_HANDLE lastTex0{};
 	D3D12_GPU_DESCRIPTOR_HANDLE lastTex1{};
+	D3D12_GPU_DESCRIPTOR_HANDLE lastNormalMap{};
 	bool haveLastTex0 = false;
 	bool haveLastTex1 = false;
+	bool haveLastNormalMap = false;
 	D3D12_PRIMITIVE_TOPOLOGY lastTopo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
 	for (size_t i = 0; i < g_gl.queuedBatches.size(); ++i)
@@ -5986,6 +6343,7 @@ static void QD3D12_FlushQueuedBatches()
 			lastPSO = nullptr;
 			haveLastTex0 = false;
 			haveLastTex1 = false;
+			haveLastNormalMap = false;
 			lastTopo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		}
 
@@ -6050,6 +6408,9 @@ static void QD3D12_FlushQueuedBatches()
 		dc->jitterPixels[1] = g_gl.jitterY;
 		dc->prevJitterPixels[0] = g_gl.prevJitterX;
 		dc->prevJitterPixels[1] = g_gl.prevJitterY;
+		dc->_motionPad[0] = batch.key.useNormalMap;
+		dc->_motionPad[1] = batch.key.normalMapStrength;
+		dc->_motionPad[2] = batch.key.normalMapYSign;
 
 		if (batch.key.useARBPrograms)
 		{
@@ -6104,6 +6465,7 @@ static void QD3D12_FlushQueuedBatches()
 
 			haveLastTex0 = false;
 			haveLastTex1 = false;
+			haveLastNormalMap = false;
 		}
 		else
 		{
@@ -6127,6 +6489,18 @@ static void QD3D12_FlushQueuedBatches()
 				g_gl.cmdList->SetGraphicsRootDescriptorTable(2, tex1Gpu);
 				lastTex1 = tex1Gpu;
 				haveLastTex1 = true;
+			}
+
+			UINT normalSrvIndex = batch.key.normalMapSrvIndex;
+			if (normalSrvIndex == UINT_MAX)
+				normalSrvIndex = g_gl.whiteTexture.srvIndex;
+
+			D3D12_GPU_DESCRIPTOR_HANDLE normalMapGpu = QD3D12_SrvGpu(normalSrvIndex);
+			if (!haveLastNormalMap || normalMapGpu.ptr != lastNormalMap.ptr)
+			{
+				g_gl.cmdList->SetGraphicsRootDescriptorTable(3, normalMapGpu);
+				lastNormalMap = normalMapGpu;
+				haveLastNormalMap = true;
 			}
 		}
 
@@ -6526,15 +6900,15 @@ void APIENTRY glVertex3f(GLfloat x, GLfloat y, GLfloat z)
 	v.py = y;
 	v.pz = z;
 
-	v.nx = 0.0f;
-	v.ny = 0.0f;
-	v.nz = 1.0f;
-	v.tx = 1.0f;
-	v.ty = 0.0f;
-	v.tz = 0.0f;
-	v.bx = 0.0f;
-	v.by = 1.0f;
-	v.bz = 0.0f;
+	v.nx = g_gl.curNormal[0];
+	v.ny = g_gl.curNormal[1];
+	v.nz = g_gl.curNormal[2];
+	v.tx = g_gl.curTangent[0];
+	v.ty = g_gl.curTangent[1];
+	v.tz = g_gl.curTangent[2];
+	v.bx = g_gl.curBinormal[0];
+	v.by = g_gl.curBinormal[1];
+	v.bz = g_gl.curBinormal[2];
 
 	v.u0 = g_gl.curU[0];
 	v.v0 = g_gl.curV[0];
@@ -6604,6 +6978,9 @@ void APIENTRY glDeleteTextures(GLsizei n, const GLuint* textures)
 				g_gl.boundTexture[unit] = 0;
 		}
 
+		if (g_gl.currentNormalMapTexture == deadId)
+			g_gl.currentNormalMapTexture = 0;
+
 		auto it = g_gl.textures.find(deadId);
 		if (it != g_gl.textures.end())
 		{
@@ -6624,19 +7001,47 @@ void APIENTRY glBindTexture(GLenum, GLuint texture)
 	if (texture == 0)
 		return;
 
-	auto& textures = g_gl.textures;
-	auto it = textures.find(texture);
-	if (it == textures.end())
+	(void)QD3D12_EnsureTextureName(texture);
+}
+
+void APIENTRY glTagTextureNormalMap(GLuint texture, GLboolean isNormalMap)
+{
+	if (texture == 0)
 	{
-		TextureResource tex{};
-		tex.glId = texture;
-		tex.srvIndex = UINT_MAX;
-		tex.minFilter = g_gl.defaultMinFilter;
-		tex.magFilter = g_gl.defaultMagFilter;
-		tex.wrapS = g_gl.defaultWrapS;
-		tex.wrapT = g_gl.defaultWrapT;
-		textures.emplace(texture, tex);
+		g_gl.lastError = GL_INVALID_VALUE;
+		return;
 	}
+
+	TextureResource& tex = QD3D12_EnsureTextureName(texture);
+	tex.isNormalMap = (isNormalMap != GL_FALSE);
+}
+
+void APIENTRY glTextureNormalMap(GLuint texture, GLboolean isNormalMap)
+{
+	glTagTextureNormalMap(texture, isNormalMap);
+}
+
+void APIENTRY glBindNormalMapTexture(GLuint texture)
+{
+	if (texture != 0)
+		(void)QD3D12_EnsureTextureName(texture);
+
+	g_gl.currentNormalMapTexture = texture;
+}
+
+void APIENTRY glNormalMapTexture(GLuint texture)
+{
+	glBindNormalMapTexture(texture);
+}
+
+void APIENTRY glNormalMapStrengthf(GLfloat strength)
+{
+	g_gl.currentNormalMapStrength = (strength < 0.0f) ? 0.0f : strength;
+}
+
+void APIENTRY glNormalMapYSignf(GLfloat sign)
+{
+	g_gl.currentNormalMapYSign = (sign < 0.0f) ? -1.0f : 1.0f;
 }
 #ifdef _DEBUG
 #pragma optimize on
@@ -6745,6 +7150,10 @@ void APIENTRY glGetIntegerv(GLenum pname, GLint* params)
 
 	case GL_CLIENT_ACTIVE_TEXTURE_ARB:
 		*params = (GLint)(GL_TEXTURE0_ARB + g_gl.clientActiveTextureUnit);
+		break;
+
+	case GL_NORMAL_MAP_BINDING_QD3D12:
+		*params = (GLint)g_gl.currentNormalMapTexture;
 		break;
 
 #ifdef GL_ACTIVE_STENCIL_FACE_EXT
@@ -8021,6 +8430,40 @@ void APIENTRY glNormalPointer(GLenum type, GLsizei stride, const void* pointer)
 	g_gl.normalArray.ptr = QD3D12_ResolveArrayPointer(pointer);
 }
 
+void APIENTRY glTangentPointer(GLenum type, GLsizei stride, const void* pointer)
+{
+	g_gl.tangentArray.size = 3;
+	g_gl.tangentArray.type = type;
+	g_gl.tangentArray.stride = stride;
+	g_gl.tangentArray.ptr = QD3D12_ResolveArrayPointer(pointer);
+}
+
+void APIENTRY glBinormalPointer(GLenum type, GLsizei stride, const void* pointer)
+{
+	g_gl.bitangentArray.size = 3;
+	g_gl.bitangentArray.type = type;
+	g_gl.bitangentArray.stride = stride;
+	g_gl.bitangentArray.ptr = QD3D12_ResolveArrayPointer(pointer);
+}
+
+void APIENTRY glNormalBuffer(GLenum type, GLsizei stride, const void* pointer)
+{
+	glNormalPointer(type, stride, pointer);
+	g_gl.normalArray.enabled = true;
+}
+
+void APIENTRY glTangentBuffer(GLenum type, GLsizei stride, const void* pointer)
+{
+	glTangentPointer(type, stride, pointer);
+	g_gl.tangentArray.enabled = true;
+}
+
+void APIENTRY glBinormalBuffer(GLenum type, GLsizei stride, const void* pointer)
+{
+	glBinormalPointer(type, stride, pointer);
+	g_gl.bitangentArray.enabled = true;
+}
+
 void APIENTRY glEnableClientState(GLenum array)
 {
 	switch (array)
@@ -8030,6 +8473,12 @@ void APIENTRY glEnableClientState(GLenum array)
 		break;
 	case GL_NORMAL_ARRAY:
 		g_gl.normalArray.enabled = true;
+		break;
+	case GL_TANGENT_ARRAY_QD3D12:
+		g_gl.tangentArray.enabled = true;
+		break;
+	case GL_BINORMAL_ARRAY_QD3D12:
+		g_gl.bitangentArray.enabled = true;
 		break;
 	case GL_COLOR_ARRAY:
 		g_gl.colorArray.enabled = true;
@@ -8051,6 +8500,12 @@ void APIENTRY glDisableClientState(GLenum array)
 		break;
 	case GL_NORMAL_ARRAY:
 		g_gl.normalArray.enabled = false;
+		break;
+	case GL_TANGENT_ARRAY_QD3D12:
+		g_gl.tangentArray.enabled = false;
+		break;
+	case GL_BINORMAL_ARRAY_QD3D12:
+		g_gl.bitangentArray.enabled = false;
 		break;
 	case GL_COLOR_ARRAY:
 		g_gl.colorArray.enabled = false;
@@ -8106,6 +8561,8 @@ void APIENTRY glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvo
 		return;
 	}
 
+	g_gl.currentPrim = mode;
+
 	g_gl.immediateVerts.Clear();
 
 	switch (type)
@@ -8158,7 +8615,7 @@ void APIENTRY glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvo
 			g_gl.immediateVerts.Data()[i].a = g_gl.curColor[3];
 		}
 	}
-	
+
 
 	FlushImmediate(mode, g_gl.immediateVerts.Data(), g_gl.immediateVerts.Size());
 }
@@ -8213,19 +8670,13 @@ void APIENTRY glVertexAttribPointerARB(GLuint index, GLint size, GLenum type, GL
 
 	if (QD3D12_CompatAttribIsTangent(index))
 	{
-		g_gl.tangentArray.size = size;
-		g_gl.tangentArray.type = type;
-		g_gl.tangentArray.stride = stride;
-		g_gl.tangentArray.ptr = QD3D12_ResolveArrayPointer(pointer);
+		glTangentPointer(type, stride, pointer);
 		return;
 	}
 
 	if (QD3D12_CompatAttribIsBitangent(index))
 	{
-		g_gl.bitangentArray.size = size;
-		g_gl.bitangentArray.type = type;
-		g_gl.bitangentArray.stride = stride;
-		g_gl.bitangentArray.ptr = QD3D12_ResolveArrayPointer(pointer);
+		glBinormalPointer(type, stride, pointer);
 		return;
 	}
 
@@ -9150,6 +9601,21 @@ PROC WINAPI qd3d12_wglGetProcAddress(LPCSTR name) {
 		{ "glVertexAttribPointerARB",   (PROC)glVertexAttribPointerARB },
 		{ "glEnableVertexAttribArrayARB", (PROC)glEnableVertexAttribArrayARB },
 		{ "glDisableVertexAttribArrayARB", (PROC)glDisableVertexAttribArrayARB },
+		{ "glTangentPointer",            (PROC)glTangentPointer },
+		{ "glBinormalPointer",           (PROC)glBinormalPointer },
+		{ "glNormalBuffer",              (PROC)glNormalBuffer },
+		{ "glTangentBuffer",             (PROC)glTangentBuffer },
+		{ "glBinormalBuffer",            (PROC)glBinormalBuffer },
+		{ "glTangent3f",                 (PROC)glTangent3f },
+		{ "glTangent3fv",                (PROC)glTangent3fv },
+		{ "glBinormal3f",                (PROC)glBinormal3f },
+		{ "glBinormal3fv",               (PROC)glBinormal3fv },
+		{ "glTagTextureNormalMap",       (PROC)glTagTextureNormalMap },
+		{ "glTextureNormalMap",          (PROC)glTextureNormalMap },
+		{ "glBindNormalMapTexture",      (PROC)glBindNormalMapTexture },
+		{ "glNormalMapTexture",          (PROC)glNormalMapTexture },
+		{ "glNormalMapStrengthf",        (PROC)glNormalMapStrengthf },
+		{ "glNormalMapYSignf",           (PROC)glNormalMapYSignf },
 		{ "glGenProgramsARB",           (PROC)glGenProgramsARB },
 		{ "glDeleteProgramsARB",        (PROC)glDeleteProgramsARB },
 		{ "glBindProgramARB",           (PROC)glBindProgramARB },
@@ -10750,6 +11216,9 @@ void APIENTRY glDrawPixels(GLsizei width, GLsizei height, GLenum format, GLenum 
 
 void APIENTRY glNormal3f(GLfloat x, GLfloat y, GLfloat z)
 {
+	g_gl.curNormal[0] = x;
+	g_gl.curNormal[1] = y;
+	g_gl.curNormal[2] = z;
 	g_glState.currentNormal[0] = x;
 	g_glState.currentNormal[1] = y;
 	g_glState.currentNormal[2] = z;
@@ -10759,6 +11228,32 @@ void APIENTRY glNormal3fv(const GLfloat* v)
 {
 	if (!v) return;
 	glNormal3f(v[0], v[1], v[2]);
+}
+
+void APIENTRY glTangent3f(GLfloat x, GLfloat y, GLfloat z)
+{
+	g_gl.curTangent[0] = x;
+	g_gl.curTangent[1] = y;
+	g_gl.curTangent[2] = z;
+}
+
+void APIENTRY glTangent3fv(const GLfloat* v)
+{
+	if (!v) return;
+	glTangent3f(v[0], v[1], v[2]);
+}
+
+void APIENTRY glBinormal3f(GLfloat x, GLfloat y, GLfloat z)
+{
+	g_gl.curBinormal[0] = x;
+	g_gl.curBinormal[1] = y;
+	g_gl.curBinormal[2] = z;
+}
+
+void APIENTRY glBinormal3fv(const GLfloat* v)
+{
+	if (!v) return;
+	glBinormal3f(v[0], v[1], v[2]);
 }
 
 // -----------------------------------------------------------------------------
@@ -10778,6 +11273,10 @@ void APIENTRY glPopAttrib(void)
 
 	g_glState = g_attribStack.back();
 	g_attribStack.pop_back();
+
+	g_gl.curNormal[0] = g_glState.currentNormal[0];
+	g_gl.curNormal[1] = g_glState.currentNormal[1];
+	g_gl.curNormal[2] = g_glState.currentNormal[2];
 }
 
 // -----------------------------------------------------------------------------
@@ -11101,7 +11600,7 @@ void glUpdateTopLevelAceelStructure(uint32_t mesh, float* transform, uint32_t& t
 
 	if (topLevelHandle == 0)
 	{
-		topLevelHandle = glRaytracingCreateInstance(&instDesc); 
+		topLevelHandle = glRaytracingCreateInstance(&instDesc);
 	}
 	else {
 		glRaytracingUpdateInstance(topLevelHandle, &instDesc);

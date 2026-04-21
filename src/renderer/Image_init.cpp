@@ -1617,6 +1617,15 @@ idImage	*idImageManager::ImageFromFile( const char *_name, textureFilter_t filte
 		declManager->MediaPrint( "%s\n", image->imgName.c_str() );
 	}
 
+	if (depth == TD_BUMP)
+	{
+		glTextureNormalMap(image->texnum, true);
+	}
+	else
+	{
+		glTextureNormalMap(image->texnum, false);
+	}
+
 	return image;
 }
 

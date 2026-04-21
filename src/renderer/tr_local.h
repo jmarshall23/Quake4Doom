@@ -298,6 +298,9 @@ public:
 	idInteraction *			lastInteraction;
 
 	bool					needsPortalSky;
+
+	uint32_t				dxrTopAccelStruct = 0;
+	uint32_t				dxrBottomAccelStruct = 0;
 };
 
 
@@ -1701,5 +1704,36 @@ void RB_ARB2_PrepareStageTexturing(const shaderStage_t* pStage, const drawSurf_t
 void RB_ARB2_DisableStageTexturing(const shaderStage_t* pStage, const drawSurf_t* surf);
 
 void R_AddEffectSurfaces(void);
+
+void R_DX_Init(void);
+void RB_DXDrawInteractions(void);
+
+static void RB_CopyModelMatrixToDXRTransform(const float* modelMatrix, float outTransform[12])
+{
+	if (!modelMatrix)
+	{
+		// identity 3x4 row-major
+		outTransform[0] = 1.0f; outTransform[1] = 0.0f; outTransform[2] = 0.0f; outTransform[3] = 0.0f;
+		outTransform[4] = 0.0f; outTransform[5] = 1.0f; outTransform[6] = 0.0f; outTransform[7] = 0.0f;
+		outTransform[8] = 0.0f; outTransform[9] = 0.0f; outTransform[10] = 1.0f; outTransform[11] = 0.0f;
+		return;
+	}
+
+	// OpenGL-style 4x4 column-major -> 3x4 row-major
+	outTransform[0] = modelMatrix[0];
+	outTransform[1] = modelMatrix[4];
+	outTransform[2] = modelMatrix[8];
+	outTransform[3] = modelMatrix[12];
+
+	outTransform[4] = modelMatrix[1];
+	outTransform[5] = modelMatrix[5];
+	outTransform[6] = modelMatrix[9];
+	outTransform[7] = modelMatrix[13];
+
+	outTransform[8] = modelMatrix[2];
+	outTransform[9] = modelMatrix[6];
+	outTransform[10] = modelMatrix[10];
+	outTransform[11] = modelMatrix[14];
+}
 
 #endif /* !__TR_LOCAL_H__ */

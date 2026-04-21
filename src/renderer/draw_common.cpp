@@ -479,6 +479,8 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 		glClipPlane(GL_CLIP_PLANE0, clipPlane);
 	}
 
+	glLoadModelMatrixf(surf->space->modelMatrix);
+
 	if (!shader->IsDrawn()) {
 		return;
 	}
@@ -547,9 +549,16 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 		ac = (idDrawVert*)vertexCache.Position(tri->ambientCache);
 		glVertexPointer(3, GL_FLOAT, sizeof(idDrawVert), ac->xyz.ToFloatPtr());
 		glTexCoordPointer(2, GL_FLOAT, sizeof(idDrawVert), reinterpret_cast<void*>(&ac->st));
+		glNormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->normal.ToFloatPtr());
+		glTangentPointer(GL_FLOAT, sizeof(idDrawVert), ac->tangents[0].ToFloatPtr());
+		glBinormalPointer(GL_FLOAT, sizeof(idDrawVert), ac->tangents[1].ToFloatPtr());
 #if RB_Q4_ENABLE_PRIM_BATCH_MESH
 	}
 #endif
+
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TANGENT_ARRAY_QD3D12);
+	glEnableClientState(GL_BINORMAL_ARRAY_QD3D12);
 
 	bool drawSolid = false;
 
@@ -644,11 +653,32 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 
 	// draw the entire surface solid
 	if (drawSolid) {
-		glColor4fv(color);
-		globalImages->whiteImage->Bind();
+		glDisable(GL_BLEND);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		// bind the texture
+		GL_SelectTexture(0);
+		glEnable(GL_TEXTURE_2D);
+		shader->GetDiffuseImage()->Bind();
+
+		GL_SelectTexture(1);
+		glEnable(GL_TEXTURE_2D);
+		shader->GetBumpImage()->Bind();
+		glBindNormalMapTexture(shader->GetBumpImage()->texnum);
+
+		// set texture matrix and texGens.  The Quake 4 path needs to know this is a depth fill.
+		RB_PrepareStageTexturing(pStage, surf, ac, true);
+
+		// draw it
+		//RB_DrawElementsWithCounters(tri);
 
 		// draw it
 		RB_Q4_DrawDepthElements(surf);
+
+		glBindNormalMapTexture(0);
+		GL_SelectTexture(1);
+		globalImages->BindNull();
+		GL_SelectTexture(0);
+		glEnable(GL_BLEND);
 	}
 
 
@@ -661,8 +691,12 @@ void RB_T_FillDepthBuffer(const drawSurf_t* surf) {
 	if (shader->GetSort() == SS_SUBVIEW) {
 		GL_State(GLS_DEPTHFUNC_LESS);
 	}
-
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TANGENT_ARRAY_QD3D12);
+	glDisableClientState(GL_BINORMAL_ARRAY_QD3D12);
 	}
+
+	
 
 /*
 =====================
@@ -2144,11 +2178,12 @@ void	RB_STD_DrawView(void) {
 #endif
 
 		// main light renderer
-		switch (tr.backEndRenderer) {
-		case BE_ARB2:
-			RB_ARB2_DrawInteractions();
-			break;
-		}
+	//	switch (tr.backEndRenderer) {
+	//	case BE_ARB2:
+	//		RB_ARB2_DrawInteractions();
+	//		break;
+	//	}
+		RB_DXDrawInteractions();
 	}
 
 	// disable stencil shadow test

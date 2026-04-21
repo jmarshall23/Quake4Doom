@@ -551,6 +551,76 @@ int idRenderModelStatic::NearestJoint( int surfaceNum, int a, int b, int c ) con
 
 //=====================================================================
 
+/*
+==================
+idRenderModelStatic::UpdateDXRSurface
+==================
+*/
+
+void idRenderModelStatic::UpdateDXR(uint32_t &dxrBottomAcel, int onlySurface)
+{
+	int numDXRVerts = 0;
+	int numDXRIndexes = 0;
+
+	for (int i = 0; i < surfaces.Num(); i++)
+	{
+		if (onlySurface != -1 && onlySurface != i)
+			continue;
+
+		modelSurface_t* surf = &surfaces[i];
+
+		numDXRVerts += surf->geometry->numVerts;
+		numDXRIndexes += surf->geometry->numIndexes;
+	}
+
+	std::vector<glRaytracingVertex_t> vertices(numDXRVerts);
+	std::vector<uint32_t> indices(numDXRIndexes);
+
+	int vertexId = 0;
+	for (int i = 0; i < surfaces.Num(); i++)
+	{
+		if (onlySurface != -1 && onlySurface != i)
+			continue;
+
+		modelSurface_t* surf = &surfaces[i];
+		for (int d = 0; d < surf->geometry->numIndexes; ++d)
+		{
+			indices[d] = vertexId + surf->geometry->indexes[d];
+		}
+
+		for (int d = 0; d < surf->geometry->numVerts; ++d)
+		{
+			vertices[vertexId].xyz[0] = surf->geometry->verts[d].xyz.x;
+			vertices[vertexId].xyz[1] = surf->geometry->verts[d].xyz.y;
+			vertices[vertexId].xyz[2] = surf->geometry->verts[d].xyz.z;
+			vertexId++;
+		}
+	}
+
+	if (numDXRVerts <= 0 || numDXRIndexes <= 0)
+	{
+		return;
+	}
+
+	glRaytracingMeshDesc_t desc = {};
+	desc.vertices = vertices.data();
+	desc.vertexCount = (uint32_t)numDXRVerts;
+	desc.indices = indices.data();
+	desc.indexCount = (uint32_t)numDXRIndexes;
+
+	if (!dxrBottomAcel)
+	{
+		dxrBottomAcel = glRaytracingCreateMesh(&desc);
+	}
+	else
+	{
+		if (!glRaytracingUpdateMesh(dxrBottomAcel, &desc))
+		{
+			glRaytracingDeleteMesh(dxrBottomAcel);
+			dxrBottomAcel = glRaytracingCreateMesh(&desc);
+		}
+	}
+}
 
 /*
 ================

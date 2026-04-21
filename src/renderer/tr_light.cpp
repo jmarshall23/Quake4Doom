@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 
 #include "tr_local.h"
+#include "Model_local.h"
 
 static const float CHECK_BOUNDS_EPSILON = 1.0f;
 
@@ -1134,6 +1135,18 @@ idRenderModel *R_EntityDefDynamicModel( idRenderEntityLocal *def ) {
 
 		// instantiate the snapshot of the dynamic model, possibly reusing memory from the cached snapshot
 		def->cachedDynamicModel = model->InstantiateDynamicModel( &def->parms, tr.viewDef, def->cachedDynamicModel );
+
+		// If we are a static mesh, build the top and bottom accel structs. Dynamic this is done elsewhere.
+		idRenderModelStatic* staticMesh = (idRenderModelStatic*)def->cachedDynamicModel;
+		if (staticMesh)
+		{
+			staticMesh->UpdateDXR(def->dxrBottomAccelStruct);
+
+			float dxrTransformMatrix[16];
+			staticMesh->UpdateDXR(def->dxrBottomAccelStruct);
+			RB_CopyModelMatrixToDXRTransform(def->modelMatrix, dxrTransformMatrix);
+			glUpdateTopLevelAceelStructure(def->dxrBottomAccelStruct, dxrTransformMatrix, def->dxrTopAccelStruct);
+		}
 
 		if ( def->cachedDynamicModel ) {
 

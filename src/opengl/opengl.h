@@ -1647,6 +1647,9 @@ typedef struct glRaytracingLight_s
 	uint32_t           twoSided;
 	float              persistant;
 	float              pad1;
+
+	glRaytracingVec3_t pointRadius;
+	float pointRadiusPad;
 } glRaytracingLight_t;
 
 typedef struct glRaytracingLightingPassDesc_s
@@ -1710,9 +1713,9 @@ void                       glRaytracingLightingSetShadowBias(float bias);
 
 bool                       glRaytracingLightingExecute(const glRaytracingLightingPassDesc_t* pass);
 
-glRaytracingLight_t        glRaytracingLightingMakePointLight(
+glRaytracingLight_t glRaytracingLightingMakePointLight(
 	float px, float py, float pz,
-	float radius,
+	float radiusX, float radiusY, float radiusZ,
 	float r, float g, float b,
 	float intensity);
 
@@ -2099,3 +2102,35 @@ BOOL        WINAPI qd3d12_wglReleaseTexImageARB(HPBUFFERARB hPbuffer, int iBuffe
 
 void APIENTRY glCompressedTexImage2DARB(GLenum target, GLint level, GLenum internalFormat,
 	GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data);
+
+#ifndef GL_TANGENT_ARRAY_QD3D12
+#define GL_TANGENT_ARRAY_QD3D12 0x6000
+#endif
+#ifndef GL_BINORMAL_ARRAY_QD3D12
+#define GL_BINORMAL_ARRAY_QD3D12 0x6001
+#endif
+#ifndef GL_NORMAL_MAP_BINDING_QD3D12
+#define GL_NORMAL_MAP_BINDING_QD3D12 0x6002
+#endif
+
+// Array-style APIs. The Buffer versions set the pointer and enable that array.
+void APIENTRY glTangentPointer(GLenum type, GLsizei stride, const void* pointer);
+void APIENTRY glBinormalPointer(GLenum type, GLsizei stride, const void* pointer);
+void APIENTRY glNormalBuffer(GLenum type, GLsizei stride, const void* pointer);
+void APIENTRY glTangentBuffer(GLenum type, GLsizei stride, const void* pointer);
+void APIENTRY glBinormalBuffer(GLenum type, GLsizei stride, const void* pointer);
+
+// Immediate-mode current tangent basis, mirroring glNormal3f/glNormal3fv.
+void APIENTRY glTangent3f(GLfloat x, GLfloat y, GLfloat z);
+void APIENTRY glTangent3fv(const GLfloat* v);
+void APIENTRY glBinormal3f(GLfloat x, GLfloat y, GLfloat z);
+void APIENTRY glBinormal3fv(const GLfloat* v);
+
+// Normal-map material tagging / binding. Tagging is optional but lets the shim
+// auto-discover a normal map from bound texture units. Explicit binding wins.
+void APIENTRY glTagTextureNormalMap(GLuint texture, GLboolean isNormalMap);
+void APIENTRY glTextureNormalMap(GLuint texture, GLboolean isNormalMap); // alias
+void APIENTRY glBindNormalMapTexture(GLuint texture);                    // 0 disables explicit normal map
+void APIENTRY glNormalMapTexture(GLuint texture);                        // alias
+void APIENTRY glNormalMapStrengthf(GLfloat strength);                    // default 1.0
+void APIENTRY glNormalMapYSignf(GLfloat sign);                           // default +1, pass -1 to flip green/Y

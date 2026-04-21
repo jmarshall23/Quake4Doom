@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 
 #include "tr_local.h"
+#include "Model_local.h"
 
 
 /*
@@ -162,6 +163,8 @@ idRenderModel *idRenderWorldLocal::ParseModel( idLexer *src ) {
 			//float	vec[8];
 			//src->Parse1DMatrix( 8, vec );
 
+			tri->isWorldTri = true;
+
 			src->ExpectTokenString("(");
 
 			tri->verts[j].xyz[0] = src->ParseFloat();
@@ -194,10 +197,19 @@ idRenderModel *idRenderWorldLocal::ParseModel( idLexer *src ) {
 
 		// add the completed surface to the model
 		model->AddSurface( surf );
+
+		{
+			idRenderModelStatic* modelStatic = (idRenderModelStatic*)model;
+			dxrWorldModel_t dxrModel;
+			modelStatic->UpdateDXR(dxrModel.dxrBottomAcel, model->NumSurfaces() - 1);
+			glUpdateTopLevelAceelStructure(dxrModel.dxrBottomAcel, NULL, dxrModel.topAccelStruct);
+			worldDXRmodels.Append(dxrModel);
+		}
 	}
 
 	src->ExpectTokenString( "}" );
 
+	// Here we create the top level accel structs for the level. 
 	model->FinishSurfaces();
 
 	return model;

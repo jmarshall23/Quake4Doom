@@ -74,6 +74,10 @@ typedef struct {
 										// this is the area number, else CHILDREN_HAVE_MULTIPLE_AREAS
 } areaNode_t;
 
+struct dxrWorldModel_t {
+	uint32_t				dxrBottomAcel = 0;
+	uint32_t				topAccelStruct = 0;
+} ;
 
 class idRenderWorldLocal : public idRenderWorld {
 public:
@@ -280,6 +284,8 @@ public:
 	//-------------------------------
 	// tr_light.c
 	void					CreateLightDefInteractions( idRenderLightLocal *ldef );
+
+	idList<dxrWorldModel_t>	worldDXRmodels;
 };
 
 #endif /* !__RENDERWORLDLOCAL_H__ */

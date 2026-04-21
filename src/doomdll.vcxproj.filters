@@ -1310,6 +1310,9 @@
     <ClCompile Include="bse\BSE_SpawnDomains.cpp">
       <Filter>BSE</Filter>
     </ClCompile>
+    <ClCompile Include="renderer\draw_dx.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="openal\idal.py">

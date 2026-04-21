@@ -529,6 +529,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with inlines|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="renderer\draw_common.cpp" />
+    <ClCompile Include="renderer\draw_dx.cpp" />
     <ClCompile Include="renderer\GuiModel.cpp" />
     <ClCompile Include="renderer\Image_files.cpp" />
     <ClCompile Include="renderer\Image_init.cpp" />

@@ -580,6 +580,7 @@ public:
 
 	// jscott: for Radiant
 	idImage* GetDiffuseImage(void) const;
+	idImage* GetBumpImage(void) const;
 
 	// AReis: New portal distance culling stuff.
 	float						GetPortalNear(void) const { return(portalDistanceNear); }

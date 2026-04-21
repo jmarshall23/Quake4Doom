@@ -101,7 +101,7 @@ public:
 	bool						DeleteSurfaceWithId( int id );
 	void						DeleteSurfacesWithNegativeId( void );
 	bool						FindSurfaceWithId( int id, int &surfaceNum );
-
+	void						UpdateDXR(uint32_t& dxrBottomAcel, int onlySurface = -1);
 public:
 	idList<modelSurface_t>		surfaces;
 	idBounds					bounds;

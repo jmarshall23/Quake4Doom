@@ -188,6 +188,7 @@ typedef struct srfTriangles_s {
 	char						description[64];
 #endif
 // RAVEN END
+	bool						isWorldTri;
 } srfTriangles_t;
 
 typedef idList<srfTriangles_t *> idTriList;
