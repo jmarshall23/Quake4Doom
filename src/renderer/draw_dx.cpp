@@ -35,9 +35,9 @@ void RB_DXDrawInteractions(void) {
 		light.color.y = vLight->lightDef->parms.shaderParms[SHADERPARM_GREEN];
 		light.color.z = vLight->lightDef->parms.shaderParms[SHADERPARM_BLUE];
 		light.type = GL_RAYTRACING_LIGHT_TYPE_POINT;
-		light.pointRadius.x = vLight->lightDef->parms.lightRadius[0] * 2;
-		light.pointRadius.y = vLight->lightDef->parms.lightRadius[1] * 2;
-		light.pointRadius.z = vLight->lightDef->parms.lightRadius[2] * 2;
+		light.pointRadius.x = vLight->lightDef->parms.lightRadius[0] * 1.4f;
+		light.pointRadius.y = vLight->lightDef->parms.lightRadius[1] * 1.4f;
+		light.pointRadius.z = vLight->lightDef->parms.lightRadius[2] * 1.4f;
 		light.intensity = 2;
 		light.position.x = vLight->globalLightOrigin.x;
 		light.position.y = vLight->globalLightOrigin.y;

@@ -1997,28 +1997,39 @@ float3 ComputeSpecular(float3 N, float3 V, float3 L, float3 lightColor, float li
     if (gEnableSpecular == 0)
         return 0.0;
 
-    float3 H = normalize(V + L);
+    N = normalize(N);
+    V = normalize(V);
+    L = normalize(L);
 
     float NdotL = saturate(dot(N, L));
     float NdotV = saturate(dot(N, V));
-    float NdotH = saturate(dot(N, H));
-    float VdotH = saturate(dot(V, H));
 
-    if (NdotL <= 0.0 || NdotV <= 0.0)
+    if (NdotL <= 0.0 || NdotV <= 0.0 || atten <= 0.0 || shadow <= 0.0)
         return 0.0;
 
-    float shininess = 48.0;
-    float specPow = pow(NdotH, shininess);
+    // Doom 3 / idTech4-style legacy specular:
+    // - Phong reflection vector, not Blinn half-vector.
+    // - Low exponent for broad plastic/metal highlights.
+    // - Strong additive multiplier like the old interaction shader.
+    // - Spec map behavior is approximated here by squaring baseAlbedo because this pass
+    //   currently has no dedicated specular texture bound.
+    const float DOOM3_SPECULAR_POWER = 8.0;
+    const float DOOM3_SPECULAR_SCALE = 6.0;
 
-    float3 dielectricF0 = float3(0.04, 0.04, 0.04);
-    float luminance = dot(baseAlbedo, float3(0.299, 0.587, 0.114));
-    float metalHint = saturate((max(max(baseAlbedo.r, baseAlbedo.g), baseAlbedo.b) - 0.75) * 1.5);
-    float3 F0 = lerp(dielectricF0, baseAlbedo, metalHint);
+    float3 R = normalize(reflect(-L, N));
+    float  RdotV = saturate(dot(R, V));
 
-    float3 fresnel = F0 + (1.0 - F0) * pow(1.0 - VdotH, 5.0);
+    float specTerm = pow(RdotV, DOOM3_SPECULAR_POWER);
 
-    float energyNorm = (shininess + 8.0) * 0.125;
-    float3 spec = fresnel * specPow * energyNorm;
+    // Doom 3 squared the specular map before applying it. Since this shader only has
+    // baseAlbedo available, use squared albedo as a pseudo specular mask.
+    float3 specMask = saturate(baseAlbedo * baseAlbedo);
+
+    // Keep a small neutral floor so very dark diffuse textures can still catch a Doom 3
+    // style highlight when no real specular map exists.
+    specMask = max(specMask, float3(0.08, 0.08, 0.08));
+
+    float3 spec = specMask * specTerm * DOOM3_SPECULAR_SCALE;
 
     return lightColor * (lightIntensity * atten * shadow * NdotL) * spec;
 }
@@ -2043,7 +2054,7 @@ void RayGen()
 
     float3 baseAlbedo    = albedoSample.rgb;
     float4 positionSample = gPositionTex.Load(int3(pixel, 0));
-	float3 worldPos       = positionSample.xyz;
+    float3 worldPos       = positionSample.xyz;
     float4 normalSample  = LoadSceneNormal(pixel);
     float3 N             = normalize(normalSample.xyz);
     float3 V             = normalize(gCameraPos.xyz - worldPos);
@@ -2056,7 +2067,7 @@ void RayGen()
     albedo *= microShadow;
 
     float aoRay      = ComputeAmbientOcclusion(worldPos, N, pixel);
-	float ao         = aoRay;
+    float ao         = aoRay;
     float skyVis  = ComputeSkyVisibility(worldPos, N, pixel);
 
     float upness = saturate(N.z * 0.5 + 0.5);
