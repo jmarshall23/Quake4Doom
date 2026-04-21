@@ -741,11 +741,13 @@ void FreeD3D12Window(struct QD3D12Window* wnd) {
 struct ImmediateVertexBuffer
 {
 	std::vector<GLVertex> storage;
+	GLVertex* ptr = nullptr;
 	size_t count = 0;
 
 	void Init(size_t initialCapacity = 1024)
 	{
 		storage.resize(initialCapacity);
+		ptr = storage.data();
 		count = 0;
 	}
 
@@ -758,21 +760,33 @@ struct ImmediateVertexBuffer
 	{
 		if (count >= storage.size())
 		{
+			GLVertex* oldPtr = ptr;
+
 			const size_t newSize = storage.empty() ? 1024 : storage.size() * 2;
 			storage.resize(newSize);
+
+			GLVertex* newPtr = storage.data();
+			if (newPtr != oldPtr)
+			{
+				ptr = newPtr;
+			}
+			else
+			{
+				ptr = newPtr;
+			}
 		}
 
-		return storage[count++];
+		return ptr[count++];
 	}
 
-	GLVertex* Data()
+	__forceinline GLVertex* Data()
 	{
-		return storage.data();
+		return ptr;
 	}
 
 	const GLVertex* Data() const
 	{
-		return storage.data();
+		return ptr;
 	}
 
 	size_t Size() const
@@ -3607,11 +3621,11 @@ static void QD3D12_CreateDevice()
 {
 	QD3D12_InitStreamlineEarly();
 #if defined(_DEBUG)
-	{
-		ComPtr<ID3D12Debug> debug;
-		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug))))
-			debug->EnableDebugLayer();
-	}
+	//{
+	//	ComPtr<ID3D12Debug> debug;
+	//	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug))))
+	//		debug->EnableDebugLayer();
+	//}
 #endif
 
 	QD3D12_CHECK(CreateDXGIFactory1(IID_PPV_ARGS(&g_gl.factory)));

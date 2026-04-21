@@ -1468,6 +1468,8 @@ R_AddEffectSurfaces
 ============== =
 */
 void R_AddEffectSurfaces(void) {
+	return;
+
 	idRenderWorldLocal* world = tr.viewDef->renderWorld;
 	const int counterMode = 0;
 	int totalDefs = 0;
